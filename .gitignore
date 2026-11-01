@@ -1,0 +1,15 @@
+data/
+__pycache__/
+output/
+.DS_Store
+.playwright-cli/
+
+# Local databases, backups, dependencies and secrets
+*.sqlite3
+*.sqlite3-*
+finroad-*.json
+.env
+.env.*
+.venv/
+node_modules/
+*.log
