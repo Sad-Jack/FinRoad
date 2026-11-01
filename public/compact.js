@@ -39,5 +39,5 @@ export function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreak
 export function headerForecast({state,month,forecastEnd,today,monthEnd,forecast,dateLabel,money}) {
   const now=today(),end=forecastEnd||monthEnd(month+'-01'),plan=forecast(state,now,end);
   const amount=plan.balance;
-  return `<div class="header-forecast-value"><span>Свободно по <button type="button" class="forecast-date" data-action="forecast-date" aria-label="Изменить дату расчёта: ${dateLabel(end,true)}" title="Выбрать дату расчёта">${dateLabel(end,end.slice(0,4)!==now.slice(0,4))}</button></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
+  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(end,end.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${end}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(end,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
 }

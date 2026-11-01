@@ -90,6 +90,13 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 
 .plan-shortfall{margin-left:auto;display:flex;align-items:baseline;justify-content:flex-end;gap:12px;color:var(--red);text-align:right}.plan-shortfall span{font-size:11px}.plan-shortfall strong{font-size:18px;line-height:1.3;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}@media(max-width:640px){.plan-shortfall{flex-basis:100%;justify-content:space-between;gap:8px}.plan-shortfall strong{font-size:16px}.plan-shortfall span{font-size:10px}}
 
+/* The header date is the calendar control itself, without an intermediate dialog. */
+.forecast-date{position:relative;display:inline-flex;cursor:pointer}
+.forecast-date>span{pointer-events:none}
+.forecast-date>input{position:absolute;inset:0;width:100%;height:100%;min-width:0;margin:0;padding:0;border:0;opacity:0;cursor:pointer}
+.forecast-date>input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer}
+.forecast-date:focus-within{outline:2px solid var(--purple);outline-offset:3px}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -436,7 +443,7 @@ function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) 
 function headerForecast({state,month,forecastEnd,today,monthEnd,forecast,dateLabel,money}) {
   const now=today(),end=forecastEnd||monthEnd(month+'-01'),plan=forecast(state,now,end);
   const amount=plan.balance;
-  return `<div class="header-forecast-value"><span>Свободно по <button type="button" class="forecast-date" data-action="forecast-date" aria-label="Изменить дату расчёта: ${dateLabel(end,true)}" title="Выбрать дату расчёта">${dateLabel(end,end.slice(0,4)!==now.slice(0,4))}</button></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
+  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(end,end.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${end}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(end,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
 }
 
 return {compactPlan,compactDebts,compactIncome,headerForecast};
@@ -618,15 +625,6 @@ function select(name,label,options,value){return `<fieldset class="choice-field"
 function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();}
 function dialogDelete(action,id){if(!id)return;const button=$('#delete-dialog');button.hidden=false;button.dataset.action=action;button.dataset.id=id;}
 function closeDialog(){$('#editor').close();dialogSubmit=null;}
-function forecastDateDialog(){
-  const defaultEnd=monthEnd(month+'-01');
-  openDialog('Рассчитать свободную сумму',field('forecast-date','По какую дату включительно','date',forecastEnd||defaultEnd,`required min="${today()}" max="2100-12-31"`)+`<button type="button" class="button small" data-action="forecast-month-end">До конца месяца · ${dateLabel(defaultEnd)}</button><p class="dialog-note repayment-note">Учитываются поступления и платежи с сегодняшнего дня по выбранную дату включительно.</p>`,async data=>{
-    const date=data.get('forecast-date');
-    if(!date || date<today() || date>'2100-12-31')throw new Error('Выбери дату не раньше сегодняшнего дня');
-    forecastEnd=date===defaultEnd?null:date;
-    render();
-  },'Рассчитать');
-}
 function incomeDialog(id=null){
   const legacy=state.transactions.find(t=>t.id===id&&t.kind==='income');
   if(legacy?.repeat==='yearly')return transactionDialog('income',id);
@@ -776,8 +774,6 @@ function balanceDialog(){
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
-  if(action==='forecast-date')return forecastDateDialog();
-  if(action==='forecast-month-end'){$('#editor [name="forecast-date"]').value=monthEnd(month+'-01');return;}
   if(action==='debt-filter'){debtFilter=el.dataset.kind;render();return;}
   if(action==='add-entry-date'){$('#entry-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
   if(action==='add-loan-date'){$('#loan-date-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
@@ -809,6 +805,14 @@ async function handle(action,el){
 
 }
 document.addEventListener('keydown',event=>{const row=event.target.closest('tr[data-action]');if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();row.click();}});
+document.addEventListener('change',event=>{
+  if(event.target.id!=='forecast-date')return;
+  const input=event.target,date=input.value;
+  if(!date||!input.validity.valid){input.value=forecastEnd||monthEnd(month+'-01');return;}
+  forecastEnd=date===monthEnd(month+'-01')?null:date;
+  render();
+  $('#forecast-date').focus({preventScroll:true});
+});
 document.addEventListener('click',event=>{const dateInput=event.target.closest('input[type="date"]');if(dateInput&&!dateInput.disabled&&!dateInput.readOnly&&typeof dateInput.showPicker==='function'){try{dateInput.showPicker();}catch{dateInput.focus();}}const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;

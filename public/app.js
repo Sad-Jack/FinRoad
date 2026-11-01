@@ -63,15 +63,6 @@ function select(name,label,options,value){return `<fieldset class="choice-field"
 function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();}
 function dialogDelete(action,id){if(!id)return;const button=$('#delete-dialog');button.hidden=false;button.dataset.action=action;button.dataset.id=id;}
 function closeDialog(){$('#editor').close();dialogSubmit=null;}
-function forecastDateDialog(){
-  const defaultEnd=monthEnd(month+'-01');
-  openDialog('Рассчитать свободную сумму',field('forecast-date','По какую дату включительно','date',forecastEnd||defaultEnd,`required min="${today()}" max="2100-12-31"`)+`<button type="button" class="button small" data-action="forecast-month-end">До конца месяца · ${dateLabel(defaultEnd)}</button><p class="dialog-note repayment-note">Учитываются поступления и платежи с сегодняшнего дня по выбранную дату включительно.</p>`,async data=>{
-    const date=data.get('forecast-date');
-    if(!date || date<today() || date>'2100-12-31')throw new Error('Выбери дату не раньше сегодняшнего дня');
-    forecastEnd=date===defaultEnd?null:date;
-    render();
-  },'Рассчитать');
-}
 function incomeDialog(id=null){
   const legacy=state.transactions.find(t=>t.id===id&&t.kind==='income');
   if(legacy?.repeat==='yearly')return transactionDialog('income',id);
@@ -221,8 +212,6 @@ function balanceDialog(){
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
-  if(action==='forecast-date')return forecastDateDialog();
-  if(action==='forecast-month-end'){$('#editor [name="forecast-date"]').value=monthEnd(month+'-01');return;}
   if(action==='debt-filter'){debtFilter=el.dataset.kind;render();return;}
   if(action==='add-entry-date'){$('#entry-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
   if(action==='add-loan-date'){$('#loan-date-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
@@ -254,6 +243,14 @@ async function handle(action,el){
 
 }
 document.addEventListener('keydown',event=>{const row=event.target.closest('tr[data-action]');if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();row.click();}});
+document.addEventListener('change',event=>{
+  if(event.target.id!=='forecast-date')return;
+  const input=event.target,date=input.value;
+  if(!date||!input.validity.valid){input.value=forecastEnd||monthEnd(month+'-01');return;}
+  forecastEnd=date===monthEnd(month+'-01')?null:date;
+  render();
+  $('#forecast-date').focus({preventScroll:true});
+});
 document.addEventListener('click',event=>{const dateInput=event.target.closest('input[type="date"]');if(dateInput&&!dateInput.disabled&&!dateInput.readOnly&&typeof dateInput.showPicker==='function'){try{dateInput.showPicker();}catch{dateInput.focus();}}const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;
