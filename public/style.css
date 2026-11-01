@@ -118,3 +118,8 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
 .date-picker-footer{display:flex;align-items:center;gap:4px;border-top:1px solid var(--border);margin-top:12px;padding-top:10px}
 .date-picker-footer button{padding:6px 8px;color:var(--muted);font-size:11px}
 .date-picker-footer button:last-child{margin-left:auto}
+
+/* Reserve the longest month label so navigation stays under the pointer. */
+.month-switch h1{display:grid;flex-shrink:0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.month-switch h1::before{content:"Сентябрь 0000";visibility:hidden;grid-area:1/1}
+.month-switch h1>span{grid-area:1/1}

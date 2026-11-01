@@ -122,6 +122,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
 .date-picker-footer button{padding:6px 8px;color:var(--muted);font-size:11px}
 .date-picker-footer button:last-child{margin-left:auto}
 
+/* Reserve the longest month label so navigation stays under the pointer. */
+.month-switch h1{display:grid;flex-shrink:0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.month-switch h1::before{content:"Сентябрь 0000";visibility:hidden;grid-area:1/1}
+.month-switch h1>span{grid-area:1/1}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -438,7 +443,7 @@ function compactPlan(ctx) {
   const problem=state.balance!==null?forecast(state,now,forecastEnd||last).firstShortfall:null;
   const warning=problem?`<div class="plan-shortfall" role="status"><span>Уходим в минус <b>${dateLabel(problem.date,problem.date.slice(0,4)!==now.slice(0,4))}</b></span><strong>${money(problem.balance)}</strong></div>`:'';
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
-  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><div class="month-switch"><h1>${monthTitle}</h1><button class="icon-button" data-action="month-prev" aria-label="Предыдущий месяц" ${isCurrent?'disabled':''}>${icon('left')}</button><button class="icon-button" data-action="month-next" aria-label="Следующий месяц">${icon('right')}</button></div>${warning}</div>
+  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><div class="month-switch"><h1><span>${monthTitle}</span></h1><button class="icon-button" data-action="month-prev" aria-label="Предыдущий месяц" ${isCurrent?'disabled':''}>${icon('left')}</button><button class="icon-button" data-action="month-next" aria-label="Следующий месяц">${icon('right')}</button></div>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
   ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell ${e.overdue?'negative':''}">${shortDate(e.date)}${e.overdue?'<span class="overdue-dot" title="Дата прошла">!</span>':''}</td><td class="name-cell"><span class="row-name">${esc(e.name)}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот месяц событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Переключи месяц или добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
   </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} событий</td><td class="numeric income-text" data-label="Приход">${money(rows.filter(e=>e.kind==='income').reduce((s,e)=>s+e.amount,0))}</td><td class="numeric expense-text" data-label="Расход">${money(rows.filter(e=>e.kind==='expense').reduce((s,e)=>s+e.amount,0))}</td><td class="numeric" data-label="Остаток">${state.balance===null?'—':money(running)}</td></tr></tfoot></table></div></section>
