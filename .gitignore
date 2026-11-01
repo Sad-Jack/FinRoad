@@ -13,3 +13,5 @@ finroad-*.json
 .venv/
 node_modules/
 *.log
+
+.idea/

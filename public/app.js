@@ -1,3 +1,4 @@
+import {browserStore,validateState,STORAGE_KEY} from './storage.js';
 import {today,addDays,monthEnd,parseMoney,eventsBetween,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} from './finance.js';
 import {compactPlan,compactDebts,compactIncome,headerForecast} from './compact.js';
 const $=s=>document.querySelector(s);
@@ -9,6 +10,7 @@ const shortDate=value=>new Date(value+'T12:00:00').toLocaleDateString('ru-RU',{d
 const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h1m5 0h1"/>',payments:'<path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/>',debts:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/>',history:'<path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/>',storage:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',plus:'<path d="M12 5v14M5 12h14"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',down:'<path d="M12 4v16m-6-6 6 6 6-6"/>',up:'<path d="M12 20V4m-6 6 6-6 6 6"/>',wallet:'<path d="M19 8V5H6a3 3 0 0 0 0 6h15v9H6a3 3 0 0 1-3-3V8m14 7h4"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/>'};
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.payments}</svg>`;
 const titles={income:'Доход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Платежи',history:'История',storage:'Мои данные'};
+let store;
 let state,revision,page='overview',month=today().slice(0,7),busy=false,dialogSubmit=null,toastTimer;
 let debtFilter='all';
 let forecastEnd=null;
@@ -31,13 +33,12 @@ $('#theme-toggle').onclick=()=>{
   try{localStorage.setItem('finroad-theme',theme);}catch{}
 };
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),4000);}
-async function save(next,message='Сохранено на этом Mac'){
+async function save(next,message='Сохранено в браузере',restore=false){
   if(busy) throw new Error('Дождись предыдущего сохранения');
   busy=true;
   try{
-    const response=await fetch('/api/state',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision,state:next})});
-    const result=await response.json();if(!response.ok)throw new Error(result.error||'Не удалось сохранить');
-    revision=result.revision;state=next;render();notify(message);
+    const result=restore?store.restore(next):store.save(next,revision);
+    revision=result.revision;state=result.state;render();notify(message);
   }finally{busy=false;}
 }
 function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
@@ -280,6 +281,14 @@ $('#close-dialog').onclick=closeDialog;$('#cancel-dialog').onclick=closeDialog;
 $('#editor-form').onsubmit=async event=>{event.preventDefault();if(!dialogSubmit||busy)return;$('#submit-dialog').disabled=true;$('#form-error').textContent='';try{await dialogSubmit(new FormData(event.target));closeDialog();}catch(error){$('#form-error').textContent=error.message;}finally{$('#submit-dialog').disabled=false;}};
 $('#import-file').onchange=async event=>{
   const file=event.target.files[0];event.target.value='';if(!file)return;
-  try{if(file.size>1_900_000)throw new Error('Файл слишком большой');const imported=JSON.parse(await file.text());if(imported.schema!==1||!Array.isArray(imported.transactions)||!Array.isArray(imported.debts))throw new Error('Это не резервная копия FinRoad');confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена'),'Восстановить');}catch(error){notify(error.message);}
+  try{if(file.size>1_900_000)throw new Error('Файл слишком большой');const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
 };
-try{const response=await fetch('/api/state');if(!response.ok)throw new Error('Сервер недоступен');({state,revision}=await response.json());render();}catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть данные</h2><p>${esc(error.message)}. Проверь, что локальный сервер запущен, и обнови страницу.</p></section>`;}
+function syncStoredState(){
+  if(!store||$('#editor').open||busy)return;
+  try{const latest=store.read();if(latest&&latest.revision!==revision){({state,revision}=latest);render();}}
+  catch(error){notify(error.message);}
+}
+window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)syncStoredState();});
+window.addEventListener('focus',syncStoredState);
+try{store=browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
+catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
