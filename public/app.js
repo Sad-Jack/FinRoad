@@ -1,3 +1,4 @@
+import {initDatePickers} from './date-picker.js';
 import {browserStore,validateState,STORAGE_KEY} from './storage.js';
 import {today,addDays,monthEnd,parseMoney,eventsBetween,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} from './finance.js';
 import {compactPlan,compactDebts,compactIncome,headerForecast} from './compact.js';
@@ -251,7 +252,7 @@ document.addEventListener('change',event=>{
   render();
   $('#forecast-date').focus({preventScroll:true});
 });
-document.addEventListener('click',event=>{const dateInput=event.target.closest('input[type="date"]');if(dateInput&&!dateInput.disabled&&!dateInput.readOnly&&typeof dateInput.showPicker==='function'){try{dateInput.showPicker();}catch{dateInput.focus();}}const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
+document.addEventListener('click',event=>{const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;
   if(input.name==='loan-amount'&&$('#entry-rows')&&['card','personal'].includes($('#editor [name="entry-type"]:checked')?.value)){
@@ -289,3 +290,5 @@ window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)syncStoredS
 window.addEventListener('focus',syncStoredState);
 try{store=browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
+
+initDatePickers();

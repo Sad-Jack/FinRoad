@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def build():
     modules = {}
     chunks = []
-    for filename in ('work-calendar.js', 'finance.js', 'compact.js', 'storage.js', 'app.js'):
+    for filename in ('work-calendar.js', 'finance.js', 'compact.js', 'storage.js', 'date-picker.js', 'app.js'):
         source = (ROOT / 'public' / filename).read_text()
         def replace_import(match):
             return f'const {{{match[1]}}} = {modules[match[2]]};'
