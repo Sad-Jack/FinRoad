@@ -448,10 +448,19 @@ return {today,addDays,monthEnd,parseMoney,plannedRepayments,unplannedDebtAmount,
 })();
 const module_2 = (() => {
 function compactPlan(ctx) {
-  const {state,now,end,plan,dateLabel,shortDate,money,esc}=ctx;
+  const {state,now,end,plan,dateLabel,shortDate,money,esc,kindNames}=ctx;
   const rows=plan.points
     .filter(point=>point.event)
     .map(({event,balance})=>({...event,running:balance}));
+  const eventName=e=>{
+    if(e.kind==='income')return e.name;
+    const debt=state.debts.find(d=>d.id===(e.debtId||e.loanDebtId||(e.debt?e.id:null)));
+    const type=kindNames?.[debt?.kind]||'Личное';
+    const rawName=(debt?.name||e.name).replace(/^Погашение\s*·\s*/i,'').trim();
+    const suffix=` · ${type}`;
+    const name=rawName.toLocaleLowerCase('ru').endsWith(suffix.toLocaleLowerCase('ru'))?rawName.slice(0,-suffix.length).trim():rawName;
+    return `${name||e.name} · ${type}`;
+  };
   const countForm=new Intl.PluralRules('ru').select(rows.length);
   const countLabel={one:'событие',few:'события',many:'событий'}[countForm] || 'событий';
   const crossesYear=now.slice(0,4)!==end.slice(0,4);
@@ -461,7 +470,7 @@ function compactPlan(ctx) {
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
   return `<section class="panel ledger-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
-  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(e.name)}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
+  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
   </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
   `;
 }
