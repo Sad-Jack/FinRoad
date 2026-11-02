@@ -44,10 +44,17 @@ export function scheduleRepayment(state,{id,debtId,amount,date}) {
 // Loan payments change cash only; the outstanding principal is edited manually.
 export function loanPayment(state,debt) {
   const linked=state.transactions.find(t=>t.loanDebtId===debt.id);
-  if(linked)return linked;
-  const candidates=state.transactions.filter(t=>!t.debtId&&!t.loanDebtId&&t.kind==='expense'&&
-    (t.name.toLowerCase()===debt.name.toLowerCase() || (debt.kind==='mortgage'&&t.name.toLowerCase()==='ипотека'&&state.debts.filter(d=>d.kind==='mortgage').length===1)));
-  return candidates.length===1?candidates[0]:null;
+  if(linked || debt.explicitSchedule) return linked ?? null;
+  // Old backups may only have names. Infer ownership only for a unique pair.
+  const loans=state.debts.filter(row=>['loan','mortgage'].includes(row.kind));
+  const singleMortgage=loans.filter(row=>row.kind==='mortgage').length===1;
+  const matches=(transaction,owner)=>transaction.name.toLowerCase()===owner.name.toLowerCase() ||
+    (singleMortgage && owner.kind==='mortgage' && transaction.name.toLowerCase()==='ипотека');
+  const candidates=state.transactions.filter(row=>row.kind==='expense' && !row.debtId &&
+    !row.loanDebtId && !row.explicitSchedule && matches(row,debt));
+  if(candidates.length!==1) return null;
+  const owners=loans.filter(owner=>!owner.explicitSchedule && matches(candidates[0],owner));
+  return owners.length===1 ? candidates[0] : null;
 }
 export function loanPayments(state,debt) {
   const linked=state.transactions.filter(t=>t.loanDebtId===debt.id);
@@ -122,7 +129,7 @@ export function eventsBetween(state, start, end) {
     if(!['loan','mortgage'].includes(debt.kind) && debt.due && amount>0) push({...debt,amount},debt.due,true);
   }
   // Same-day income first, consistently in the plan and running-balance forecast.
-  return events.sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate) || (a.kind==='income'?-1:1)-(b.kind==='income'?-1:1) || a.name.localeCompare(b.name));
+  return events.sort((a,b)=>a.date.localeCompare(b.date) || (a.kind==='income'?-1:1)-(b.kind==='income'?-1:1) || a.name.localeCompare(b.name));
 }
 export function forecast(state,start,end) {
   const events=eventsBetween(state,start,end);
@@ -233,12 +240,19 @@ export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name
   const oldDebt=state.debts.find(d=>d.id===debtId),oldTransaction=state.transactions.find(t=>t.id===transactionId);
   const previous=oldDebt?(['loan','mortgage'].includes(oldDebt.kind)?loanPayments(state,oldDebt):plannedRepayments(state,oldDebt.id)):[oldTransaction].filter(Boolean);
   const owned=new Set(previous.map(t=>t.id));
-  const draft={...state,debts:state.debts.filter(d=>d.id!==debtId),transactions:state.transactions.filter(t=>!owned.has(t.id)&&t.loanDebtId!==debtId&&t.debtId!==debtId)};
+  const draft={
+    ...state,
+    debts:state.debts.filter(debt=>debt.id!==debtId),
+    transactions:state.transactions.filter(transaction=>{
+      const linkedToEditedDebt=oldDebt && (transaction.loanDebtId===oldDebt.id || transaction.debtId===oldDebt.id);
+      return !owned.has(transaction.id) && !linkedToEditedDebt;
+    })
+  };
   const isDebt=type!=='regular',id=isDebt?(debtId||crypto.randomUUID()):null;
   if(isDebt){
     if(amount!==null&&(!Number.isSafeInteger(amount)||amount<0))throw new Error('Укажи корректный остаток долга');
     if(due)paymentTiming('once',null,due);
-    draft.debts.push({id,name:name.trim(),kind:type,amount,due:['card','personal'].includes(type)?due:null});
+    draft.debts.push({id,name:name.trim(),kind:type,amount,explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
   }
   if(type==='regular'&&!payments.length)payments=[{id:oldTransaction?.id,repeat:'once',amount:null,date:null}];
   if(type==='regular'&&payments.length!==1)throw new Error('Для личного платежа доступно одно расписание');
@@ -260,7 +274,7 @@ export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name
       if(!incomplete)scheduled+=p.amount;
       if(amount!==null&&scheduled>amount)throw new Error('Сумма превышает остаток долга');
     }
-    draft.transactions.push({id:paymentId,name:name.trim(),kind:'expense',amount:p.amount??null,repeat:p.repeat,...timing,...(incomplete?{draft:true}:{}),...(isDebt?(isRepayment?{debtId:id}:{loanDebtId:id}):{})});
+    draft.transactions.push({id:paymentId,name:name.trim(),kind:'expense',amount:p.amount??null,repeat:p.repeat,...timing,...(incomplete?{draft:true}:{}),...(isDebt?(isRepayment?{debtId:id}:{loanDebtId:id}):{explicitSchedule:true})});
   }
   state.debts=draft.debts;state.transactions=draft.transactions;
 }
