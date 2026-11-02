@@ -131,13 +131,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
   .payment-ledger tbody .schedule-cell{grid-row:3}
 }
 
-/* Keep the plan heading and column labels attached to the app header. */
-.compact-shell:has(.plan-panel) .terminal-header{margin-bottom:0}
-.plan-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
-.plan-panel .ledger-scroll{overflow:visible}
-.plan-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
-.plan-panel .plan-ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--plan-toolbar-height,45px));z-index:3;background:var(--head)}
-@media(max-width:640px){.plan-panel .plan-ledger thead th{position:static}}
+/* Keep table headings and column labels attached to the app header. */
+.compact-shell:has(.ledger-panel) .terminal-header{margin-bottom:0}
+.ledger-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
+.ledger-panel .ledger-scroll{overflow:visible}
+.ledger-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
+.ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
+@media(max-width:640px){.ledger-panel .ledger thead th{position:static}}
 
 </style></head>
 <body>
@@ -759,9 +759,9 @@ function change(mutator,message){const next=structuredClone(state);mutator(next)
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
 const headerSizeObserver=new ResizeObserver(()=>{
-  const header=$('.terminal-header'),toolbar=$('.plan-panel .ledger-toolbar');
+  const header=$('.terminal-header'),toolbar=$('.ledger-panel .ledger-toolbar');
   document.documentElement.style.setProperty('--app-header-height',header.getBoundingClientRect().height+'px');
-  if(toolbar)document.documentElement.style.setProperty('--plan-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+  if(toolbar)document.documentElement.style.setProperty('--ledger-toolbar-height',toolbar.getBoundingClientRect().height+'px');
 });
 headerSizeObserver.observe($('.terminal-header'));
 function render(){
@@ -783,10 +783,10 @@ function render(){
   const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
   $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
-  const previousToolbar=$('.plan-panel .ledger-toolbar');
+  const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
   $('#app').innerHTML=page==='debts'?compactDebts(ctx):page==='income'?compactIncome(ctx):compactPlan(ctx);
-  const toolbar=$('.plan-panel .ledger-toolbar');
+  const toolbar=$('.ledger-panel .ledger-toolbar');
   if(toolbar)headerSizeObserver.observe(toolbar);
 }
 function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}

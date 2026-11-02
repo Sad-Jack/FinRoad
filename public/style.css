@@ -128,10 +128,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
   .payment-ledger tbody .schedule-cell{grid-row:3}
 }
 
-/* Keep the plan heading and column labels attached to the app header. */
-.compact-shell:has(.plan-panel) .terminal-header{margin-bottom:0}
-.plan-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
-.plan-panel .ledger-scroll{overflow:visible}
-.plan-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
-.plan-panel .plan-ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--plan-toolbar-height,45px));z-index:3;background:var(--head)}
-@media(max-width:640px){.plan-panel .plan-ledger thead th{position:static}}
+/* Keep table headings and column labels attached to the app header. */
+.compact-shell:has(.ledger-panel) .terminal-header{margin-bottom:0}
+.ledger-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
+.ledger-panel .ledger-scroll{overflow:visible}
+.ledger-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
+.ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
+@media(max-width:640px){.ledger-panel .ledger thead th{position:static}}
