@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {emptyState,validateState} from '../public/storage.js';
-import {forecast,monthEnd,savePaymentEntry,incomeBreakdown} from '../public/finance.js';
+import {forecast,addDays,savePaymentEntry,incomeBreakdown} from '../public/finance.js';
 import {compactPlan,compactIncome} from '../public/compact.js';
 
 const transaction=(name,date,kind,amount)=>({name,id:name,date,kind,amount,repeat:'once'});
@@ -14,18 +14,18 @@ test('displayed cash flows stay chronological and reconcile with the forecast ac
     transaction('A','2026-11-02','expense',1000),
     transaction('unreceived','2026-11-01','income',9000),
     transaction('salary','2026-11-02','income',15000),
-    transaction('rent','2026-12-01','expense',3000)
+    transaction('rent','2026-12-02','expense',3000),
+    transaction('outside','2026-12-03','income',80000)
   ];
   const now='2026-11-02';
-  const projection=forecast(state,now,'2026-11-30');
-  assert.deepEqual(projection.points.filter(p=>p.event).map(p=>p.event.id),['Z','salary','A']);
-  assert.equal(projection.balance,12000);
-  const context={state,today:()=>now,monthEnd,forecast,dateLabel:String,shortDate:String,money:String,esc:String,icon:()=>''};
-  const november=compactPlan({...context,month:'2026-11'});
-  assert.doesNotMatch(november,/unreceived|overdue-dot/);
-  assert.match(november,/<tfoot>.*data-label="Приход">15000<.*data-label="Расход">13000<.*data-label="Остаток">12000</s);
-  const december=compactPlan({...context,month:'2026-12'});
-  assert.match(december,/<tfoot>.*data-label="Приход">0<.*data-label="Расход">3000<.*data-label="Остаток">9000</s);
+  const end=addDays(now,30);
+  const plan=forecast(state,now,end);
+  assert.deepEqual(plan.events.map(event=>event.id),['salary','A','rent']);
+  assert.equal(plan.firstShortfall,null);
+  assert.equal(state.balance,10000);
+  const html=compactPlan({state,now,end,plan,dateLabel:String,shortDate:String,money:String,esc:String});
+  assert.doesNotMatch(html,/unreceived|outside|month-next/);
+  assert.match(html,/<tfoot>.*data-label="Приход">15000<.*data-label="Расход">4000<.*data-label="Остаток">21000</s);
 });
 
 test('saving a payment keeps unrelated imported transactions with explicit null links',()=>{

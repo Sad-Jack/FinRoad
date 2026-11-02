@@ -20,7 +20,7 @@ test('future start is respected and date math crosses year boundaries',()=>{cons
 test('credit-card deadline reserved, undated debts are not cashflows',()=>{const s=base();s.debts=[{id:'card',name:'Card',amount:7000,due:'2026-11-05',kind:'card'},{id:'loan',name:'Loan',amount:900000,due:null,kind:'loan'}];assert.equal(forecast(s,'2026-11-01','2026-11-04').free,10000);assert.equal(forecast(s,'2026-11-01','2026-11-05').free,3000);});
 test('paid expense reduces actual balance once and disappears from forecast',()=>{const s=base();s.transactions=[expense('rent','2026-11-02',2000,'monthly')];const event=eventsBetween(s,'2026-11-01','2026-11-30')[0];settle(s,event,'2026-11-02');assert.equal(s.balance,8000);assert.equal(forecast(s,'2026-11-01','2026-11-30').free,8000);assert.throws(()=>settle(s,event));assert.equal(eventsBetween(s,'2026-11-01','2026-12-31').length,1);});
 test('debt settlement clears outstanding balance',()=>{const s=base();s.debts=[{id:'card',name:'Card',kind:'card',amount:5000,due:'2026-11-05'}];settle(s,eventsBetween(s,'2026-11-01','2026-11-30')[0]);assert.equal(s.debts[0].amount,0);assert.equal(s.balance,5000);});
-test('overdue one-off expense is reserved immediately',()=>{const s=base();s.transactions=[expense('old','2026-10-10',4000)];const p=forecast(s,'2026-11-01','2026-11-30');assert.equal(p.free,6000);assert.equal(p.events[0].effectiveDate,'2026-11-01');});
+test('past one-off expense does not reduce the manually entered starting balance',()=>{const s=base();s.transactions=[expense('old','2026-10-10',4000)];const p=forecast(s,'2026-11-01','2026-11-30');assert.equal(p.balance,10000);assert.equal(p.events.length,0);});
 test('legacy reserve is ignored; only negative cash reports shortfall',()=>{const s=base();s.reserve=15000;const p=forecast(s,'2026-11-01','2026-11-30');assert.equal(p.free,10000);assert.equal(p.shortfall,0);delete s.reserve;s.balance=-100;const negative=forecast(s,'2026-11-01','2026-11-30');assert.equal(negative.free,0);assert.equal(negative.shortfall,100);});
 test('next income skips today, includes next monthly occurrence',()=>{const s=base();s.transactions=[{...expense('salary','2026-11-01',20000,'monthly'),kind:'income'}];assert.equal(nextIncomeDate(s,'2026-11-01'),'2026-12-01');});
 test('late expected income never disguises a shortage',()=>{const s=base();s.transactions=[{...expense('late salary','2026-10-30',50000),kind:'income'},expense('rent','2026-11-02',15000)];const p=forecast(s,'2026-11-01','2026-11-30');assert.equal(p.shortfall,5000);assert.equal(p.income,0);});
@@ -81,12 +81,12 @@ test('first shortfall reports the first negative date before a later income',()=
   assert.equal(p.balance,14000);assert.equal(p.free,0);
   assert.equal(forecast(s,'2026-11-01','2026-11-08').balance,14000);
 });
-test('negative opening balance and overdue expenses surface today; zero is not a shortfall',()=>{
+test('only an actual or projected negative balance in the period produces a warning',()=>{
   const s=base();s.balance=0;
   assert.equal(forecast(s,'2026-11-01','2026-11-30').firstShortfall,null);
   s.balance=-100;assert.equal(forecast(s,'2026-11-01','2026-11-30').firstShortfall.date,'2026-11-01');
   s.balance=0;s.transactions=[expense('overdue','2026-10-20',200)];
-  assert.equal(forecast(s,'2026-11-01','2026-11-30').firstShortfall.date,'2026-11-01');
+  assert.equal(forecast(s,'2026-11-01','2026-11-30').firstShortfall,null);
 });
 
 const {loanPayment,saveLoanPayment}=await import('../public/finance.js');

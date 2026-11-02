@@ -1,6 +1,6 @@
 import {initDatePickers} from './date-picker.js';
 import {browserStore,validateState,STORAGE_KEY} from './storage.js';
-import {today,addDays,monthEnd,parseMoney,eventsBetween,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} from './finance.js';
+import {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} from './finance.js';
 import {compactPlan,compactDebts,compactIncome,headerForecast} from './compact.js';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -12,9 +12,9 @@ const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x=
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.payments}</svg>`;
 const titles={income:'Доход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Платежи',history:'История',storage:'Мои данные'};
 let store;
-let state,revision,page='overview',month=today().slice(0,7),busy=false,dialogSubmit=null,toastTimer;
+let state,revision,page='overview',busy=false,dialogSubmit=null,toastTimer;
 let debtFilter='all';
-let forecastEnd=null;
+let forecastEnd=null, renderedDay, dayTimer;
 const kindNames={loan:'Кредит',card:'Кредитная карта',personal:'Личный долг',mortgage:'Ипотека'};
 const repeatNames={once:'Разово',monthly:'Каждый месяц',yearly:'Каждый год'};
 function applyTheme(theme){
@@ -46,12 +46,19 @@ function change(mutator,message){const next=structuredClone(state);mutator(next)
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
 function render(){
-  if(month<today().slice(0,7)){month=today().slice(0,7);forecastEnd=null;}
-  if(forecastEnd && forecastEnd<today())forecastEnd=null;
+  const now=today();
+  renderedDay=now;
+  clearTimeout(dayTimer);
+  const midnight=new Date();
+  midnight.setHours(24,0,0,0);
+  dayTimer=setTimeout(render,midnight.getTime()-Date.now()+100);
+  if(forecastEnd && forecastEnd<now)forecastEnd=null;
+  const end=addDays(now,30);
+  const plan=forecast(state,now,end);
   $('#current-date').textContent=new Date(today()+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
   $('#page-name').textContent=titles[page];
   $('#navigation').innerHTML=[['overview','План'],['debts','Платежи'],['income','Доход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
-  const ctx={state,month,forecastEnd,today,addDays,monthEnd,forecast,eventsBetween,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
+  const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
   $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><strong>${state.balance===null?'Указать':money(state.balance)}</strong>${icon('edit')}`;
   const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
   const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
@@ -206,7 +213,7 @@ function transactionDialog(kind='expense',id=null,date=today()){
 function debtDialog(id=null,selectedPaymentId=null){return paymentDialog({debtId:id,transactionId:selectedPaymentId});}
 function repaymentDialog(debtId,id=null){return paymentDialog({debtId,transactionId:id});}
 function balanceDialog(){
-  openDialog('Сколько есть сейчас?',field('balance','Доступные деньги, ₽','text',state.balance===null?'':state.balance/100,'required inputmode="decimal" placeholder="Сумма на счетах и наличные"')+`<p class="dialog-note">Введи фактический остаток на сегодня. Расчёт начнётся с этой суммы. Прошедшие регулярные события до сегодняшнего дня перестанут попадать в прогноз. Разовые платежи и сроки долгов останутся.</p>`,async data=>{
+  openDialog('Сколько есть сейчас?',field('balance','Доступные деньги, ₽','text',state.balance===null?'':state.balance/100,'required inputmode="decimal" placeholder="Сумма на счетах и наличные"')+`<p class="dialog-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
     const balance=parseMoney(data.get('balance'));
     await change(s=>{s.balance=balance;s.balanceDate=today();},'Остаток обновлён');
   });
@@ -226,8 +233,6 @@ async function handle(action,el){
   if(action==='edit-transaction')return transactionDialog('expense',el.dataset.id);
   if(action==='add-debt'||action==='edit-debt')return debtDialog(el.dataset.id);
   if(action==='balance')return balanceDialog();
-  if(action==='month-next'){month=addDays(monthEnd(month+'-01'),1).slice(0,7);forecastEnd=null;render();return;}
-  if(action==='month-prev'){const current=today().slice(0,7);if(month<=current)return;month=addDays(month+'-01',-1).slice(0,7);if(month<current)month=current;forecastEnd=null;render();return;}
   if(action==='delete-income'){
     const item=(state.incomeSources||[]).find(s=>s.id===el.dataset.id)||state.transactions.find(t=>t.id===el.dataset.id&&t.kind==='income');
     if(!item)return;
@@ -247,8 +252,8 @@ document.addEventListener('keydown',event=>{const row=event.target.closest('tr[d
 document.addEventListener('change',event=>{
   if(event.target.id!=='forecast-date')return;
   const input=event.target,date=input.value;
-  if(!date||!input.validity.valid){input.value=forecastEnd||monthEnd(month+'-01');return;}
-  forecastEnd=date===monthEnd(month+'-01')?null:date;
+  if(!date||!input.validity.valid){input.value=forecastEnd||addDays(today(),30);return;}
+  forecastEnd=date===addDays(today(),30)?null:date;
   render();
   $('#forecast-date').focus({preventScroll:true});
 });
@@ -287,7 +292,10 @@ function syncStoredState(){
   catch(error){notify(error.message);}
 }
 window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)syncStoredState();});
-window.addEventListener('focus',syncStoredState);
+window.addEventListener('focus',()=>{
+  syncStoredState();
+  if(state && renderedDay!==today())render();
+});
 try{store=browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
 

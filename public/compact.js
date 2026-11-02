@@ -1,22 +1,19 @@
 export function compactPlan(ctx) {
-  const {state,month,forecastEnd,today,monthEnd,forecast,dateLabel,shortDate,money,esc,icon}=ctx;
-  const now=today();
-  const first=month+'-01',last=monthEnd(first),isCurrent=month===now.slice(0,7);
-  const plan=forecast(state,now,last);
+  const {state,now,end,plan,dateLabel,shortDate,money,esc}=ctx;
   const rows=plan.points
-    .filter(point=>point.event && (isCurrent || point.event.date>=first))
+    .filter(point=>point.event)
     .map(({event,balance})=>({...event,running:balance}));
   const countForm=new Intl.PluralRules('ru').select(rows.length);
   const countLabel={one:'событие',few:'события',many:'событий'}[countForm] || 'событий';
-  const monthTitle=new Date(first+'T12:00:00').toLocaleDateString('ru-RU',{month:'long',year:'numeric'}).replace(' г.','');
-  const period=forecastEnd && forecastEnd!==last ? forecast(state,now,forecastEnd) : plan;
-  const problem=state.balance!==null ? period.firstShortfall : null;
+  const crossesYear=now.slice(0,4)!==end.slice(0,4);
+  const rangeTitle=`${dateLabel(now,crossesYear)} — ${dateLabel(end,crossesYear)}`;
+  const problem=state.balance!==null ? plan.firstShortfall : null;
   const warning=problem?`<div class="plan-shortfall" role="status"><span>Уходим в минус <b>${dateLabel(problem.date,problem.date.slice(0,4)!==now.slice(0,4))}</b></span><strong>${money(problem.balance)}</strong></div>`:'';
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
-  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><div class="month-switch"><h1><span>${monthTitle}</span></h1><button class="icon-button" data-action="month-prev" aria-label="Предыдущий месяц" ${isCurrent?'disabled':''}>${icon('left')}</button><button class="icon-button" data-action="month-next" aria-label="Следующий месяц">${icon('right')}</button></div>${warning}</div>
+  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
-  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(e.name)}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот месяц событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Переключи месяц или добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
-  </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${money(rows.filter(e=>e.kind==='income').reduce((s,e)=>s+e.amount,0))}</td><td class="numeric expense-text" data-label="Расход">${money(rows.filter(e=>e.kind==='expense').reduce((s,e)=>s+e.amount,0))}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
+  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(e.name)}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
+  </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
   `;
 }
 
@@ -40,8 +37,8 @@ export function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreak
     return `<tr class="editable-row" tabindex="0" data-action="edit-income" data-id="${esc(s.id)}" aria-label="Изменить источник ${esc(s.name)}"><td class="name-cell"><button class="row-name" data-action="edit-income" data-id="${esc(s.id)}">${esc(s.name)}</button></td><td class="numeric" data-label="До налога">${s.legacy?'—':money(s.amount)}</td><td data-label="Налог">${s.legacy?'Не задан':s.taxRate/100+'%'}</td><td class="numeric income-text" data-label="На руки">${money(net)}</td><td class="schedule-cell" data-label="Выплаты">${schedule}</td></tr>`;
   }).join('')||'<tr><td colspan="5"><div class="empty">Добавь первый источник дохода.</div></td></tr>'}</tbody></table></div></section>`;
 }
-export function headerForecast({state,month,forecastEnd,today,monthEnd,forecast,dateLabel,money}) {
-  const now=today(),end=forecastEnd||monthEnd(month+'-01'),plan=forecast(state,now,end);
-  const amount=plan.balance;
-  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(end,end.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${end}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(end,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
+export function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money}) {
+  const selected=forecastEnd || end;
+  const amount=selected===end ? plan.balance : forecast(state,now,selected).balance;
+  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
 }

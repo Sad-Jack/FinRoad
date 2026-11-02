@@ -99,8 +99,9 @@ export function saveLoanPayment(state,debt,payment,existingId=null) {
 export function eventsBetween(state, start, end) {
   const events = [];
   const push = (item, date, debt=false, scheduledDate=date) => {
+    if (date < start || date > end) return;
     const key = `${item.id}:${scheduledDate}`;
-    if ((debt || !state.completed[key]) && date<=end) events.push({...item, date, scheduledDate, key, debt, effectiveDate: date<start?start:date, overdue:date<start, kind:debt?'expense':item.kind});
+    if (debt || !state.completed[key]) events.push({...item, date, scheduledDate, key, debt, kind:debt?'expense':item.kind});
   };
   for (const item of [...state.transactions,...(state.incomeSources||[]).flatMap(incomeTransactions)]) {
     if(item.draft)continue;
@@ -108,19 +109,17 @@ export function eventsBetween(state, start, end) {
       const linked=state.debts.find(d=>d.id===item.debtId);
       push(linked?{...item,name:`Погашение · ${linked.name}`}:item,item.date); continue;
     }
-    // Include unpaid occurrences since the user's balance snapshot (or start date).
-    const from = state.balanceDate < start ? state.balanceDate : start;
     const [sy,sm,sd] = item.date.split('-').map(Number);
     const shiftIncome=item.kind==='income'&&item.repeat==='monthly';
     const until=shiftIncome?addDays(monthEnd(end),1):end;
     const [ey,em] = until.split('-').map(Number);
-    for(let year=Number(from.slice(0,4));year<=ey;year++) {
+    for(let year=Number(start.slice(0,4));year<=ey;year++) {
       for(let month=1;month<=12;month++) {
         if(year===ey && month>em) break;
         if(item.repeat==='yearly' && month!==sm) continue;
         const scheduledDate = occurrenceDate(year,month,item.day??sd);
         const adjusted=shiftIncome?previousWorkingDay(scheduledDate):{date:scheduledDate,estimated:false};
-        if(adjusted.date>=from && scheduledDate>=item.date) push({...item,calendarEstimated:adjusted.estimated},adjusted.date,false,scheduledDate);
+        if(scheduledDate>=item.date) push({...item,calendarEstimated:adjusted.estimated},adjusted.date,false,scheduledDate);
       }
     }
   }
@@ -136,12 +135,10 @@ export function forecast(state,start,end) {
   let balance=state.balance ?? 0, minimum=balance, income=0, expense=0;
   const points=[{date:start,balance}];
   for(const event of events) {
-    // A late expected income is not available money: confirm receipt or reschedule it.
-    if(event.kind==='income' && event.overdue) continue;
     const delta=event.kind==='income'?event.amount:-event.amount;
     balance+=delta; minimum=Math.min(minimum,balance);
     if(delta>0) income+=delta; else expense-=delta;
-    points.push({date:event.effectiveDate,balance,event});
+    points.push({date:event.date,balance,event});
   }
   points.push({date:end,balance});
   const firstShortfall=points.find(point=>point.balance<0)??null;
