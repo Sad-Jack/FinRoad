@@ -131,6 +131,14 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
   .payment-ledger tbody .schedule-cell{grid-row:3}
 }
 
+/* Keep the plan heading and column labels attached to the app header. */
+.compact-shell:has(.plan-panel) .terminal-header{margin-bottom:0}
+.plan-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
+.plan-panel .ledger-scroll{overflow:visible}
+.plan-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
+.plan-panel .plan-ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--plan-toolbar-height,45px));z-index:3;background:var(--head)}
+@media(max-width:640px){.plan-panel .plan-ledger thead th{position:static}}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -468,7 +476,7 @@ function compactPlan(ctx) {
   const problem=state.balance!==null ? plan.firstShortfall : null;
   const warning=problem?`<div class="plan-shortfall" role="status"><span>Уходим в минус <b>${dateLabel(problem.date,problem.date.slice(0,4)!==now.slice(0,4))}</b></span><strong>${money(problem.balance)}</strong></div>`:'';
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
-  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
+  return `<section class="panel ledger-panel plan-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
   ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
   </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
@@ -750,6 +758,12 @@ async function save(next,message='Сохранено в браузере',restor
 function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
+const headerSizeObserver=new ResizeObserver(()=>{
+  const header=$('.terminal-header'),toolbar=$('.plan-panel .ledger-toolbar');
+  document.documentElement.style.setProperty('--app-header-height',header.getBoundingClientRect().height+'px');
+  if(toolbar)document.documentElement.style.setProperty('--plan-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+});
+headerSizeObserver.observe($('.terminal-header'));
 function render(){
   const now=today();
   renderedDay=now;
@@ -769,7 +783,11 @@ function render(){
   const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
   $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
+  const previousToolbar=$('.plan-panel .ledger-toolbar');
+  if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
   $('#app').innerHTML=page==='debts'?compactDebts(ctx):page==='income'?compactIncome(ctx):compactPlan(ctx);
+  const toolbar=$('.plan-panel .ledger-toolbar');
+  if(toolbar)headerSizeObserver.observe(toolbar);
 }
 function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}

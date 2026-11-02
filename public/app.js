@@ -45,6 +45,12 @@ async function save(next,message='Сохранено в браузере',restor
 function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
+const headerSizeObserver=new ResizeObserver(()=>{
+  const header=$('.terminal-header'),toolbar=$('.plan-panel .ledger-toolbar');
+  document.documentElement.style.setProperty('--app-header-height',header.getBoundingClientRect().height+'px');
+  if(toolbar)document.documentElement.style.setProperty('--plan-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+});
+headerSizeObserver.observe($('.terminal-header'));
 function render(){
   const now=today();
   renderedDay=now;
@@ -64,7 +70,11 @@ function render(){
   const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
   $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
+  const previousToolbar=$('.plan-panel .ledger-toolbar');
+  if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
   $('#app').innerHTML=page==='debts'?compactDebts(ctx):page==='income'?compactIncome(ctx):compactPlan(ctx);
+  const toolbar=$('.plan-panel .ledger-toolbar');
+  if(toolbar)headerSizeObserver.observe(toolbar);
 }
 function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
