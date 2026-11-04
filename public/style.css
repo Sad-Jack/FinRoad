@@ -142,3 +142,5 @@ button,label,legend,svg{user-select:none;-webkit-user-select:none}
 input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-select:text}
 #close-dialog{line-height:1;align-self:center}
 #close-dialog .icon{width:20px;height:20px}
+
+.transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}

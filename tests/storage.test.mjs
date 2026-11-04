@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {today,addDays} from '../public/finance.js';
 import {browserStore,emptyState,validateState,STORAGE_KEY} from '../public/storage.js';
 const memory=()=>{const values=new Map();return {getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)};};
 test('file storage persists changes across store instances and leaves original data immutable',()=>{
@@ -48,7 +49,7 @@ test('legacy backups retain partial schedules and remove retired reserve setting
 });
 test('known debt balance caps repayments across multiple scheduled dates',()=>{
  const input=emptyState('2026-11-01');input.debts=[{id:'debt',name:'Test',kind:'card',amount:100}];
- input.transactions=[1,2].map(n=>({id:'part'+n,name:'Test',kind:'expense',repeat:'once',date:'2026-11-0'+n,amount:60,debtId:'debt'}));
+ input.transactions=[1,2].map(n=>({id:'part'+n,name:'Test',kind:'expense',repeat:'once',date:addDays(today(),n),amount:60,debtId:'debt'}));
  assert.throws(()=>validateState(input),/превышают/);
 });
 test('explicit import can recover corrupt storage but rejects an invalid backup first',()=>{

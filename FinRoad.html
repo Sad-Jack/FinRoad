@@ -146,6 +146,8 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 #close-dialog{line-height:1;align-self:center}
 #close-dialog .icon{width:20px;height:20px}
 
+.transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -218,9 +220,9 @@ function occurrenceDate(year, month, day) {
 function plannedRepayments(state, debtId, excludeId=null) {
   return state.transactions.filter(t=>t.debtId===debtId && t.id!==excludeId && !state.completed[`${t.id}:${t.date}`]).sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31'));
 }
-function unplannedDebtAmount(state, debtId, excludeId=null) {
+function unplannedDebtAmount(state, debtId, excludeId=null,referenceDate=today()) {
   const debt=state.debts.find(d=>d.id===debtId);
-  return Math.max(0,(debt?.amount??0)-plannedRepayments(state,debtId,excludeId).filter(t=>!t.draft).reduce((sum,t)=>sum+t.amount,0));
+  return Math.max(0,(debt?.amount??0)-plannedRepayments(state,debtId,excludeId).filter(t=>!t.draft&&t.date>=referenceDate).reduce((sum,t)=>sum+t.amount,0));
 }
 function scheduleRepayment(state,{id,debtId,amount,date}) {
   const debt=state.debts.find(d=>d.id===debtId);
@@ -317,11 +319,16 @@ function eventsBetween(state, start, end) {
     }
   }
   for (const debt of state.debts) {
-    const amount=unplannedDebtAmount(state,debt.id);
+    const amount=unplannedDebtAmount(state,debt.id,null,start);
     if(!['loan','mortgage'].includes(debt.kind) && debt.due && amount>0) push({...debt,amount},debt.due,true);
   }
   // Same-day income first, consistently in the plan and running-balance forecast.
   return events.sort((a,b)=>a.date.localeCompare(b.date) || (a.kind==='income'?-1:1)-(b.kind==='income'?-1:1) || a.name.localeCompare(b.name));
+}
+function addMoney(left,right){
+  const result=left+right;
+  if(!Number.isSafeInteger(result))throw new Error('Сумма прогноза превышает точный диапазон расчёта в копейках');
+  return result;
 }
 function forecast(state,start,end) {
   const events=eventsBetween(state,start,end);
@@ -329,8 +336,8 @@ function forecast(state,start,end) {
   const points=[{date:start,balance}];
   for(const event of events) {
     const delta=event.kind==='income'?event.amount:-event.amount;
-    balance+=delta; minimum=Math.min(minimum,balance);
-    if(delta>0) income+=delta; else expense-=delta;
+    balance=addMoney(balance,delta); minimum=Math.min(minimum,balance);
+    if(delta>0) income=addMoney(income,delta); else expense=addMoney(expense,-delta);
     points.push({date:event.date,balance,event});
   }
   points.push({date:end,balance});
@@ -409,7 +416,7 @@ function paymentEntries(state,referenceDate=today()) {
     entries.push({id:transaction.id,name:transaction.debtId&&debt?`Погашение · ${debt.name}`:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
   }
   for(const debt of state.debts){
-    const amount=unplannedDebtAmount(state,debt.id);
+    const amount=unplannedDebtAmount(state,debt.id,null,referenceDate);
     const deadline=!['loan','mortgage'].includes(debt.kind)&&debt.due&&amount>0;
     if(deadline||!represented.has(debt.id))entries.push({id:debt.id,name:debt.name,kind:debt.kind,amount:deadline?amount:null,repeat:'once',date:deadline?debt.due:null,debt,deadline:Boolean(deadline)});
   }
@@ -453,7 +460,7 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
   let scheduled=0;
   for(const p of payments){
     if(p.amount!=null&&(!Number.isSafeInteger(p.amount)||p.amount<=0))throw new Error('Сумма платежа должна быть больше нуля');
-    if(!['monthly','once'].includes(p.repeat))throw new Error('Выбери периодичность платежа');
+    if(!(['monthly','once'].includes(p.repeat)||type==='regular'&&p.repeat==='yearly'&&previous.some(t=>t.id===p.id&&t.repeat==='yearly')))throw new Error('Выбери периодичность платежа');
     if(p.id&&(!owned.has(p.id)||used.has(p.id)))throw new Error('Некорректная запись платежа');
     const paymentId=p.id||crypto.randomUUID();used.add(paymentId);
     const timing=p.repeat==='once'&&!p.date?{date:null}:paymentTiming(p.repeat,p.day,p.date,previous.find(t=>t.id===p.id));
@@ -462,7 +469,7 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
     if(isRepayment){
       if(p.repeat!=='once')throw new Error('Для погашения укажи конкретную дату');
       if(due&&timing.date&&timing.date>due)throw new Error('Дата позже срока полного погашения');
-      if(!incomplete)scheduled+=p.amount;
+      if(!incomplete&&timing.date>=today())scheduled+=p.amount;
       if(amount!==null&&scheduled>amount)throw new Error('Сумма превышает остаток долга');
     }
     draft.transactions.push({id:paymentId,name:name.trim(),kind:'expense',amount:p.amount??null,repeat:p.repeat,...timing,...(incomplete?{draft:true}:{}),...(isDebt?(isRepayment?{debtId:id}:{loanDebtId:id}):{explicitSchedule:true})});
@@ -496,8 +503,8 @@ function compactPlan(ctx) {
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
   return `<section class="panel ledger-panel plan-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
-  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
-  </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
+  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
+  </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${plan.error?'—':money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${plan.error?'—':money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null||plan.error?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
   `;
 }
 
@@ -524,13 +531,13 @@ function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) 
 function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money}) {
   const selected=forecastEnd || end;
   const amount=selected===end ? plan.balance : forecast(state,now,selected).balance;
-  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null?'—':money(amount)}</strong></div>`;
+  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
 }
 
 return {compactPlan,compactDebts,compactIncome,headerForecast};
 })();
 const module_3 = (() => {
-const {cardDebtAmount} = module_1;
+const {cardDebtAmount,today} = module_1;
 // Persistent browser storage for the standalone file. No HTTP requests.
 const STORAGE_KEY = 'finroad-state-v1';
 function emptyState(date) {
@@ -606,7 +613,7 @@ function validateState(input) {
     check(row.kind==='expense'&&row.repeat==='once'&&(row.draft||row.amount>0),'Погашение должно быть разовым расходом больше нуля');
     if(Object.hasOwn(state.completed,`${row.id}:${row.date}`))continue;
     check(['card','personal'].includes(debt.kind),'Некорректное погашение долга');
-    if(row.draft)continue;
+    if(row.draft||row.date<today())continue;
     check(!debt.due||row.date<=debt.due,'Запланированное погашение позже срока долга');
     const amount=(scheduled.get(debt.id)||0)+row.amount;scheduled.set(debt.id,amount);
     check(debt.amount===null||amount<=debt.amount,'Погашения превышают остаток долга');
@@ -795,16 +802,19 @@ function render(){
   midnight.setHours(24,0,0,0);
   dayTimer=setTimeout(render,midnight.getTime()-Date.now()+100);
   if(forecastEnd && forecastEnd<now)forecastEnd=null;
-  const end=addDays(now,30);
-  const plan=forecast(state,now,end);
+  const end=forecastEnd||addDays(now,30);
+  let plan;
+  try{plan=forecast(state,now,end);}
+  catch(error){plan={points:[],balance:0,income:0,expense:0,firstShortfall:null,error:error.message};}
   $('#current-date').textContent=new Date(today()+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
   $('#page-name').textContent=titles[page];
   $('#navigation').innerHTML=[['overview','План'],['debts','Платежи'],['income','Доход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
   const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
   $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><strong>${state.balance===null?'Указать':money(state.balance)}</strong>${icon('edit')}`;
   const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
-  const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
-  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  const debtSum=knownDebts.reduce((total,debt)=>total+BigInt(debt.amount),0n);
+  const totalDebt=debtSum<=BigInt(Number.MAX_SAFE_INTEGER)?Number(debtSum):null,missingDebt=debts.length-knownDebts.length;
+  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
@@ -905,16 +915,16 @@ function paymentDialog({debtId=null,transactionId=null}={}){
   const debt=state.debts.find(d=>d.id===(debtId||transaction?.debtId||transaction?.loanDebtId))||state.debts.find(d=>['loan','mortgage'].includes(d.kind)&&loanPayment(state,d)?.id===transactionId);
   const existing=debt?(['loan','mortgage'].includes(debt.kind)?loanPayments(state,debt):plannedRepayments(state,debt.id)):[transaction].filter(Boolean);
   const item=existing[0],type=debt?.kind||'regular',name=debt?.name||transaction?.name||'';
-  const repeat=type==='mortgage'?'monthly':item?.repeat==='once'?'once':'monthly';
+  const repeat=type==='mortgage'?'monthly':item?.repeat||'monthly';
   openDialog(debt||transaction?'Изменить платёж':'Добавить платёж',
     field('name','Название','text',name,'required maxlength="100"')+
     select('entry-type','Тип',{regular:'Личное',loan:'Кредит',mortgage:'Ипотека',personal:'Личный долг',card:'Кредитная карта'},type)+
     `<div id="entry-principal">${field('principal','Остаток долга, ₽','text',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-card"><div class="field-row">${field('credit-limit','Максимальный лимит, ₽','text',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${field('card-balance','Текущий баланс, ₽','text',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
-    `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата'},repeat)}</div>`+
+    `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата',...(type==='regular'&&repeat==='yearly'?{yearly:'Ежегодно'}:{})},repeat)}</div>`+
     `<div id="entry-payment">${field('entry-amount','Сумма платежа, ₽','text',item?.amount!=null?item.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-day">${dayWheel('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
-    `<div id="entry-single-date">${field('entry-date','Дата платежа','date',item?.repeat==='once'?item.date:'')}</div>`+
+    `<div id="entry-single-date">${field('entry-date','Дата платежа','date',item&&item.repeat!=='monthly'?item.date:'')}</div>`+
     `<div id="entry-due">${field('entry-due','Погасить до','date',debt?.due||'')}</div>`+
     `<div id="entry-split"><div id="entry-rows">${(existing.filter(p=>p.repeat==='once').length?existing.filter(p=>p.repeat==='once'):[null]).map(loanDateRow).join('')}</div><button type="button" class="button small" data-action="add-entry-date">Разбить платёж</button></div>`,async data=>{
       const type=data.get('entry-type'),repeat=type==='mortgage'?'monthly':data.get('entry-repeat');
@@ -925,7 +935,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
       }else payments=[...$('#entry-rows').children].map(row=>({id:row.dataset.paymentId||undefined,amount:row.querySelector('[name="loan-amount"]').value.trim(),date:row.querySelector('[name="loan-date"]').value})).filter(p=>p.amount||p.date).map(p=>({...p,amount:p.amount?parseMoney(p.amount):null,repeat:'once'}));
       await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,due:data.get('entry-due')||null,payments}));
     });
-  dialogDelete(transaction?'delete-transaction':'delete-debt',transaction?.id||debt?.id);
+  dialogDelete(debt?'delete-debt':'delete-transaction',debt?.id||transaction?.id);
   updateEntryFields();
 }
 function updateEntryFields(){
@@ -1024,9 +1034,13 @@ $('#editor-form').addEventListener('input',event=>{
       const card=$('#editor [name="entry-type"]:checked').value==='card';
       const principal=$('#editor [name="principal"]').value.trim();
       const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
-      const total=card?cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null):principal?parseMoney(principal):null;
+      const savedDebt=$('#card-debt-preview').dataset.savedDebt;
+      let total=principal?parseMoney(principal):null;
+      if(card)total=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null)??(savedDebt!==''?Number(savedDebt):null);
       if(total===null)return;
-      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input&&el.closest('.loan-date-row').querySelector('[name="loan-date"]').value>=today()).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const paymentDate=input.closest('.loan-date-row').querySelector('[name="loan-date"]').value;
+      if(paymentDate&&paymentDate<today())return;
       const max=Math.max(0,total-other);if(input.value&&parseMoney(input.value)>max)input.value=String(max/100);
     }catch{}
   }
@@ -1047,7 +1061,7 @@ $('#close-dialog').onclick=closeDialog;$('#cancel-dialog').onclick=closeDialog;
 $('#editor-form').onsubmit=async event=>{event.preventDefault();if(!dialogSubmit||busy)return;$('#submit-dialog').disabled=true;$('#form-error').textContent='';try{await dialogSubmit(new FormData(event.target));closeDialog();}catch(error){$('#form-error').textContent=error.message;}finally{$('#submit-dialog').disabled=false;}};
 $('#import-file').onchange=async event=>{
   const file=event.target.files[0];event.target.value='';if(!file)return;
-  try{if(file.size>1_900_000)throw new Error('Файл слишком большой');const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
+  try{const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
 };
 function syncStoredState(){
   if(!store||$('#editor').open||busy)return;

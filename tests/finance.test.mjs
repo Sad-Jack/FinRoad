@@ -1,5 +1,6 @@
-import test from 'node:test';
+import test,{mock} from 'node:test';
 import assert from 'node:assert/strict';
+mock.timers.enable({apis:['Date'],now:new Date('2026-11-04T12:00:00Z')});
 import {parseMoney,eventsBetween,forecast,settle,addDays,nextIncomeDate} from '../public/finance.js';
 const base=()=>({schema:1,demo:false,balance:10000,balanceDate:'2026-11-01',transactions:[],debts:[],completed:{}});
 const expense=(id,date,amount,repeat='once')=>({id,name:id,date,amount,repeat,kind:'expense'});

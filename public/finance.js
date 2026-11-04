@@ -35,9 +35,9 @@ function occurrenceDate(year, month, day) {
 export function plannedRepayments(state, debtId, excludeId=null) {
   return state.transactions.filter(t=>t.debtId===debtId && t.id!==excludeId && !state.completed[`${t.id}:${t.date}`]).sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31'));
 }
-export function unplannedDebtAmount(state, debtId, excludeId=null) {
+export function unplannedDebtAmount(state, debtId, excludeId=null,referenceDate=today()) {
   const debt=state.debts.find(d=>d.id===debtId);
-  return Math.max(0,(debt?.amount??0)-plannedRepayments(state,debtId,excludeId).filter(t=>!t.draft).reduce((sum,t)=>sum+t.amount,0));
+  return Math.max(0,(debt?.amount??0)-plannedRepayments(state,debtId,excludeId).filter(t=>!t.draft&&t.date>=referenceDate).reduce((sum,t)=>sum+t.amount,0));
 }
 export function scheduleRepayment(state,{id,debtId,amount,date}) {
   const debt=state.debts.find(d=>d.id===debtId);
@@ -134,11 +134,16 @@ export function eventsBetween(state, start, end) {
     }
   }
   for (const debt of state.debts) {
-    const amount=unplannedDebtAmount(state,debt.id);
+    const amount=unplannedDebtAmount(state,debt.id,null,start);
     if(!['loan','mortgage'].includes(debt.kind) && debt.due && amount>0) push({...debt,amount},debt.due,true);
   }
   // Same-day income first, consistently in the plan and running-balance forecast.
   return events.sort((a,b)=>a.date.localeCompare(b.date) || (a.kind==='income'?-1:1)-(b.kind==='income'?-1:1) || a.name.localeCompare(b.name));
+}
+function addMoney(left,right){
+  const result=left+right;
+  if(!Number.isSafeInteger(result))throw new Error('Сумма прогноза превышает точный диапазон расчёта в копейках');
+  return result;
 }
 export function forecast(state,start,end) {
   const events=eventsBetween(state,start,end);
@@ -146,8 +151,8 @@ export function forecast(state,start,end) {
   const points=[{date:start,balance}];
   for(const event of events) {
     const delta=event.kind==='income'?event.amount:-event.amount;
-    balance+=delta; minimum=Math.min(minimum,balance);
-    if(delta>0) income+=delta; else expense-=delta;
+    balance=addMoney(balance,delta); minimum=Math.min(minimum,balance);
+    if(delta>0) income=addMoney(income,delta); else expense=addMoney(expense,-delta);
     points.push({date:event.date,balance,event});
   }
   points.push({date:end,balance});
@@ -226,7 +231,7 @@ export function paymentEntries(state,referenceDate=today()) {
     entries.push({id:transaction.id,name:transaction.debtId&&debt?`Погашение · ${debt.name}`:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
   }
   for(const debt of state.debts){
-    const amount=unplannedDebtAmount(state,debt.id);
+    const amount=unplannedDebtAmount(state,debt.id,null,referenceDate);
     const deadline=!['loan','mortgage'].includes(debt.kind)&&debt.due&&amount>0;
     if(deadline||!represented.has(debt.id))entries.push({id:debt.id,name:debt.name,kind:debt.kind,amount:deadline?amount:null,repeat:'once',date:deadline?debt.due:null,debt,deadline:Boolean(deadline)});
   }
@@ -270,7 +275,7 @@ export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name
   let scheduled=0;
   for(const p of payments){
     if(p.amount!=null&&(!Number.isSafeInteger(p.amount)||p.amount<=0))throw new Error('Сумма платежа должна быть больше нуля');
-    if(!['monthly','once'].includes(p.repeat))throw new Error('Выбери периодичность платежа');
+    if(!(['monthly','once'].includes(p.repeat)||type==='regular'&&p.repeat==='yearly'&&previous.some(t=>t.id===p.id&&t.repeat==='yearly')))throw new Error('Выбери периодичность платежа');
     if(p.id&&(!owned.has(p.id)||used.has(p.id)))throw new Error('Некорректная запись платежа');
     const paymentId=p.id||crypto.randomUUID();used.add(paymentId);
     const timing=p.repeat==='once'&&!p.date?{date:null}:paymentTiming(p.repeat,p.day,p.date,previous.find(t=>t.id===p.id));
@@ -279,7 +284,7 @@ export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name
     if(isRepayment){
       if(p.repeat!=='once')throw new Error('Для погашения укажи конкретную дату');
       if(due&&timing.date&&timing.date>due)throw new Error('Дата позже срока полного погашения');
-      if(!incomplete)scheduled+=p.amount;
+      if(!incomplete&&timing.date>=today())scheduled+=p.amount;
       if(amount!==null&&scheduled>amount)throw new Error('Сумма превышает остаток долга');
     }
     draft.transactions.push({id:paymentId,name:name.trim(),kind:'expense',amount:p.amount??null,repeat:p.repeat,...timing,...(incomplete?{draft:true}:{}),...(isDebt?(isRepayment?{debtId:id}:{loanDebtId:id}):{explicitSchedule:true})});

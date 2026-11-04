@@ -59,16 +59,19 @@ function render(){
   midnight.setHours(24,0,0,0);
   dayTimer=setTimeout(render,midnight.getTime()-Date.now()+100);
   if(forecastEnd && forecastEnd<now)forecastEnd=null;
-  const end=addDays(now,30);
-  const plan=forecast(state,now,end);
+  const end=forecastEnd||addDays(now,30);
+  let plan;
+  try{plan=forecast(state,now,end);}
+  catch(error){plan={points:[],balance:0,income:0,expense:0,firstShortfall:null,error:error.message};}
   $('#current-date').textContent=new Date(today()+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
   $('#page-name').textContent=titles[page];
   $('#navigation').innerHTML=[['overview','План'],['debts','Платежи'],['income','Доход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
   const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
   $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><strong>${state.balance===null?'Указать':money(state.balance)}</strong>${icon('edit')}`;
   const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
-  const totalDebt=knownDebts.reduce((total,debt)=>total+debt.amount,0),missingDebt=debts.length-knownDebts.length;
-  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  const debtSum=knownDebts.reduce((total,debt)=>total+BigInt(debt.amount),0n);
+  const totalDebt=debtSum<=BigInt(Number.MAX_SAFE_INTEGER)?Number(debtSum):null,missingDebt=debts.length-knownDebts.length;
+  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
@@ -169,16 +172,16 @@ function paymentDialog({debtId=null,transactionId=null}={}){
   const debt=state.debts.find(d=>d.id===(debtId||transaction?.debtId||transaction?.loanDebtId))||state.debts.find(d=>['loan','mortgage'].includes(d.kind)&&loanPayment(state,d)?.id===transactionId);
   const existing=debt?(['loan','mortgage'].includes(debt.kind)?loanPayments(state,debt):plannedRepayments(state,debt.id)):[transaction].filter(Boolean);
   const item=existing[0],type=debt?.kind||'regular',name=debt?.name||transaction?.name||'';
-  const repeat=type==='mortgage'?'monthly':item?.repeat==='once'?'once':'monthly';
+  const repeat=type==='mortgage'?'monthly':item?.repeat||'monthly';
   openDialog(debt||transaction?'Изменить платёж':'Добавить платёж',
     field('name','Название','text',name,'required maxlength="100"')+
     select('entry-type','Тип',{regular:'Личное',loan:'Кредит',mortgage:'Ипотека',personal:'Личный долг',card:'Кредитная карта'},type)+
     `<div id="entry-principal">${field('principal','Остаток долга, ₽','text',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-card"><div class="field-row">${field('credit-limit','Максимальный лимит, ₽','text',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${field('card-balance','Текущий баланс, ₽','text',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
-    `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата'},repeat)}</div>`+
+    `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата',...(type==='regular'&&repeat==='yearly'?{yearly:'Ежегодно'}:{})},repeat)}</div>`+
     `<div id="entry-payment">${field('entry-amount','Сумма платежа, ₽','text',item?.amount!=null?item.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-day">${dayWheel('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
-    `<div id="entry-single-date">${field('entry-date','Дата платежа','date',item?.repeat==='once'?item.date:'')}</div>`+
+    `<div id="entry-single-date">${field('entry-date','Дата платежа','date',item&&item.repeat!=='monthly'?item.date:'')}</div>`+
     `<div id="entry-due">${field('entry-due','Погасить до','date',debt?.due||'')}</div>`+
     `<div id="entry-split"><div id="entry-rows">${(existing.filter(p=>p.repeat==='once').length?existing.filter(p=>p.repeat==='once'):[null]).map(loanDateRow).join('')}</div><button type="button" class="button small" data-action="add-entry-date">Разбить платёж</button></div>`,async data=>{
       const type=data.get('entry-type'),repeat=type==='mortgage'?'monthly':data.get('entry-repeat');
@@ -189,7 +192,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
       }else payments=[...$('#entry-rows').children].map(row=>({id:row.dataset.paymentId||undefined,amount:row.querySelector('[name="loan-amount"]').value.trim(),date:row.querySelector('[name="loan-date"]').value})).filter(p=>p.amount||p.date).map(p=>({...p,amount:p.amount?parseMoney(p.amount):null,repeat:'once'}));
       await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,due:data.get('entry-due')||null,payments}));
     });
-  dialogDelete(transaction?'delete-transaction':'delete-debt',transaction?.id||debt?.id);
+  dialogDelete(debt?'delete-debt':'delete-transaction',debt?.id||transaction?.id);
   updateEntryFields();
 }
 function updateEntryFields(){
@@ -288,9 +291,13 @@ $('#editor-form').addEventListener('input',event=>{
       const card=$('#editor [name="entry-type"]:checked').value==='card';
       const principal=$('#editor [name="principal"]').value.trim();
       const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
-      const total=card?cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null):principal?parseMoney(principal):null;
+      const savedDebt=$('#card-debt-preview').dataset.savedDebt;
+      let total=principal?parseMoney(principal):null;
+      if(card)total=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null)??(savedDebt!==''?Number(savedDebt):null);
       if(total===null)return;
-      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input&&el.closest('.loan-date-row').querySelector('[name="loan-date"]').value>=today()).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const paymentDate=input.closest('.loan-date-row').querySelector('[name="loan-date"]').value;
+      if(paymentDate&&paymentDate<today())return;
       const max=Math.max(0,total-other);if(input.value&&parseMoney(input.value)>max)input.value=String(max/100);
     }catch{}
   }
@@ -311,7 +318,7 @@ $('#close-dialog').onclick=closeDialog;$('#cancel-dialog').onclick=closeDialog;
 $('#editor-form').onsubmit=async event=>{event.preventDefault();if(!dialogSubmit||busy)return;$('#submit-dialog').disabled=true;$('#form-error').textContent='';try{await dialogSubmit(new FormData(event.target));closeDialog();}catch(error){$('#form-error').textContent=error.message;}finally{$('#submit-dialog').disabled=false;}};
 $('#import-file').onchange=async event=>{
   const file=event.target.files[0];event.target.value='';if(!file)return;
-  try{if(file.size>1_900_000)throw new Error('Файл слишком большой');const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
+  try{const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
 };
 function syncStoredState(){
   if(!store||$('#editor').open||busy)return;

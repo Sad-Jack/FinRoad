@@ -1,4 +1,4 @@
-import {cardDebtAmount} from './finance.js';
+import {cardDebtAmount,today} from './finance.js';
 // Persistent browser storage for the standalone file. No HTTP requests.
 export const STORAGE_KEY = 'finroad-state-v1';
 export function emptyState(date) {
@@ -74,7 +74,7 @@ export function validateState(input) {
     check(row.kind==='expense'&&row.repeat==='once'&&(row.draft||row.amount>0),'Погашение должно быть разовым расходом больше нуля');
     if(Object.hasOwn(state.completed,`${row.id}:${row.date}`))continue;
     check(['card','personal'].includes(debt.kind),'Некорректное погашение долга');
-    if(row.draft)continue;
+    if(row.draft||row.date<today())continue;
     check(!debt.due||row.date<=debt.due,'Запланированное погашение позже срока долга');
     const amount=(scheduled.get(debt.id)||0)+row.amount;scheduled.set(debt.id,amount);
     check(debt.amount===null||amount<=debt.amount,'Погашения превышают остаток долга');

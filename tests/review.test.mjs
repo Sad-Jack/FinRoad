@@ -1,5 +1,6 @@
-import test from 'node:test';
+import test,{mock} from 'node:test';
 import assert from 'node:assert/strict';
+mock.timers.enable({apis:['Date'],now:new Date('2026-11-04T12:00:00Z')});
 import {emptyState,validateState} from '../public/storage.js';
 import {forecast,addDays,savePaymentEntry,incomeBreakdown,cardDebtAmount} from '../public/finance.js';
 import {compactPlan,compactIncome} from '../public/compact.js';
@@ -83,4 +84,11 @@ test('credit card repayment limits use the calculated debt and reject changes at
   const before=structuredClone(state);
   assert.throws(()=>savePaymentEntry(state,{debtId:state.debts[0].id,type:'card',name:'Карта',creditLimit:6000000,cardBalance:2000000,payments:[{id:state.transactions[0].id,amount:5000000,repeat:'once',date:'2026-11-10'}]}),/превышает/);
   assert.deepEqual(state,before);
+});
+
+test('forecast rejects unsafe aggregate money instead of losing kopecks',()=>{
+  const state=emptyState('2026-11-04');state.balance=0;
+  state.transactions=Array.from({length:1000},(_,i)=>transaction('income'+i,'2026-11-10','income',1e13));
+  state.transactions.push(transaction('kopeck','2026-11-10','expense',1));
+  assert.throws(()=>forecast(validateState(state),'2026-11-04','2026-11-30'),/точный диапазон/);
 });
