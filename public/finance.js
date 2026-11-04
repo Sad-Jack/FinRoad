@@ -19,6 +19,16 @@ export function parseMoney(value) {
   if (!Number.isSafeInteger(amount) || Math.abs(amount)>1e13) throw new Error('Слишком большая сумма');
   return amount;
 }
+export function cardDebtAmount(limit,balance) {
+  for(const value of [limit,balance]){
+    if(value!==null&&(!Number.isSafeInteger(value)||Math.abs(value)>1e13))throw new Error('Укажи корректную сумму карты');
+  }
+  if(limit!==null&&limit<0)throw new Error('Лимит карты должен быть не меньше нуля');
+  if(limit===null||balance===null)return null;
+  const amount=Math.max(0,limit-balance);
+  if(amount>1e13)throw new Error('Слишком большая сумма долга');
+  return amount;
+}
 function occurrenceDate(year, month, day) {
   return `${year}-${String(month).padStart(2,'0')}-${String(Math.min(day,new Date(year,month,0).getDate())).padStart(2,'0')}`;
 }
@@ -231,7 +241,7 @@ export function paymentEntries(state,referenceDate=today()) {
 }
 
 // One editor for ordinary expenses and debt schedules; existing IDs remain stable.
-export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount=null,due=null,payments=[]}) {
+export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount=null,due=null,payments=[],creditLimit=null,cardBalance=null}) {
   if(!['regular','loan','mortgage','personal','card'].includes(type))throw new Error('Выбери тип платежа');
   if(!name.trim())throw new Error('Укажи название');
   const oldDebt=state.debts.find(d=>d.id===debtId),oldTransaction=state.transactions.find(t=>t.id===transactionId);
@@ -245,11 +255,12 @@ export function savePaymentEntry(state,{debtId=null,transactionId=null,type,name
       return !owned.has(transaction.id) && !linkedToEditedDebt;
     })
   };
+  if(type==='card')amount=cardDebtAmount(creditLimit,cardBalance)??amount;
   const isDebt=type!=='regular',id=isDebt?(debtId||crypto.randomUUID()):null;
   if(isDebt){
     if(amount!==null&&(!Number.isSafeInteger(amount)||amount<0))throw new Error('Укажи корректный остаток долга');
     if(due)paymentTiming('once',null,due);
-    draft.debts.push({id,name:name.trim(),kind:type,amount,explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
+    draft.debts.push({id,name:name.trim(),kind:type,amount,...(type==='card'?{creditLimit,cardBalance}:{}),explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
   }
   if(type==='regular'&&!payments.length)payments=[{id:oldTransaction?.id,repeat:'once',amount:null,date:null}];
   if(type==='regular'&&payments.length!==1)throw new Error('Для личного платежа доступно одно расписание');

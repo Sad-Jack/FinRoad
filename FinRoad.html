@@ -139,6 +139,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
 .ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
 @media(max-width:640px){.ledger-panel .ledger thead th{position:static}}
 
+/* Controls use pointer interaction; content text stays available for copying. */
+:focus-visible,.forecast-date:focus-within,.day-wheel-frame:focus-within{outline:none!important}
+button,label,legend,svg{user-select:none;-webkit-user-select:none}
+input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-select:text}
+#close-dialog{line-height:1;align-self:center}
+#close-dialog .icon{width:20px;height:20px}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -146,7 +153,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
     <header class="terminal-header"><div class="brand"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" title="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button id="header-balance" class="header-balance" type="button" data-action="balance" aria-label="Изменить текущий остаток"></button></div><nav id="navigation" aria-label="Разделы"></nav><div id="header-debt" class="header-debt" aria-live="polite"></div><div id="header-forecast" aria-live="polite"></div><div class="header-right"><span id="current-date"></span></div></header>
     <main><span id="page-name" hidden></span><div id="app" aria-live="polite"><p>Открываем данные…</p></div></main>
   </div>
-  <dialog id="editor"><form id="editor-form"><div class="dialog-heading"><div><div class="eyebrow" id="dialog-eyebrow">ТВОЙ ПЛАН</div><h2 id="dialog-title"></h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Закрыть">×</button></div><div id="dialog-fields"></div><p class="form-error" id="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button danger" id="delete-dialog" hidden>Удалить</button><button type="button" class="button subtle" id="cancel-dialog">Отмена</button><button type="submit" class="button primary" id="submit-dialog">Сохранить</button></div></form></dialog>
+  <dialog id="editor"><form id="editor-form"><div class="dialog-heading"><div><div class="eyebrow" id="dialog-eyebrow">ТВОЙ ПЛАН</div><h2 id="dialog-title"></h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Закрыть"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="dialog-fields"></div><p class="form-error" id="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button danger" id="delete-dialog" hidden>Удалить</button><button type="button" class="button subtle" id="cancel-dialog">Отмена</button><button type="submit" class="button primary" id="submit-dialog">Сохранить</button></div></form></dialog>
   <div id="toast" role="status"></div><input id="import-file" type="file" accept="application/json,.json" hidden>
   <script>
 const module_0 = (() => {
@@ -193,6 +200,16 @@ function parseMoney(value) {
   if (!/^-?\d+(\.\d{1,2})?$/.test(text)) throw new Error('Введи сумму с точностью до копеек');
   const amount = Math.round(Number(text)*100);
   if (!Number.isSafeInteger(amount) || Math.abs(amount)>1e13) throw new Error('Слишком большая сумма');
+  return amount;
+}
+function cardDebtAmount(limit,balance) {
+  for(const value of [limit,balance]){
+    if(value!==null&&(!Number.isSafeInteger(value)||Math.abs(value)>1e13))throw new Error('Укажи корректную сумму карты');
+  }
+  if(limit!==null&&limit<0)throw new Error('Лимит карты должен быть не меньше нуля');
+  if(limit===null||balance===null)return null;
+  const amount=Math.max(0,limit-balance);
+  if(amount>1e13)throw new Error('Слишком большая сумма долга');
   return amount;
 }
 function occurrenceDate(year, month, day) {
@@ -407,7 +424,7 @@ function paymentEntries(state,referenceDate=today()) {
 }
 
 // One editor for ordinary expenses and debt schedules; existing IDs remain stable.
-function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount=null,due=null,payments=[]}) {
+function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount=null,due=null,payments=[],creditLimit=null,cardBalance=null}) {
   if(!['regular','loan','mortgage','personal','card'].includes(type))throw new Error('Выбери тип платежа');
   if(!name.trim())throw new Error('Укажи название');
   const oldDebt=state.debts.find(d=>d.id===debtId),oldTransaction=state.transactions.find(t=>t.id===transactionId);
@@ -421,11 +438,12 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
       return !owned.has(transaction.id) && !linkedToEditedDebt;
     })
   };
+  if(type==='card')amount=cardDebtAmount(creditLimit,cardBalance)??amount;
   const isDebt=type!=='regular',id=isDebt?(debtId||crypto.randomUUID()):null;
   if(isDebt){
     if(amount!==null&&(!Number.isSafeInteger(amount)||amount<0))throw new Error('Укажи корректный остаток долга');
     if(due)paymentTiming('once',null,due);
-    draft.debts.push({id,name:name.trim(),kind:type,amount,explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
+    draft.debts.push({id,name:name.trim(),kind:type,amount,...(type==='card'?{creditLimit,cardBalance}:{}),explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
   }
   if(type==='regular'&&!payments.length)payments=[{id:oldTransaction?.id,repeat:'once',amount:null,date:null}];
   if(type==='regular'&&payments.length!==1)throw new Error('Для личного платежа доступно одно расписание');
@@ -452,7 +470,7 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
   state.debts=draft.debts;state.transactions=draft.transactions;
 }
 
-return {today,addDays,monthEnd,parseMoney,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,saveLoanPayments,paymentTiming,saveLoanPayment,eventsBetween,forecast,nextIncomeDate,settle,undoSettlement,incomeBreakdown,incomeTransactions,saveIncomeSource,paymentEntries,savePaymentEntry};
+return {today,addDays,monthEnd,parseMoney,cardDebtAmount,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,saveLoanPayments,paymentTiming,saveLoanPayment,eventsBetween,forecast,nextIncomeDate,settle,undoSettlement,incomeBreakdown,incomeTransactions,saveIncomeSource,paymentEntries,savePaymentEntry};
 })();
 const module_2 = (() => {
 function compactPlan(ctx) {
@@ -512,6 +530,7 @@ function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money
 return {compactPlan,compactDebts,compactIncome,headerForecast};
 })();
 const module_3 = (() => {
+const {cardDebtAmount} = module_1;
 // Persistent browser storage for the standalone file. No HTTP requests.
 const STORAGE_KEY = 'finroad-state-v1';
 function emptyState(date) {
@@ -552,6 +571,10 @@ function validateState(input) {
       money(row.amount,collection==='debts'||draft);
       if(collection==='debts') {
         check(['loan','mortgage','personal','card'].includes(row.kind),'Некорректный тип долга');
+        if(row.kind==='card'){
+          const calculated=cardDebtAmount(row.creditLimit??null,row.cardBalance??null);
+          if(calculated!==null)check(row.amount===calculated,'Остаток долга не совпадает с лимитом и балансом карты');
+        }
         if(row.due)date(row.due);
       } else {
         check(['income','expense'].includes(row.kind)&&['once','monthly','yearly'].includes(row.repeat),'Некорректный тип операции');
@@ -713,7 +736,7 @@ return {initDatePickers};
 const module_5 = (() => {
 const {initDatePickers} = module_4;
 const {browserStore,validateState,STORAGE_KEY} = module_3;
-const {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} = module_1;
+const {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
 const {compactPlan,compactDebts,compactIncome,headerForecast} = module_2;
 const $=s=>document.querySelector(s);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -887,6 +910,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
     field('name','Название','text',name,'required maxlength="100"')+
     select('entry-type','Тип',{regular:'Личное',loan:'Кредит',mortgage:'Ипотека',personal:'Личный долг',card:'Кредитная карта'},type)+
     `<div id="entry-principal">${field('principal','Остаток долга, ₽','text',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
+    `<div id="entry-card"><div class="field-row">${field('credit-limit','Максимальный лимит, ₽','text',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${field('card-balance','Текущий баланс, ₽','text',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
     `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата'},repeat)}</div>`+
     `<div id="entry-payment">${field('entry-amount','Сумма платежа, ₽','text',item?.amount!=null?item.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-day">${dayWheel('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
@@ -899,7 +923,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
         const amount=data.get('entry-amount')?.trim();
         payments=[{id:type==='regular'?transaction?.id||item?.id:(item?.repeat==='monthly'?item.id:undefined),amount:amount?parseMoney(amount):null,repeat,day:Number(data.get('entry-day')),date:data.get('entry-date')}];
       }else payments=[...$('#entry-rows').children].map(row=>({id:row.dataset.paymentId||undefined,amount:row.querySelector('[name="loan-amount"]').value.trim(),date:row.querySelector('[name="loan-date"]').value})).filter(p=>p.amount||p.date).map(p=>({...p,amount:p.amount?parseMoney(p.amount):null,repeat:'once'}));
-      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),due:data.get('entry-due')||null,payments}));
+      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,due:data.get('entry-due')||null,payments}));
     });
   dialogDelete(transaction?'delete-transaction':'delete-debt',transaction?.id||debt?.id);
   updateEntryFields();
@@ -909,11 +933,21 @@ function updateEntryFields(){
   const type=$('#editor [name="entry-type"]:checked').value;
   const monthly=type==='mortgage'||$('#editor [name="entry-repeat"]:checked').value==='monthly';
   const split=['card','personal'].includes(type)||type==='loan'&&!monthly;
-  for(const [selector,enabled] of [['#entry-principal',type!=='regular'],['#entry-repeat',['regular','loan'].includes(type)],['#entry-payment',!split],['#entry-day',!split&&monthly],['#entry-single-date',type==='regular'&&!monthly],['#entry-due',['card','personal'].includes(type)],['#entry-split',split]]){
+  for(const [selector,enabled] of [['#entry-principal',!['regular','card'].includes(type)],['#entry-card',type==='card'],['#entry-repeat',['regular','loan'].includes(type)],['#entry-payment',!split],['#entry-day',!split&&monthly],['#entry-single-date',type==='regular'&&!monthly],['#entry-due',['card','personal'].includes(type)],['#entry-split',split]]){
     const section=$(selector);section.hidden=!enabled;section.querySelectorAll('input').forEach(input=>input.disabled=!enabled);
   }
   $('#entry-split [data-action="add-entry-date"]').textContent=type==='loan'?'Добавить дату':'Разбить платёж';
+  updateCardDebtPreview();
   initDayWheels();
+}
+function updateCardDebtPreview(){
+  const preview=$('#card-debt-preview');
+  if(!preview||$('#entry-card').hidden)return;
+  try{
+    const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
+    const amount=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null);
+    preview.textContent=amount===null?(preview.dataset.savedDebt!==''?'Сохранённый долг '+money(Number(preview.dataset.savedDebt)):'Долг —'):'Долг '+money(amount);
+  }catch(error){preview.textContent=error.message;}
 }
 $('#editor-form').addEventListener('change',event=>{if(['entry-type','entry-repeat'].includes(event.target.name))updateEntryFields();});
 function transactionDialog(kind='expense',id=null,date=today()){
@@ -971,6 +1005,7 @@ async function handle(action,el){
   if(action==='import'){$('#import-file').click();return;}
 
 }
+document.addEventListener('keydown',event=>{if(event.key==='Tab')event.preventDefault();},true);
 document.addEventListener('keydown',event=>{const row=event.target.closest('tr[data-action]');if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();row.click();}});
 document.addEventListener('change',event=>{
   if(event.target.id!=='forecast-date')return;
@@ -983,10 +1018,15 @@ document.addEventListener('change',event=>{
 document.addEventListener('click',event=>{const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;
+  if(['credit-limit','card-balance'].includes(input.name))updateCardDebtPreview();
   if(input.name==='loan-amount'&&$('#entry-rows')&&['card','personal'].includes($('#editor [name="entry-type"]:checked')?.value)){
     try{
-      if(!$('#editor [name="principal"]').value.trim())return;
-      const total=parseMoney($('#editor [name="principal"]').value),other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const card=$('#editor [name="entry-type"]:checked').value==='card';
+      const principal=$('#editor [name="principal"]').value.trim();
+      const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
+      const total=card?cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null):principal?parseMoney(principal):null;
+      if(total===null)return;
+      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
       const max=Math.max(0,total-other);if(input.value&&parseMoney(input.value)>max)input.value=String(max/100);
     }catch{}
   }

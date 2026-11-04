@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {emptyState,validateState} from '../public/storage.js';
-import {forecast,addDays,savePaymentEntry,incomeBreakdown} from '../public/finance.js';
+import {forecast,addDays,savePaymentEntry,incomeBreakdown,cardDebtAmount} from '../public/finance.js';
 import {compactPlan,compactIncome} from '../public/compact.js';
 
 const transaction=(name,date,kind,amount)=>({name,id:name,date,kind,amount,repeat:'once'});
@@ -52,4 +52,35 @@ test('a new loan and a standalone payment can share a name without being edited 
   savePaymentEntry(state,{type:'loan',name:'Банк',debtId:state.debts[0].id,payments:[{amount:3000,repeat:'monthly',day:10}]});
   assert.deepEqual(state.transactions.find(row=>row.id===standalone.id),standalone);
   assert.equal(state.transactions.length,2);
+});
+
+test('credit card debt derives from limit and balance and survives export/import',()=>{
+  const state=emptyState('2026-11-04');
+  savePaymentEntry(state,{type:'card',name:'Карта',creditLimit:6000000,cardBalance:380000});
+  assert.equal(state.debts[0].amount,5620000);
+  const restored=validateState(JSON.parse(JSON.stringify(state)));
+  assert.deepEqual(restored,state);
+  assert.equal(cardDebtAmount(6000000,6100000),0);
+  assert.equal(cardDebtAmount(6000000,-10000),6010000);
+  assert.throws(()=>cardDebtAmount(-1,0),/Лимит/);
+  restored.debts[0].amount=1;
+  assert.throws(()=>validateState(restored),/не совпадает/);
+});
+
+test('editing a legacy card preserves its known debt until both new amounts are entered',()=>{
+  const state=emptyState('2026-11-04');
+  state.debts=[{id:'card',kind:'card',name:'Карта',amount:3400000}];
+  savePaymentEntry(state,{debtId:'card',type:'card',name:'Карта',amount:3400000,creditLimit:6000000});
+  assert.equal(state.debts[0].amount,3400000);
+  assert.equal(validateState(state).debts[0].creditLimit,6000000);
+  savePaymentEntry(state,{debtId:'card',type:'card',name:'Карта',creditLimit:6000000,cardBalance:380000});
+  assert.equal(state.debts[0].amount,5620000);
+});
+
+test('credit card repayment limits use the calculated debt and reject changes atomically',()=>{
+  const state=emptyState('2026-11-04');
+  savePaymentEntry(state,{type:'card',name:'Карта',creditLimit:6000000,cardBalance:380000,payments:[{amount:5000000,repeat:'once',date:'2026-11-10'}]});
+  const before=structuredClone(state);
+  assert.throws(()=>savePaymentEntry(state,{debtId:state.debts[0].id,type:'card',name:'Карта',creditLimit:6000000,cardBalance:2000000,payments:[{id:state.transactions[0].id,amount:5000000,repeat:'once',date:'2026-11-10'}]}),/превышает/);
+  assert.deepEqual(state,before);
 });

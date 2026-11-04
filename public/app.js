@@ -1,6 +1,6 @@
 import {initDatePickers} from './date-picker.js';
 import {browserStore,validateState,STORAGE_KEY} from './storage.js';
-import {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry} from './finance.js';
+import {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} from './finance.js';
 import {compactPlan,compactDebts,compactIncome,headerForecast} from './compact.js';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -174,6 +174,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
     field('name','Название','text',name,'required maxlength="100"')+
     select('entry-type','Тип',{regular:'Личное',loan:'Кредит',mortgage:'Ипотека',personal:'Личный долг',card:'Кредитная карта'},type)+
     `<div id="entry-principal">${field('principal','Остаток долга, ₽','text',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
+    `<div id="entry-card"><div class="field-row">${field('credit-limit','Максимальный лимит, ₽','text',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${field('card-balance','Текущий баланс, ₽','text',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
     `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата'},repeat)}</div>`+
     `<div id="entry-payment">${field('entry-amount','Сумма платежа, ₽','text',item?.amount!=null?item.amount/100:'','inputmode="decimal"')}</div>`+
     `<div id="entry-day">${dayWheel('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
@@ -186,7 +187,7 @@ function paymentDialog({debtId=null,transactionId=null}={}){
         const amount=data.get('entry-amount')?.trim();
         payments=[{id:type==='regular'?transaction?.id||item?.id:(item?.repeat==='monthly'?item.id:undefined),amount:amount?parseMoney(amount):null,repeat,day:Number(data.get('entry-day')),date:data.get('entry-date')}];
       }else payments=[...$('#entry-rows').children].map(row=>({id:row.dataset.paymentId||undefined,amount:row.querySelector('[name="loan-amount"]').value.trim(),date:row.querySelector('[name="loan-date"]').value})).filter(p=>p.amount||p.date).map(p=>({...p,amount:p.amount?parseMoney(p.amount):null,repeat:'once'}));
-      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),due:data.get('entry-due')||null,payments}));
+      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,due:data.get('entry-due')||null,payments}));
     });
   dialogDelete(transaction?'delete-transaction':'delete-debt',transaction?.id||debt?.id);
   updateEntryFields();
@@ -196,11 +197,21 @@ function updateEntryFields(){
   const type=$('#editor [name="entry-type"]:checked').value;
   const monthly=type==='mortgage'||$('#editor [name="entry-repeat"]:checked').value==='monthly';
   const split=['card','personal'].includes(type)||type==='loan'&&!monthly;
-  for(const [selector,enabled] of [['#entry-principal',type!=='regular'],['#entry-repeat',['regular','loan'].includes(type)],['#entry-payment',!split],['#entry-day',!split&&monthly],['#entry-single-date',type==='regular'&&!monthly],['#entry-due',['card','personal'].includes(type)],['#entry-split',split]]){
+  for(const [selector,enabled] of [['#entry-principal',!['regular','card'].includes(type)],['#entry-card',type==='card'],['#entry-repeat',['regular','loan'].includes(type)],['#entry-payment',!split],['#entry-day',!split&&monthly],['#entry-single-date',type==='regular'&&!monthly],['#entry-due',['card','personal'].includes(type)],['#entry-split',split]]){
     const section=$(selector);section.hidden=!enabled;section.querySelectorAll('input').forEach(input=>input.disabled=!enabled);
   }
   $('#entry-split [data-action="add-entry-date"]').textContent=type==='loan'?'Добавить дату':'Разбить платёж';
+  updateCardDebtPreview();
   initDayWheels();
+}
+function updateCardDebtPreview(){
+  const preview=$('#card-debt-preview');
+  if(!preview||$('#entry-card').hidden)return;
+  try{
+    const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
+    const amount=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null);
+    preview.textContent=amount===null?(preview.dataset.savedDebt!==''?'Сохранённый долг '+money(Number(preview.dataset.savedDebt)):'Долг —'):'Долг '+money(amount);
+  }catch(error){preview.textContent=error.message;}
 }
 $('#editor-form').addEventListener('change',event=>{if(['entry-type','entry-repeat'].includes(event.target.name))updateEntryFields();});
 function transactionDialog(kind='expense',id=null,date=today()){
@@ -258,6 +269,7 @@ async function handle(action,el){
   if(action==='import'){$('#import-file').click();return;}
 
 }
+document.addEventListener('keydown',event=>{if(event.key==='Tab')event.preventDefault();},true);
 document.addEventListener('keydown',event=>{const row=event.target.closest('tr[data-action]');if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();row.click();}});
 document.addEventListener('change',event=>{
   if(event.target.id!=='forecast-date')return;
@@ -270,10 +282,15 @@ document.addEventListener('change',event=>{
 document.addEventListener('click',event=>{const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;
+  if(['credit-limit','card-balance'].includes(input.name))updateCardDebtPreview();
   if(input.name==='loan-amount'&&$('#entry-rows')&&['card','personal'].includes($('#editor [name="entry-type"]:checked')?.value)){
     try{
-      if(!$('#editor [name="principal"]').value.trim())return;
-      const total=parseMoney($('#editor [name="principal"]').value),other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
+      const card=$('#editor [name="entry-type"]:checked').value==='card';
+      const principal=$('#editor [name="principal"]').value.trim();
+      const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
+      const total=card?cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null):principal?parseMoney(principal):null;
+      if(total===null)return;
+      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
       const max=Math.max(0,total-other);if(input.value&&parseMoney(input.value)>max)input.value=String(max/100);
     }catch{}
   }

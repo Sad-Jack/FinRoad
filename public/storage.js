@@ -1,3 +1,4 @@
+import {cardDebtAmount} from './finance.js';
 // Persistent browser storage for the standalone file. No HTTP requests.
 export const STORAGE_KEY = 'finroad-state-v1';
 export function emptyState(date) {
@@ -38,6 +39,10 @@ export function validateState(input) {
       money(row.amount,collection==='debts'||draft);
       if(collection==='debts') {
         check(['loan','mortgage','personal','card'].includes(row.kind),'Некорректный тип долга');
+        if(row.kind==='card'){
+          const calculated=cardDebtAmount(row.creditLimit??null,row.cardBalance??null);
+          if(calculated!==null)check(row.amount===calculated,'Остаток долга не совпадает с лимитом и балансом карты');
+        }
         if(row.due)date(row.due);
       } else {
         check(['income','expense'].includes(row.kind)&&['once','monthly','yearly'].includes(row.repeat),'Некорректный тип операции');
