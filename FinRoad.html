@@ -148,6 +148,19 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 
 .transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}
 
+/* A short introduction only appears in the public, temporary demo. */
+.demo-intro{display:flex;justify-content:space-between;align-items:center;gap:32px;padding:34px 0 28px;max-width:1180px;margin:auto}
+.demo-copy{max-width:740px}.demo-brand{color:var(--text);font-size:22px;font-weight:600;letter-spacing:-.5px;text-decoration:none}
+.demo-badge{display:inline-block;margin:0 0 0 14px;font-size:9px;letter-spacing:1px;color:var(--mint)}
+.demo-copy h1{font-size:clamp(23px,3vw,34px);font-weight:500;letter-spacing:-.7px;margin:12px 0 10px;line-height:1.2}
+.demo-copy p{font-size:13px;line-height:1.7;color:var(--muted);margin:0 0 10px}
+.demo-copy small{display:block;font-size:11px;line-height:1.6;color:var(--muted)}
+.demo-actions{display:flex;flex-direction:column;gap:9px;flex-shrink:0;min-width:190px}
+.demo-actions .button{justify-content:center;text-decoration:none;font-size:12px;padding:11px 16px}
+.demo-source{font-size:11px;color:var(--muted);text-align:center;text-decoration:none;padding-top:3px}
+.demo-source:hover,.demo-brand:hover{color:var(--purple)}
+@media(max-width:640px){.demo-intro{display:block;padding:24px 0 22px}.demo-badge{margin-left:10px;font-size:8px;letter-spacing:.5px}.demo-copy p{font-size:12px}.demo-copy small{font-size:10px}.demo-actions{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;min-width:0;gap:8px}.demo-actions .button{padding:10px 8px;font-size:11px}.demo-source{grid-column:1/-1;padding:6px 0 0}}
+
 @media(max-width:640px){
   .payment-ledger tfoot tr{display:flex;justify-content:space-between;gap:12px}
   .payment-ledger tfoot .debt-total{text-align:right}
@@ -663,6 +676,48 @@ function browserStore(storage) {
 return {STORAGE_KEY,emptyState,validateState,browserStore};
 })();
 const module_4 = (() => {
+const {addDays} = module_1;
+const {emptyState,validateState} = module_3;
+
+// Synthetic dates follow the visitor's day so the example never expires.
+function demoState(date) {
+  const state=emptyState(date);
+  state.demo=true;
+  state.balance=1800000;
+  state.debts=[
+    {id:'demo-loan',name:'Кредит',kind:'loan',amount:18000000,explicitSchedule:true},
+    {id:'demo-card',name:'Кредитная карта',kind:'card',creditLimit:10000000,cardBalance:7000000,amount:3000000}
+  ];
+  state.transactions=[
+    {id:'demo-rent',name:'Аренда квартиры',amount:2500000,date:addDays(date,2)},
+    {id:'demo-food',name:'Продукты на неделю',amount:600000,date:addDays(date,4)},
+    {id:'demo-loan-payment',name:'Кредит',amount:1200000,date:addDays(date,12),loanDebtId:'demo-loan'},
+    {id:'demo-living',name:'Продукты и транспорт',amount:800000,date:addDays(date,17)},
+    {id:'demo-bills',name:'Коммунальные платежи',amount:700000,date:addDays(date,25)},
+    {id:'demo-card-payment',name:'Кредитная карта',amount:1000000,date:addDays(date,27),debtId:'demo-card'}
+  ].map(row=>({...row,kind:'expense',repeat:'once'}));
+  state.incomeSources=[
+    {id:'demo-salary',name:'Зарплата',amount:6000000,date:addDays(date,8)},
+    {id:'demo-advance',name:'Аванс',amount:4000000,date:addDays(date,22)}
+  ].map(row=>({...row,taxRate:0,salaryShare:10000,repeat:'once'}));
+  return validateState(state);
+}
+
+// The demo never reads or writes browser storage, even after editing or import.
+function demoStore(date) {
+  let record={revision:1,state:demoState(date)};
+  const read=()=>structuredClone(record);
+  function save(state,revision) {
+    if(revision!==record.revision)throw new Error('Обнови пример перед сохранением');
+    record={revision:revision+1,state:validateState(state)};
+    return read();
+  }
+  return {read,save,restore:state=>save(state,record.revision),load:read};
+}
+
+return {demoState,demoStore};
+})();
+const module_5 = (() => {
 // A shared, local calendar for every date field, including fields inside dialogs.
 function initDatePickers(){
   const popup=document.createElement('div');
@@ -750,11 +805,13 @@ function initDatePickers(){
 
 return {initDatePickers};
 })();
-const module_5 = (() => {
-const {initDatePickers} = module_4;
+const module_6 = (() => {
+const {initDatePickers} = module_5;
 const {browserStore,validateState,STORAGE_KEY} = module_3;
 const {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
 const {compactPlan,compactDebts,compactIncome,headerForecast} = module_2;
+const {demoStore} = module_4;
+const isDemo=document.body.dataset.demo==='true';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=(value,sign=false)=>`${sign&&value>0?'+':''}${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:value%100?2:0}).format(value/100)} ₽`;
@@ -779,15 +836,15 @@ function applyTheme(theme){
   $('meta[name="theme-color"]').content=day?'#d8eafb':'#0b1021';
 }
 let savedTheme='night';
-try{savedTheme=localStorage.getItem('finroad-theme')==='day'?'day':'night';}catch{}
+try{if(!isDemo)savedTheme=localStorage.getItem('finroad-theme')==='day'?'day':'night';}catch{}
 applyTheme(savedTheme);
 $('#theme-toggle').onclick=()=>{
   const theme=document.documentElement.dataset.theme==='day'?'night':'day';
   applyTheme(theme);
-  try{localStorage.setItem('finroad-theme',theme);}catch{}
+  try{if(!isDemo)localStorage.setItem('finroad-theme',theme);}catch{}
 };
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),4000);}
-async function save(next,message='Сохранено в браузере',restore=false){
+async function save(next,message=isDemo?'Изменено в примере · до перезагрузки':'Сохранено в браузере',restore=false){
   if(busy) throw new Error('Дождись предыдущего сохранения');
   busy=true;
   try{
@@ -997,6 +1054,10 @@ function balanceDialog(){
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
+  if(action==='reset-demo'&&isDemo){
+    store=demoStore(today());({state,revision}=store.load());
+    forecastEnd=null;page='overview';debtFilter='all';render();notify('Исходный пример восстановлен');return;
+  }
   if(action==='debt-filter'){debtFilter=el.dataset.kind;render();return;}
   if(action==='add-entry-date'){$('#entry-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
   if(action==='add-loan-date'){$('#loan-date-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
@@ -1074,7 +1135,7 @@ $('#import-file').onchange=async event=>{
   try{const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
 };
 function syncStoredState(){
-  if(!store||$('#editor').open||busy)return;
+  if(isDemo||!store||$('#editor').open||busy)return;
   try{const latest=store.read();if(latest&&latest.revision!==revision){({state,revision}=latest);render();}}
   catch(error){notify(error.message);}
 }
@@ -1083,7 +1144,7 @@ window.addEventListener('focus',()=>{
   syncStoredState();
   if(state && renderedDay!==today())render();
 });
-try{store=browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
+try{store=isDemo?demoStore(today()):browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
 
 initDatePickers();

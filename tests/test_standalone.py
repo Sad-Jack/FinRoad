@@ -22,6 +22,17 @@ class StandaloneTest(unittest.TestCase):
         self.assertNotIn('fetch(', html)
         self.assertIn("connect-src 'none'", html)
 
+    def test_demo_has_an_explicit_temporary_mode_and_download_is_an_empty_app(self):
+        builder = module('build_standalone')
+        demo, standalone = builder.build(demo=True), builder.build()
+        self.assertIn('<body data-demo="true">', demo)
+        self.assertIn('download="FinRoad.html"', demo)
+        self.assertIn('data-action="reset-demo"', demo)
+        self.assertNotIn('<body data-demo="true">', standalone)
+        self.assertNotIn('class="demo-intro"', standalone)
+        self.assertNotIn('type="module"', demo)
+        self.assertIn("connect-src 'none'", demo)
+
     def test_export_keeps_original_database_and_existing_backup_untouched(self):
         with tempfile.TemporaryDirectory() as tmp:
             db, output = Path(tmp) / 'old.sqlite3', Path(tmp) / 'backup.json'

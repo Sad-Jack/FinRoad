@@ -5,10 +5,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-def build():
+def build(demo=False):
     modules = {}
     chunks = []
-    for filename in ('work-calendar.js', 'finance.js', 'compact.js', 'storage.js', 'date-picker.js', 'app.js'):
+    for filename in ('work-calendar.js', 'finance.js', 'compact.js', 'storage.js', 'demo.js', 'date-picker.js', 'app.js'):
         source = (ROOT / 'public' / filename).read_text()
         def replace_import(match):
             return f'const {{{match[1]}}} = {modules[match[2]]};'
@@ -21,6 +21,17 @@ def build():
         modules[filename] = module
         chunks.append(f'const {module} = (() => {{\n{source}\nreturn {{{",".join(exports)}}};\n}})();')
     html = (ROOT / 'public/index.html').read_text()
+    if demo:
+        html = html.replace('<body>', '<body data-demo="true">')
+        html = html.replace('<title>FinRoad · Финансы под звёздами</title>', '<title>FinRoad · Попробовать на примере</title>')
+        banner = '''<section class="demo-intro" aria-label="Знакомство с FinRoad">
+          <div class="demo-copy"><a class="demo-brand" href="https://github.com/Sad-Jack/FinRoad">FinRoad</a><span class="demo-badge">ДЕМО · ВЫМЫШЛЕННЫЕ ДАННЫЕ</span>
+          <h1>Хватит ли денег до зарплаты?</h1>
+          <p>В исходном примере итог за месяц положительный, но до зарплаты денег не хватает. Меняй суммы и даты во вкладках «Платежи» и «Доход» — прогноз пересчитается.</p>
+          <small>Изменения в демо действуют до перезагрузки. Скачанный файл откроется с пустым планом и будет сохранять твои записи в браузере.</small></div>
+          <div class="demo-actions"><a class="button primary" href="FinRoad.html" download="FinRoad.html">Скачать для себя</a><button class="button" type="button" data-action="reset-demo">Вернуть пример</button><a class="demo-source" href="https://github.com/Sad-Jack/FinRoad">Код и инструкция на GitHub ↗</a></div>
+        </section>'''
+        html = html.replace('<header class="terminal-header">', banner + '<header class="terminal-header">')
     favicon = base64.b64encode((ROOT / 'public/favicon.svg').read_bytes()).decode()
     html = html.replace('href="/favicon.svg"', f'href="data:image/svg+xml;base64,{favicon}"')
     css = (ROOT / 'public/style.css').read_text()

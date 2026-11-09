@@ -2,6 +2,8 @@ import {initDatePickers} from './date-picker.js';
 import {browserStore,validateState,STORAGE_KEY} from './storage.js';
 import {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} from './finance.js';
 import {compactPlan,compactDebts,compactIncome,headerForecast} from './compact.js';
+import {demoStore} from './demo.js';
+const isDemo=document.body.dataset.demo==='true';
 const $=s=>document.querySelector(s);
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=(value,sign=false)=>`${sign&&value>0?'+':''}${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:value%100?2:0}).format(value/100)} ₽`;
@@ -26,15 +28,15 @@ function applyTheme(theme){
   $('meta[name="theme-color"]').content=day?'#d8eafb':'#0b1021';
 }
 let savedTheme='night';
-try{savedTheme=localStorage.getItem('finroad-theme')==='day'?'day':'night';}catch{}
+try{if(!isDemo)savedTheme=localStorage.getItem('finroad-theme')==='day'?'day':'night';}catch{}
 applyTheme(savedTheme);
 $('#theme-toggle').onclick=()=>{
   const theme=document.documentElement.dataset.theme==='day'?'night':'day';
   applyTheme(theme);
-  try{localStorage.setItem('finroad-theme',theme);}catch{}
+  try{if(!isDemo)localStorage.setItem('finroad-theme',theme);}catch{}
 };
 function notify(message){$('#toast').textContent=message;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),4000);}
-async function save(next,message='Сохранено в браузере',restore=false){
+async function save(next,message=isDemo?'Изменено в примере · до перезагрузки':'Сохранено в браузере',restore=false){
   if(busy) throw new Error('Дождись предыдущего сохранения');
   busy=true;
   try{
@@ -244,6 +246,10 @@ function balanceDialog(){
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
+  if(action==='reset-demo'&&isDemo){
+    store=demoStore(today());({state,revision}=store.load());
+    forecastEnd=null;page='overview';debtFilter='all';render();notify('Исходный пример восстановлен');return;
+  }
   if(action==='debt-filter'){debtFilter=el.dataset.kind;render();return;}
   if(action==='add-entry-date'){$('#entry-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
   if(action==='add-loan-date'){$('#loan-date-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
@@ -321,7 +327,7 @@ $('#import-file').onchange=async event=>{
   try{const imported=validateState(JSON.parse(await file.text()));confirmDialog('Восстановить данные?',`Файл «${esc(file.name)}»: ${imported.transactions.length} событий и ${imported.debts.length} долгов. Текущие данные будут заменены.`,async()=>save(imported,'Резервная копия восстановлена',true),'Восстановить');}catch(error){notify(error.message);}
 };
 function syncStoredState(){
-  if(!store||$('#editor').open||busy)return;
+  if(isDemo||!store||$('#editor').open||busy)return;
   try{const latest=store.read();if(latest&&latest.revision!==revision){({state,revision}=latest);render();}}
   catch(error){notify(error.message);}
 }
@@ -330,7 +336,7 @@ window.addEventListener('focus',()=>{
   syncStoredState();
   if(state && renderedDay!==today())render();
 });
-try{store=browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
+try{store=isDemo?demoStore(today()):browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
 
 initDatePickers();
