@@ -2,8 +2,8 @@ import test,{mock} from 'node:test';
 import assert from 'node:assert/strict';
 mock.timers.enable({apis:['Date'],now:new Date('2026-11-04T12:00:00Z')});
 import {emptyState,validateState} from '../public/storage.js';
-import {forecast,addDays,savePaymentEntry,incomeBreakdown,cardDebtAmount} from '../public/finance.js';
-import {compactPlan,compactIncome} from '../public/compact.js';
+import {forecast,addDays,savePaymentEntry,incomeBreakdown,cardDebtAmount,paymentEntries} from '../public/finance.js';
+import {compactPlan,compactIncome,compactDebts} from '../public/compact.js';
 
 const transaction=(name,date,kind,amount)=>({name,id:name,date,kind,amount,repeat:'once'});
 
@@ -91,4 +91,26 @@ test('forecast rejects unsafe aggregate money instead of losing kopecks',()=>{
   state.transactions=Array.from({length:1000},(_,i)=>transaction('income'+i,'2026-11-10','income',1e13));
   state.transactions.push(transaction('kopeck','2026-11-10','expense',1));
   assert.throws(()=>forecast(validateState(state),'2026-11-04','2026-11-30'),/точный диапазон/);
+});
+
+test('payment footer totals debt by filter once even with several scheduled rows',()=>{
+  const state=emptyState('2026-11-04');
+  state.debts=[
+    {id:'loan',name:'Loan',kind:'loan',amount:10001},
+    {id:'card',name:'Card',kind:'card',amount:20002},
+    {id:'home',name:'Home',kind:'mortgage',amount:30003},
+    {id:'friend',name:'Friend',kind:'personal',amount:40004}
+  ];
+  state.transactions=[1,2].map(n=>({...transaction('part'+n,'2026-11-10','expense',1000),debtId:'card'}));
+  const ctx={state,paymentEntries,money:String,esc:String,dateLabel:String,kindNames:{},button:()=>''};
+  for(const [debtFilter,total] of [['all',100010],['loan',10001],['card',20002],['mortgage',30003],['personal',40004],['regular',0]]){
+    const html=compactDebts({...ctx,debtFilter});
+    assert.match(html,new RegExp('<tfoot>.*Всего.*class="numeric debt-total">'+total+'</td>', 's'));
+  }
+  state.debts.push({id:'unknown',name:'Unknown',kind:'card',amount:null});
+  assert.match(compactDebts({...ctx,debtFilter:'card'}),/не заполнено 1/);
+  state.debts=state.debts.filter(debt=>debt.amount===null);state.transactions=[];
+  assert.match(compactDebts({...ctx,debtFilter:'card'}),/class="numeric debt-total">—<\/td>/);
+  state.debts=[];
+  assert.match(compactDebts({...ctx,debtFilter:'all'}),/class="numeric debt-total">0<\/td>/);
 });

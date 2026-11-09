@@ -148,6 +148,11 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 
 .transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}
 
+@media(max-width:640px){
+  .payment-ledger tfoot tr{display:flex;justify-content:space-between;gap:12px}
+  .payment-ledger tfoot .debt-total{text-align:right}
+}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
@@ -512,12 +517,17 @@ function compactDebts(ctx) {
   const {state,money,icon,button,esc,dateLabel,kindNames,debtFilter,paymentEntries}=ctx;
   const entries=paymentEntries(state),groups=[['all','Все'],['regular','Личное'],['mortgage','Ипотека'],['loan','Кредиты'],['card','Кредитные карты'],['personal','Личные долги']];
   const filtered=entries.filter(e=>debtFilter==='all'||e.kind===debtFilter);
+  const debts=state.debts.filter(debt=>debtFilter==='all'||debt.kind===debtFilter);
+  const known=debts.filter(debt=>debt.amount!==null),missing=debts.length-known.length;
+  const total=known.reduce((sum,debt)=>sum+BigInt(debt.amount),0n);
+  const totalLabel=debts.length&&!known.length?'—':total>BigInt(Number.MAX_SAFE_INTEGER)?'Сумма вне диапазона':money(Number(total));
+
   return `<section class="panel ledger-panel"><div class="ledger-toolbar"><div class="debt-tabs" role="tablist" aria-label="Тип платежа">${groups.map(([kind,label])=>`<button role="tab" aria-selected="${debtFilter===kind}" class="tab ${debtFilter===kind?'active':''}" data-action="debt-filter" data-kind="${kind}">${label}<span>${entries.filter(e=>kind==='all'||e.kind===kind).length}</span></button>`).join('')}</div><div class="ledger-actions"><button class="button small subtle" data-action="import">Импорт</button><button class="button small subtle" data-action="export">Экспорт</button>${button('Добавить','add-payment',true)}</div></div>
   <div class="ledger-scroll"><table class="ledger management-ledger payment-ledger"><thead><tr><th>Платёж / кому</th><th>Тип</th><th class="numeric">Сумма платежа</th><th>Расписание</th><th class="numeric">Остаток долга</th></tr></thead><tbody>${filtered.map(e=>{
     const action=e.transaction?'edit-transaction':'edit-debt';
     const schedule=e.date?(e.repeat==='monthly'?`Ежемесячно · ${(e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'}`:dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':e.deadline?' · остаток к сроку':' · разово')):'Не задано';
     return `<tr class="editable-row" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Личное'}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'—':money(e.amount)}</td><td class="schedule-cell" data-label="Расписание">${schedule}</td><td class="numeric" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
-  }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody></table></div></section>`;
+  }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="4" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric debt-total">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 
 function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) {
