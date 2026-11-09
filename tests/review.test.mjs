@@ -40,7 +40,7 @@ test('saving a payment keeps unrelated imported transactions with explicit null 
 test('legacy income displays its validated payment day and ignores extra imported markup',()=>{
   const state=emptyState('2026-11-01');
   state.transactions=[{...transaction('Legacy','2026-11-01','income',200),repeat:'monthly',day:15,salaryDay:'<b>untrusted</b>'}];
-  const html=compactIncome({state:validateState(state),button:()=>'',esc:String,money:String,incomeBreakdown});
+  const html=compactIncome({state:validateState(state),icon:()=>'',button:()=>'',esc:String,money:String,incomeBreakdown});
   assert.match(html,/15-го/);
   assert.doesNotMatch(html,/untrusted/);
 });
@@ -102,7 +102,7 @@ test('payment footer totals debt by filter once even with several scheduled rows
     {id:'friend',name:'Friend',kind:'personal',amount:40004}
   ];
   state.transactions=[1,2].map(n=>({...transaction('part'+n,'2026-11-10','expense',1000),debtId:'card'}));
-  const ctx={state,paymentEntries,money:String,esc:String,dateLabel:String,kindNames:{},button:()=>''};
+  const ctx={state,paymentEntries,money:String,esc:String,dateLabel:String,kindNames:{},button:()=>'',icon:()=>''};
   for(const [debtFilter,total] of [['all',100010],['loan',10001],['card',20002],['mortgage',30003],['personal',40004],['regular',0]]){
     const html=compactDebts({...ctx,debtFilter});
     assert.match(html,new RegExp('<tfoot>.*Всего.*class="numeric debt-total">'+total+'</td>', 's'));

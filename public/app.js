@@ -10,9 +10,9 @@ const money=(value,sign=false)=>`${sign&&value>0?'+':''}${new Intl.NumberFormat(
 const bigMoney=value=>`${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:value%100?2:0}).format(value/100)}<span class="currency">₽</span>`;
 const dateLabel=(value,year=false)=>new Date(value+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',...(year?{year:'numeric'}:{})});
 const shortDate=value=>new Date(value+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'}).replace('.','');
-const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h1m5 0h1"/>',payments:'<path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/>',debts:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/>',history:'<path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/>',storage:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',plus:'<path d="M12 5v14M5 12h14"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',down:'<path d="M12 4v16m-6-6 6 6 6-6"/>',up:'<path d="M12 20V4m-6 6 6-6 6 6"/>',wallet:'<path d="M19 8V5H6a3 3 0 0 0 0 6h15v9H6a3 3 0 0 1-3-3V8m14 7h4"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/>'};
+const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h1m5 0h1"/>',payments:'<path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/>',income:'<path d="m3 17 6-6 4 4 8-10m-6 0h6v6"/>',debts:'<path d="m3 7 6 6 4-4 8 10m-6 0h6v-6"/>',history:'<path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/>',storage:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',plus:'<path d="M12 5v14M5 12h14"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',down:'<path d="M12 4v16m-6-6 6 6 6-6"/>',up:'<path d="M12 20V4m-6 6 6-6 6 6"/>',wallet:'<path d="M19 8V5H6a3 3 0 0 0 0 6h15v9H6a3 3 0 0 1-3-3V8m14 7h4"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/>'};
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.payments}</svg>`;
-const titles={income:'Доход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Платежи',history:'История',storage:'Мои данные'};
+const titles={income:'Приход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Расход',history:'История',storage:'Мои данные'};
 let store;
 let state,revision,page='overview',busy=false,dialogSubmit=null,toastTimer;
 let debtFilter='all';
@@ -47,10 +47,22 @@ async function save(next,message=isDemo?'Изменено в примере · �
 function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
+// Repaint the fixed sky behind rounded sticky corners, above scrolling rows.
+const stickySky=$('.night').cloneNode(true);
+stickySky.classList.add('sticky-sky');
+document.body.append(stickySky);
+function updateStickyShield(){
+  const header=$('.terminal-header').getBoundingClientRect();
+  const toolbar=$('.ledger-panel .ledger-toolbar')?.getBoundingClientRect();
+  const bottom=Math.max(0,header.bottom,toolbar?Math.min(toolbar.bottom,header.bottom+toolbar.height):0);
+  stickySky.style.setProperty('--sticky-shield-height',bottom+'px');
+}
+window.addEventListener('scroll',updateStickyShield,{passive:true});
 const headerSizeObserver=new ResizeObserver(()=>{
   const header=$('.terminal-header'),toolbar=$('.ledger-panel .ledger-toolbar');
   document.documentElement.style.setProperty('--app-header-height',header.getBoundingClientRect().height+'px');
   if(toolbar)document.documentElement.style.setProperty('--ledger-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+  updateStickyShield();
 });
 headerSizeObserver.observe($('.terminal-header'));
 function render(){
@@ -65,21 +77,23 @@ function render(){
   let plan;
   try{plan=forecast(state,now,end);}
   catch(error){plan={points:[],balance:0,income:0,expense:0,firstShortfall:null,error:error.message};}
-  $('#current-date').textContent=new Date(today()+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  $('#current-date').innerHTML=`${icon('calendar')}<time datetime="${now}">${dateLabel(now,true)}</time>`;
   $('#page-name').textContent=titles[page];
-  $('#navigation').innerHTML=[['overview','План'],['debts','Платежи'],['income','Доход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
+  $('#navigation').innerHTML=[['overview','План'],['debts','Расход'],['income','Приход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
   const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
-  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><strong>${state.balance===null?'Указать':money(state.balance)}</strong>${icon('edit')}`;
+  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><span class="header-balance-value"><strong>${money(state.balance??0)}</strong>${icon('edit')}</span>`;
   const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
   const debtSum=knownDebts.reduce((total,debt)=>total+BigInt(debt.amount),0n);
   const totalDebt=debtSum<=BigInt(Number.MAX_SAFE_INTEGER)?Number(debtSum):null,missingDebt=debts.length-knownDebts.length;
-  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  const debtLabel=state.debts.some(debt=>debt.kind==='mortgage')?'Долг без ипотеки':'Долг';
+  $('#header-debt').innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
   $('#app').innerHTML=page==='debts'?compactDebts(ctx):page==='income'?compactIncome(ctx):compactPlan(ctx);
   const toolbar=$('.ledger-panel .ledger-toolbar');
   if(toolbar)headerSizeObserver.observe(toolbar);
+  updateStickyShield();
 }
 function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
@@ -239,8 +253,8 @@ function transactionDialog(kind='expense',id=null,date=today()){
 function debtDialog(id=null,selectedPaymentId=null){return paymentDialog({debtId:id,transactionId:selectedPaymentId});}
 function repaymentDialog(debtId,id=null){return paymentDialog({debtId,transactionId:id});}
 function balanceDialog(){
-  openDialog('Сколько есть сейчас?',field('balance','Доступные деньги, ₽','text',state.balance===null?'':state.balance/100,'required inputmode="decimal" placeholder="Сумма на счетах и наличные"')+`<p class="dialog-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
-    const balance=parseMoney(data.get('balance'));
+  openDialog('Сколько есть сейчас?',`<label class="balance-field" for="balance-amount"><span>Доступные деньги<span class="sr-only">, ₽</span></span><span class="balance-amount"><input id="balance-amount" name="balance" type="text" value="${esc(state.balance===null?'':state.balance/100)}" inputmode="decimal" placeholder="0" aria-describedby="balance-note" autofocus><span class="balance-currency" aria-hidden="true">₽</span></span></label><p class="dialog-note" id="balance-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
+    const balance=parseMoney(String(data.get('balance')??'').trim()||'0');
     await change(s=>{s.balance=balance;s.balanceDate=today();},'Остаток обновлён');
   });
 }

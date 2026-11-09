@@ -196,8 +196,8 @@ export function incomeBreakdown(source) {
 export function incomeTransactions(source) {
   const amounts=incomeBreakdown(source),split=source.repeat==='monthly'&&source.salaryShare>0&&source.salaryShare<10000;
   return [
-    {id:source.id,sourceId:source.id,name:source.name+(split?' · зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
-    {id:source.id+'-advance',sourceId:source.id,name:source.name+' · аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
+    {id:source.id,sourceId:source.id,name:source.name+(split?' · Зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
+    {id:source.id+'-advance',sourceId:source.id,name:source.name+' · Аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
   ].filter(t=>t.amount>0);
 }
 export function saveIncomeSource(state,source) {

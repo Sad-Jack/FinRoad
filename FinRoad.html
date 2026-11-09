@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b1021"><title>FinRoad · Финансы под звёздами</title><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTgiIGZpbGw9IiMxMDE3MmMiLz48cGF0aCBkPSJNNDMgMTNBMjIgMjIgMCAxIDAgNTEgNDcgMjQgMjQgMCAwIDEgNDMgMTNaIiBmaWxsPSIjYzljNWZmIi8+PHBhdGggZD0ibTQ4IDEyIDIgNiA2IDItNiAyLTIgNi0yLTYtNi0yIDYtMloiIGZpbGw9IiM5ZGUwZDMiLz48L3N2Zz4K"><style>
+html{scrollbar-gutter:stable}
 :root {
   color-scheme: dark;
   --bg:#0a1021; --text:#edf0fb; --muted:#9cabc3; --faint:#7e91ae;
@@ -25,7 +26,7 @@
 /* The sky changes with the interface, without changing any financial data. */
 .night{position:fixed;inset:0;overflow:hidden;z-index:-1;background:radial-gradient(ellipse at 78% 24%,#29345666,transparent 50%),linear-gradient(145deg,#0b1023 10%,#141c35 62%,#263a4a)}.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 15% 8%,#ccd7f6 70%,transparent),radial-gradient(1px 1px at 45% 22%,#c2b7e7 70%,transparent),radial-gradient(1px 1px at 89% 11%,#ccd7f6 70%,transparent),radial-gradient(1.5px 1.5px at 74% 34%,#ccd7f6 70%,transparent);background-size:337px 319px,479px 401px,277px 431px,727px 657px;opacity:.5}.aurora{position:absolute;width:80vw;height:38vw;right:-25vw;top:15vh;background:radial-gradient(ellipse,#7c80b318,transparent 70%);transform:rotate(-35deg);filter:blur(25px)}.mountain{position:absolute;bottom:0;width:100%;clip-path:polygon(0 85%,10% 56%,18% 68%,27% 22%,35% 52%,44% 32%,54% 65%,68% 12%,73% 27%,80% 0,90% 47%,100% 30%,100% 100%,0 100%)}.mountain-back{background:#14263888;height:24vh}.mountain-front{background:#08132299;transform:scaleX(-1);height:17vh}.sky-sun,.clouds{display:none}
 [data-theme="day"] .night{background:linear-gradient(170deg,#c7e5fa 0%,#e4effc 52%,#f8e9d6 100%)}[data-theme="day"] .stars,[data-theme="day"] .aurora{display:none}[data-theme="day"] .sky-sun{display:block;position:absolute;right:12%;top:8%;width:90px;height:90px;border-radius:50%;background:#fff4ce;box-shadow:0 0 75px 45px #fff7ddaa}[data-theme="day"] .clouds{display:block;position:absolute;inset:0;background:radial-gradient(ellipse 22% 7% at 20% 17%,#ffffff90,transparent),radial-gradient(ellipse 23% 8% at 53% 30%,#ffffff80,transparent),radial-gradient(ellipse 30% 10% at 87% 52%,#ffffff80,transparent);filter:blur(12px)}[data-theme="day"] .mountain-back{background:#8daebd55}[data-theme="day"] .mountain-front{background:#6b98a855}
-.compact-shell{width:100%;min-height:100dvh;padding:0 clamp(12px,2.4vw,42px);margin:0}.compact-shell main{min-width:0}.terminal-header{display:flex;align-items:center;gap:30px;height:60px;margin-bottom:12px;border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:9px;font-size:24px;font-weight:550;letter-spacing:-1px;flex-shrink:0}.brand-dot{color:var(--purple)}.theme-toggle{display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid transparent;border-radius:10px;background:var(--active);color:var(--purple)}.theme-toggle:hover{border-color:var(--border)}.theme-toggle svg{width:26px;height:26px}.theme-sun{display:none}[data-theme="day"] .theme-moon{display:none}[data-theme="day"] .theme-sun{display:block;color:#c88518}nav{display:flex;align-items:center;gap:5px}.nav-button{display:flex;align-items:center;gap:8px;background:none;border:1px solid transparent;border-radius:8px;padding:8px 15px;font-size:12px;color:var(--muted)}.nav-button:hover{background:var(--hover);color:var(--text)}.nav-button.active{background:var(--active);border-color:var(--border);color:var(--purple)}.icon{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.header-right{margin-left:auto;font-size:11px;color:var(--muted)}
+.compact-shell{width:100%;min-height:100dvh;padding:0 clamp(12px,2.4vw,42px);margin:0}.compact-shell main{min-width:0}.icon{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .panel{border:1px solid var(--border);background:var(--panel);border-radius:11px;backdrop-filter:blur(16px);overflow:hidden}.balance-strip{display:flex;align-items:center;min-height:54px;padding:9px 0;gap:0}.balance-item{display:flex;align-items:baseline;justify-content:center;gap:12px;flex:1;min-width:0;padding:0 15px;border-right:1px solid var(--border)}.balance-item:last-child{border:0}.balance-item>span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}.balance-item>strong{font-weight:500;font-size:21px;letter-spacing:-.65px;line-height:1.35;font-variant-numeric:tabular-nums;white-space:nowrap}.balance-item.free>strong{color:var(--purple)}.mini-edit{display:flex;align-items:center;background:none;border:0;padding:1px;color:var(--muted)}.mini-edit .icon{width:12px;height:12px}.compact-gap{height:12px}.compact-alert{font-size:11px;color:var(--red);padding-top:9px}.ledger-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border)}.ledger-toolbar h1{font-size:16px;letter-spacing:-.2px;font-weight:500}.ledger-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}.button{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 12px;background:var(--button);border:1px solid var(--border);border-radius:8px;font-size:11px;white-space:nowrap}.button:hover{background:var(--active)}.button.primary{background:var(--primary);border-color:transparent;color:var(--primary-text);font-weight:600}.button.primary:hover{filter:brightness(1.05)}.button.small{padding:6px 9px;font-size:10px}.button.subtle{background:none;color:var(--muted)}.button.danger{color:var(--red)}.button .icon{width:14px;height:14px}.text-button{background:none;border:0;color:var(--purple);padding:3px 0;display:inline-flex;align-items:center;gap:6px;font-size:11px}.icon-button{border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);display:grid;place-items:center;width:27px;height:27px;font-size:23px;padding:0;flex-shrink:0}.icon-button:hover{background:var(--active);border-color:var(--border);color:var(--text)}.icon-button .icon{width:14px;height:14px}.icon-button.done{color:var(--mint)}
 .ledger-scroll{overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}.ledger{width:100%;border-collapse:collapse;font-size:12px;text-align:left;white-space:nowrap}.ledger thead{background:var(--head)}.ledger th{padding:8px 16px;color:var(--muted);font-weight:400;font-size:10px}.ledger td{padding:4px 16px;height:38px;border-top:1px solid var(--border)}.ledger tbody tr:hover{background:var(--hover)}.ledger .numeric{text-align:right;font-variant-numeric:tabular-nums}.ledger .date-col{width:90px}.ledger .actions-col{width:100px}.ledger .date-cell{font-size:11px;color:var(--muted)}.ledger .name-cell{width:34%;white-space:normal}.row-name{background:none;border:none;padding:0;text-align:left;color:var(--text);font-size:12px;overflow-wrap:anywhere}button.row-name:hover{color:var(--purple);text-decoration:underline;text-underline-offset:3px}.repeat-tag{font-size:9px;margin-left:10px;color:var(--faint);white-space:nowrap}.event-actions{display:flex;align-items:center;justify-content:flex-end;gap:1px}.delete-action{opacity:.55}.ledger tr:hover .delete-action{opacity:1}.dash{color:var(--faint)}.income-text,.positive{color:var(--mint)!important}.expense-text{color:var(--red)}.negative{color:var(--red)!important}.caution{color:var(--gold)!important}.running-balance{color:var(--muted)}.ledger tfoot{background:var(--foot)}.ledger tfoot td{height:37px;border-top:1px solid var(--border);background:var(--foot);font-size:11px}.foot-muted{color:var(--faint);font-size:9px;margin-left:5px}.ledger-hint{display:flex;justify-content:space-between;gap:12px;color:var(--faint);font-size:9px;padding:8px 2px 0}footer{display:flex;justify-content:space-between;gap:12px;padding:12px 2px;color:var(--faint);font-size:9px}.debt-tabs{display:flex;flex-wrap:wrap;gap:3px;min-width:0}.tab{background:none;border:0;border-radius:7px;padding:7px 9px;color:var(--muted);white-space:nowrap;font-size:10px}.tab.active{background:var(--active);color:var(--purple)}.tab span{margin-left:5px;font-size:9px;color:var(--faint)}.debt-type{font-size:11px;color:var(--muted)}.debt-type.card{color:var(--gold)}.muted{font-size:11px;color:inherit}.repay-button{font-size:10px!important;padding:4px 8px!important;margin-right:4px;color:var(--purple)}.repayment-summary{color:var(--purple);font-size:11px}.repayment-summary small{display:block;font-size:9px;line-height:1.2;color:var(--muted)}.empty{padding:35px 20px;text-align:center;font-size:12px;line-height:1.8;color:var(--muted);white-space:normal}.empty h2{font-size:17px;font-weight:500;color:var(--text);margin-bottom:7px}.empty .button{margin-top:15px}
 /* Dialogs and history stay readable in both themes. */
@@ -35,11 +36,11 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 @media(max-width:820px){.balance-item{flex-direction:column;align-items:flex-start;gap:1px;padding:0 13px}.balance-strip{min-height:58px;padding:7px 0}.balance-item>strong{font-size:19px}.ledger .name-cell{width:auto}.ledger .date-col{width:60px}.ledger td,.ledger th{padding-left:8px;padding-right:8px}.ledger{font-size:11px}.row-name{font-size:11px}.ledger .icon-button{width:24px}.debt-tabs{flex-basis:100%}.ledger-toolbar:has(.debt-tabs) .ledger-actions{margin-left:auto}}
 /* On a phone every field remains available without a horizontal scroller. */
 @media(max-width:640px){
-  .compact-shell{padding:0 10px}.terminal-header{height:55px;gap:14px;margin-bottom:9px}.brand{font-size:21px;gap:7px}.theme-toggle{width:29px;height:29px}.theme-toggle svg{width:23px;height:23px}.nav-button{padding:8px 10px;font-size:11px;gap:5px}.nav-button .icon{width:14px;height:14px}.header-right{display:none}nav{margin-left:auto;gap:2px}
+  .compact-shell{padding:0 10px}
   .balance-strip{padding:8px 0;flex-wrap:wrap}.balance-item{padding:0 10px;gap:2px;flex:1}.balance-item>span{font-size:9px;line-height:1.4;flex-wrap:wrap}.balance-item>strong{font-size:17px;letter-spacing:-.5px}.balance-strip:has(.balance-item:nth-child(4)) .balance-item{flex:0 0 50%;padding:5px 12px}.balance-strip:has(.balance-item:nth-child(4)) .balance-item:nth-child(2){border-right:0}
   .compact-gap{height:9px}.ledger-toolbar{padding:9px;gap:8px;flex-wrap:wrap}.ledger-toolbar h1{font-size:14px}.ledger-actions{gap:5px;margin-left:auto}.ledger-actions .button{font-size:10px;padding:7px 9px;gap:5px}.ledger-actions .button .icon{width:12px;height:12px}.ledger-scroll{max-height:none;overflow:visible}.ledger{display:block;width:100%;min-width:0;white-space:normal}.ledger thead{position:absolute;width:1px;height:1px;clip:rect(0,0,0,0);overflow:hidden}.ledger tbody,.ledger tfoot{display:block}.ledger tbody tr,.ledger tfoot tr{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px 3px;padding:9px;border-top:1px solid var(--border);align-items:center}.ledger td{display:block;height:auto;min-width:0;padding:0!important;border:0}.ledger .date-cell{grid-column:1;grid-row:1;font-size:9px}.ledger .name-cell{grid-column:2/5;grid-row:1;width:auto}.row-name{font-size:11px;line-height:1.4}.ledger .actions-cell{grid-column:5/7;grid-row:1}.ledger .event-actions{gap:0}.ledger .icon-button{width:25px;height:28px}.ledger .icon-button .icon{width:13px;height:13px}.ledger [data-label]{grid-column:span 2;text-align:left;font-size:12px;overflow-wrap:anywhere}.ledger [data-label]:before{content:attr(data-label);display:block;font-size:9px;color:var(--faint);font-weight:400;margin-bottom:2px}.ledger .numeric{white-space:nowrap}.ledger tfoot{position:static}.ledger tfoot td{background:transparent;height:auto}.ledger tfoot .total-label{grid-column:1/-1;font-size:10px}.ledger tfoot .total-empty{display:none}.ledger td[colspan]:has(.empty){grid-column:1/-1}.foot-muted{font-size:9px}.ledger-hint{flex-direction:column;gap:3px;font-size:8px;padding:7px 1px 0}footer{font-size:8px;gap:8px;padding:10px 1px}.debt-tabs{gap:2px;flex-basis:100%}.debt-tabs .tab{font-size:10px;padding:6px}.ledger-toolbar:has(.debt-tabs) .ledger-actions{margin-left:0;flex-wrap:wrap}.debt-ledger .debt-name{grid-column:1/4;grid-row:1}.debt-ledger .actions-cell{grid-column:4/7;grid-row:1}.debt-ledger .debt-kind{grid-column:1/-1;grid-row:2}.debt-ledger .debt-kind:before{display:none}.debt-type{font-size:10px}.debt-ledger [data-label]{font-size:11px}.repay-button{font-size:9px!important;padding:4px 6px!important;margin-right:2px}.repayment-summary{font-size:11px}.repayment-summary small{font-size:9px}.muted{font-size:10px}.empty{padding:25px 10px}dialog{padding:21px}.dialog-heading h2{font-size:20px}.field-row{gap:10px}.field input,.field select{padding:10px 8px}.history-list .event-row{padding:10px 8px}.event-description small{font-size:9px}
 }
-@media(max-width:360px){.brand>a{display:none}.balance-item{padding:0 7px}.balance-item>strong{font-size:15px}.balance-item>span{font-size:8px}.ledger-toolbar .ledger-actions{gap:4px}.ledger-actions .button{padding:6px}.ledger [data-label]{font-size:11px}.ledger .name-cell{grid-column:2/4}.ledger .actions-cell{grid-column:4/7}}
+@media(max-width:360px){.balance-item{padding:0 7px}.balance-item>strong{font-size:15px}.balance-item>span{font-size:8px}.ledger-toolbar .ledger-actions{gap:4px}.ledger-actions .button{padding:6px}.ledger [data-label]{font-size:11px}.ledger .name-cell{grid-column:2/4}.ledger .actions-cell{grid-column:4/7}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:640px){.balance-item>span{display:block}.balance-item .mini-edit{display:inline-flex;vertical-align:-2px;margin-left:2px}.balance-item.free>span>span{display:none}}
 .forecast-date{padding:0;background:none;border:0;border-bottom:1px dotted var(--faint);border-radius:0;color:inherit;font:inherit;line-height:inherit;white-space:nowrap}.forecast-date:hover{color:var(--purple);border-bottom-color:var(--purple)}
@@ -51,16 +52,8 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 .balance-item.shortfall-warning>.dismiss-mark{font-size:20px;flex-shrink:0}
 
 .choice-field{border:0;padding:0;margin:0 0 16px;min-width:0}.choice-field legend{color:var(--muted);font-size:12px;margin-bottom:8px}.choices{display:flex;flex-wrap:wrap;gap:6px}.choices label{position:relative;flex:1;min-width:max-content;cursor:pointer}.choices input{position:absolute;opacity:0;width:1px;height:1px}.choices span{display:block;text-align:center;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:11px}.choices input:checked+span{background:var(--active);border-color:var(--purple);color:var(--purple)}.choices input:focus-visible+span{outline:2px solid var(--purple);outline-offset:2px}[hidden]{display:none!important}
-.header-balance{display:grid;grid-template-columns:auto auto;align-items:center;column-gap:7px;text-align:left;letter-spacing:0;background:none;border:0;padding:3px 0;min-width:100px}.header-balance small{grid-column:1/-1;font-size:10px;font-weight:400}.header-balance strong{font-size:20px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}.header-balance .icon{width:13px;height:13px;color:var(--muted)}.income-preview{display:flex;flex-wrap:wrap;gap:7px 16px;padding:10px 12px;margin:0 0 10px;background:var(--active);border-radius:8px;font-size:12px}.income-preview strong{color:var(--mint)}.schedule-cell{font-size:11px}.management-ledger .name-cell{width:auto}.plan-ledger .row-name{cursor:default}
-@media(max-width:640px){.terminal-header{height:auto;min-height:66px;flex-wrap:wrap;gap:5px 12px;padding:7px 0}.header-balance strong{font-size:17px}.header-balance small{font-size:9px}.header-balance{min-width:90px}.terminal-header nav{flex:1;justify-content:flex-end}.nav-button{padding:7px}.nav-button .icon{display:none}.plan-ledger .name-cell{grid-column:2/-1}.management-ledger .name-cell{grid-column:1/5}.management-ledger .actions-cell{grid-column:5/7}.management-ledger .schedule-cell{grid-column:1/-1}.income-preview{font-size:11px}}
-
-#header-forecast{margin-left:auto;min-width:0}.header-right{margin-left:0;flex-shrink:0}
-.header-forecast-warning,.header-forecast-value{display:grid;grid-template-columns:auto auto;align-items:center;gap:0 10px;font:inherit;text-align:left;padding:3px 0;background:none;border:0;min-width:0}
-.header-forecast-warning{color:var(--red);cursor:pointer}.header-forecast-warning>span:first-child,.header-forecast-value>span{grid-column:1;font-size:10px;line-height:1.4;white-space:nowrap}.header-forecast-value>span{color:var(--muted)}
-.header-forecast-warning strong,.header-forecast-value strong{grid-column:1;font-size:20px;line-height:1.3;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}.header-forecast-value strong{color:var(--purple)}
-.header-forecast-warning .dismiss-mark{grid-column:2;grid-row:1/3;font-size:22px}.header-forecast-warning:hover{opacity:.75}
-@media(max-width:1000px){.header-right{display:none}.terminal-header{gap:18px}}
-@media(max-width:640px){.terminal-header{gap:6px 12px}#header-forecast{flex-basis:100%;margin:0;padding-top:5px;border-top:1px solid var(--border)}.header-forecast-warning,.header-forecast-value{display:flex;align-items:baseline;gap:7px;width:100%;padding:2px 0}.header-forecast-warning strong,.header-forecast-value strong{font-size:16px;margin-left:auto}.header-forecast-warning>span:first-child,.header-forecast-value>span{font-size:10px;white-space:normal}.header-forecast-warning .dismiss-mark{font-size:18px}}
+.income-preview{display:flex;flex-wrap:wrap;gap:7px 16px;padding:10px 12px;margin:0 0 10px;background:var(--active);border-radius:8px;font-size:12px}.income-preview strong{color:var(--mint)}.schedule-cell{font-size:11px}.management-ledger .name-cell{width:auto}.plan-ledger .row-name{cursor:default}
+@media(max-width:640px){.plan-ledger .name-cell{grid-column:2/-1}.management-ledger .name-cell{grid-column:1/5}.management-ledger .actions-cell{grid-column:5/7}.management-ledger .schedule-cell{grid-column:1/-1}.income-preview{font-size:11px}}
 
 .calendar-estimate{display:inline-block;margin-left:8px;font-size:10px;color:var(--gold)}
 
@@ -84,10 +77,6 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 :is(html,dialog,.ledger-scroll,.repayment-list,.history-list)::-webkit-scrollbar-thumb:hover{background:var(--purple)}
 :is(html,dialog,.ledger-scroll,.repayment-list,.history-list)::-webkit-scrollbar-corner{background:transparent}
 
-.header-debt{display:grid;gap:2px;margin-left:auto;min-width:0;flex-shrink:0}.header-debt small{font-size:10px;color:var(--muted)}.header-debt strong{font-size:20px;line-height:1.3;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text)}
-@media(min-width:641px) and (max-width:1100px){.terminal-header{height:auto;min-height:60px;flex-wrap:wrap;padding:9px 0;gap:8px 18px}.header-debt{margin-left:auto}.header-right{display:none}}
-@media(max-width:640px){.header-debt{flex-basis:100%;display:flex;align-items:baseline;justify-content:space-between;margin:0;padding-top:5px;border-top:1px solid var(--border)}.header-debt strong{font-size:16px}}
-
 .plan-shortfall{margin-left:auto;display:flex;align-items:baseline;justify-content:flex-end;gap:12px;color:var(--red);text-align:right}.plan-shortfall span{font-size:11px}.plan-shortfall strong{font-size:18px;line-height:1.3;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}@media(max-width:640px){.plan-shortfall{flex-basis:100%;justify-content:space-between;gap:8px}.plan-shortfall strong{font-size:16px}.plan-shortfall span{font-size:10px}}
 
 /* The header date is the calendar control itself, without an intermediate dialog. */
@@ -99,7 +88,116 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 
 /* Long lists extend the document; only the app header stays in view. */
 .compact-shell{--page-gutter:clamp(12px,2.4vw,42px);padding-bottom:20px}
-.terminal-header{position:sticky;top:0;z-index:5;margin-inline:calc(-1 * var(--page-gutter));padding-inline:var(--page-gutter);background:var(--dialog);backdrop-filter:blur(20px)}
+/* One gathered row: navigation, balances, then the current date. */
+.terminal-header{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  min-height:94px;margin:0 0 12px;padding:10px 22px;
+  border:1px solid var(--border);border-radius:16px;
+  background:var(--dialog);backdrop-filter:blur(20px);
+  box-shadow:0 1px 2px var(--shadow);
+}
+.header-navigation{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.theme-toggle{
+  display:grid;place-items:center;flex-shrink:0;
+  width:46px;height:46px;padding:0;
+  border:1px solid transparent;border-radius:12px;
+  background:var(--active);color:var(--purple);
+}
+.theme-toggle:hover{border-color:var(--border)}
+.theme-toggle svg{width:30px;height:30px}
+.theme-sun{display:none}
+[data-theme="day"] .theme-moon{display:none}
+[data-theme="day"] .theme-sun{display:block;color:#c88518}
+.terminal-header nav{
+  display:flex;align-items:center;gap:6px;
+  margin:0;padding-left:18px;border-left:1px solid var(--border);
+}
+.nav-button{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  min-height:46px;padding:10px 14px;
+  border:1px solid transparent;border-radius:10px;
+  background:none;color:var(--muted);font-size:14px;white-space:nowrap;
+}
+.nav-button .icon{width:19px;height:19px}
+.nav-button:hover{background:var(--hover);color:var(--text)}
+.nav-button.active{background:var(--active);border-color:var(--border);color:var(--purple)}
+.header-metrics{
+  order:1;display:grid;grid-template-columns:minmax(150px,.85fr) minmax(190px,1.15fr) minmax(185px,1fr);
+  flex:1;min-width:0;align-items:center;margin-left:auto;
+  padding-left:22px;border-left:1px solid var(--border);
+}
+.header-balance,.header-debt,.header-forecast-value{min-width:0;text-align:left}
+.header-balance{
+  display:grid;gap:2px;
+  width:100%;padding:0 20px 0 8px;border:0;background:none;letter-spacing:0;
+}
+.header-balance small{font-weight:400}
+.header-balance-value{display:flex;align-items:center;gap:14px;min-width:0}
+.header-balance-value strong{min-width:0}
+.header-balance .icon{width:16px;height:16px;color:var(--muted)}
+.header-balance:hover .icon,.header-balance:hover small{color:var(--purple)}
+.header-debt{display:grid;gap:2px;padding:0 22px;border-left:1px solid var(--border)}
+#header-forecast{min-width:0;padding-left:12px;border-left:1px solid var(--border)}
+.header-forecast-value{display:grid;gap:2px;cursor:pointer;padding:10px 18px;background:var(--active);border-radius:10px}
+.header-balance small,.header-debt small,.header-forecast-value>span{font-size:13px;line-height:1.45;color:var(--muted)}
+.header-balance strong,.header-debt strong,.header-forecast-value strong{
+  font-size:26px;line-height:1.3;font-weight:600;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;overflow-wrap:anywhere;
+}
+.header-forecast-value>span,.header-forecast-value strong{color:var(--purple)}
+.header-right{order:2;flex-shrink:0;padding-left:22px;border-left:1px solid var(--border);font-size:14px;color:var(--muted)}
+#current-date{display:flex;align-items:center;gap:12px;white-space:nowrap}
+#current-date .icon{width:23px;height:23px}
+@media(min-width:1241px) and (max-width:1500px){
+  .terminal-header{gap:14px;padding-inline:18px}
+  .header-navigation{gap:14px}
+  .terminal-header nav{padding-left:14px;gap:3px}
+  .nav-button{padding-inline:10px;gap:7px}
+  .header-metrics{padding-left:14px;grid-template-columns:minmax(135px,.85fr) minmax(170px,1.15fr) minmax(175px,1fr)}
+  .header-balance{padding-right:16px}
+  .header-debt{padding-inline:16px}
+  .header-forecast-value{padding-inline:14px}
+  .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:24px}
+  .header-balance small,.header-debt small,.header-forecast-value>span{font-size:12px}
+  .header-right{padding-left:14px;font-size:12px}
+}
+@media(max-width:1240px){
+  .terminal-header{gap:12px 18px;padding:12px 18px}
+  .header-right{order:1;margin-left:auto}
+  .header-metrics{
+    order:2;flex-basis:100%;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) minmax(0,1fr);
+    margin:0;padding:12px 0 0;border-left:0;border-top:1px solid var(--border);
+  }
+  .header-balance{padding-left:0}
+  .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:24px}
+}
+@media(max-width:640px){
+  .terminal-header{gap:10px;padding:12px;border-radius:12px;margin-bottom:9px}
+  .header-navigation{width:100%;gap:10px}
+  .theme-toggle{width:38px;height:38px;border-radius:10px}
+  .theme-toggle svg{width:27px;height:27px}
+  .terminal-header nav{flex:1;justify-content:space-between;gap:2px;padding-left:10px}
+  .nav-button{min-height:40px;padding:8px;font-size:12px;gap:5px}
+  .nav-button .icon{width:16px;height:16px}
+  .header-metrics{grid-template-columns:minmax(0,1fr);gap:10px;padding-top:10px}
+  .header-balance{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:2px 0}
+  .header-balance-value{gap:8px}
+  .header-debt{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0 0;border-left:0;border-top:1px solid var(--border)}
+  #header-forecast{padding:0;border:0}
+  .header-forecast-value{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px}
+  .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:20px;letter-spacing:-.3px}
+  .header-balance small,.header-debt small,.header-forecast-value>span{font-size:12px}
+  .header-right{order:3;display:block;width:100%;margin:0;padding:10px 0 0;border-left:0;border-top:1px solid var(--border);font-size:12px}
+  #current-date{justify-content:flex-end;gap:8px}
+  #current-date .icon{width:18px;height:18px}
+}
+@media(max-width:380px){
+  .nav-button{padding-inline:5px;font-size:11px}
+  .nav-button .icon{display:none}
+  .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:18px}
+  .header-balance small,.header-debt small,.header-forecast-value>span{font-size:11px}
+}
 @media(max-width:640px){.compact-shell{--page-gutter:10px}}
 
 /* The same calendar palette in the header and in payment/income forms. */
@@ -133,11 +231,66 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
 
 /* Keep table headings and column labels attached to the app header. */
 .compact-shell:has(.ledger-panel) .terminal-header{margin-bottom:0}
-.ledger-panel{overflow:visible;backdrop-filter:none;border-top:0;border-radius:0 0 11px 11px}
+.ledger-panel{overflow:clip;backdrop-filter:none;border-top:1px solid var(--border);border-radius:16px}
 .ledger-panel .ledger-scroll{overflow:visible}
-.ledger-panel .ledger-toolbar{position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
+.ledger-panel .ledger-toolbar{border-radius:16px 16px 0 0;position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
 .ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
-@media(max-width:640px){.ledger-panel .ledger thead th{position:static}}
+@media(max-width:640px){.ledger-panel{border-radius:12px}.ledger-panel .ledger-toolbar{border-radius:12px 12px 0 0}.ledger-panel .ledger thead th{position:static}}
+
+/* Payment filters stay together; file actions are separate from creation. */
+.ledger-panel:is(.payments-panel,.income-panel){border-top:1px solid var(--border);border-radius:16px}
+.management-toolbar{
+  min-height:88px;gap:20px;padding:14px 16px;border-radius:16px 16px 0 0;
+  flex-wrap:wrap;
+}
+.management-toolbar .debt-tabs{
+  display:flex;flex:0 1 auto;flex-wrap:wrap;align-items:center;gap:2px;
+  max-width:100%;padding:3px;border:1px solid var(--border);border-radius:12px;
+  background:var(--field);
+}
+.management-toolbar .tab{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:42px;padding:8px 12px;border-radius:10px;font-size:14px;
+}
+.management-toolbar .tab:hover{background:var(--hover);color:var(--text)}
+.management-toolbar .tab.active{background:var(--active);color:var(--purple)}
+.management-toolbar .tab .tab-count{
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  min-width:24px;min-height:24px;margin:0;padding:1px 5px;
+  border-radius:6px;background:var(--hover);color:var(--muted);
+  font-size:12px;line-height:1.4;font-variant-numeric:tabular-nums;
+}
+.management-toolbar .tab.active .tab-count{background:var(--active);color:var(--purple)}
+.management-toolbar .ledger-actions{gap:18px;margin-left:auto}
+.payment-transfer{display:flex;align-items:center;gap:8px}
+.payment-create{display:flex;padding-left:18px;border-left:1px solid var(--border)}
+.management-toolbar .ledger-actions .button{
+  min-height:46px;padding:10px 14px;border-radius:10px;font-size:14px;gap:9px;
+}
+.management-toolbar .ledger-actions .button .icon{width:20px;height:20px}
+.management-toolbar .ledger-actions .button.primary{padding-inline:18px}
+@media(max-width:1300px){
+  .management-toolbar{gap:12px}
+  .management-toolbar .debt-tabs{flex-basis:100%}
+}
+@media(max-width:640px){
+  .management-toolbar{padding:12px;min-height:0;border-radius:12px 12px 0 0}
+  .ledger-panel:is(.payments-panel,.income-panel){border-radius:12px}
+  .management-toolbar .debt-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:3px}
+  .management-toolbar .tab{justify-content:space-between;min-width:0;padding:8px;font-size:12px;white-space:normal;text-align:left}
+  .management-toolbar .ledger-actions{width:100%;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .payment-transfer{gap:6px}
+  .payment-create{padding-left:10px}
+  .management-toolbar .ledger-actions .button{min-height:42px;padding:8px;font-size:12px;gap:5px}
+  .management-toolbar .ledger-actions .button.primary{padding-inline:10px}
+  .management-toolbar .ledger-actions .button .icon{width:17px;height:17px}
+}
+@media(max-width:380px){
+  .management-toolbar .tab{font-size:11px;gap:5px;padding:7px 6px}
+  .management-toolbar .tab .tab-count{min-width:20px;font-size:11px}
+  .management-toolbar .ledger-actions .button{font-size:11px;padding-inline:6px}
+  .management-toolbar .ledger-actions .button.primary{padding-inline:8px}
+}
 
 /* Controls use pointer interaction; content text stays available for copying. */
 :focus-visible,.forecast-date:focus-within,.day-wheel-frame:focus-within{outline:none!important}
@@ -145,6 +298,44 @@ button,label,legend,svg{user-select:none;-webkit-user-select:none}
 input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-select:text}
 #close-dialog{line-height:1;align-self:center}
 #close-dialog .icon{width:20px;height:20px}
+
+/* The cash editor emphasizes its single amount without changing other forms. */
+#editor:has(.balance-field){
+  width:min(540px,calc(100% - 24px));padding:30px;border-radius:22px;
+  box-shadow:0 16px 64px var(--shadow);
+}
+#editor:has(.balance-field) .eyebrow{display:none}
+#editor:has(.balance-field) .dialog-heading{align-items:flex-start;gap:16px;margin-bottom:24px}
+#editor:has(.balance-field) .dialog-heading h2{margin:0;font-size:24px;line-height:1.3;font-weight:600;letter-spacing:-.5px}
+#editor:has(.balance-field) #close-dialog{width:32px;height:32px;align-self:flex-start}
+#editor:has(.balance-field) #close-dialog .icon{width:24px;height:24px}
+.balance-field{display:grid;gap:10px;min-width:0;font-size:16px;line-height:1.4;font-weight:600;color:var(--muted)}
+.balance-amount{
+  display:flex;align-items:center;gap:12px;min-width:0;min-height:62px;padding:8px 16px;
+  border:1px solid color-mix(in srgb,var(--purple) 40%,transparent);
+  border-radius:12px;background:var(--active);cursor:text;
+}
+.balance-amount:focus-within{border-color:var(--purple)}
+.balance-amount input{
+  width:100%;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;
+  color:var(--text);font-size:36px;font-weight:600;line-height:1.2;letter-spacing:-.6px;
+  font-variant-numeric:tabular-nums;
+}
+.balance-amount input::placeholder{color:var(--faint);opacity:1}
+.balance-currency{flex-shrink:0;font-size:24px;font-weight:600;color:var(--muted)}
+#editor:has(.balance-field) .dialog-note{margin-top:16px;font-size:14px;line-height:1.55}
+#editor:has(.balance-field) .dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
+#editor:has(.balance-field) .dialog-actions .button{min-width:0;min-height:48px;padding:10px 14px;border-radius:11px;font-size:16px;font-weight:600}
+#editor:has(.balance-field) #cancel-dialog{background:transparent;color:var(--muted)}
+#editor:has(.balance-field) #cancel-dialog:hover{background:var(--hover);color:var(--text)}
+@media(max-width:480px){
+  #editor:has(.balance-field){padding:22px;border-radius:18px}
+  #editor:has(.balance-field) .dialog-heading{gap:10px;margin-bottom:22px}
+  #editor:has(.balance-field) .dialog-heading h2{font-size:22px}
+  .balance-amount input{font-size:32px}
+  #editor:has(.balance-field) .dialog-actions{gap:10px;margin-top:24px}
+  #editor:has(.balance-field) .dialog-actions .button{font-size:14px;padding-inline:8px}
+}
 
 .transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}
 
@@ -164,11 +355,31 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
   .payment-ledger tfoot .debt-total{text-align:right}
 }
 
+/* A stationary copy of the sky fills the cutouts of the rounded sticky headers. */
+.night.sticky-sky{
+  z-index:2;pointer-events:none;
+  clip-path:inset(0 0 max(0px,calc(100% - var(--sticky-shield-height,0px))) 0);
+}
+
+.nav-button[data-action="nav-income"] .icon{color:var(--mint);opacity:.85}
+.nav-button[data-action="nav-debts"] .icon{color:var(--red);opacity:.85}
+
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
   <div class="shell compact-shell">
-    <header class="terminal-header"><div class="brand"><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" title="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><button id="header-balance" class="header-balance" type="button" data-action="balance" aria-label="Изменить текущий остаток"></button></div><nav id="navigation" aria-label="Разделы"></nav><div id="header-debt" class="header-debt" aria-live="polite"></div><div id="header-forecast" aria-live="polite"></div><div class="header-right"><span id="current-date"></span></div></header>
+    <header class="terminal-header">
+      <div class="header-navigation">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" title="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <nav id="navigation" aria-label="Разделы"></nav>
+      </div>
+      <div class="header-metrics">
+        <button id="header-balance" class="header-balance" type="button" data-action="balance" aria-label="Изменить текущий остаток"></button>
+        <div id="header-debt" class="header-debt" aria-live="polite"></div>
+        <div id="header-forecast" aria-live="polite"></div>
+      </div>
+      <div class="header-right" title="Текущая дата"><span id="current-date"></span></div>
+    </header>
     <main><span id="page-name" hidden></span><div id="app" aria-live="polite"><p>Открываем данные…</p></div></main>
   </div>
   <dialog id="editor"><form id="editor-form"><div class="dialog-heading"><div><div class="eyebrow" id="dialog-eyebrow">ТВОЙ ПЛАН</div><h2 id="dialog-title"></h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Закрыть"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="dialog-fields"></div><p class="form-error" id="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button danger" id="delete-dialog" hidden>Удалить</button><button type="button" class="button subtle" id="cancel-dialog">Отмена</button><button type="submit" class="button primary" id="submit-dialog">Сохранить</button></div></form></dialog>
@@ -397,8 +608,8 @@ function incomeBreakdown(source) {
 function incomeTransactions(source) {
   const amounts=incomeBreakdown(source),split=source.repeat==='monthly'&&source.salaryShare>0&&source.salaryShare<10000;
   return [
-    {id:source.id,sourceId:source.id,name:source.name+(split?' · зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
-    {id:source.id+'-advance',sourceId:source.id,name:source.name+' · аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
+    {id:source.id,sourceId:source.id,name:source.name+(split?' · Зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
+    {id:source.id+'-advance',sourceId:source.id,name:source.name+' · Аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
   ].filter(t=>t.amount>0);
 }
 function saveIncomeSource(state,source) {
@@ -519,7 +730,7 @@ function compactPlan(ctx) {
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
   return `<section class="panel ledger-panel plan-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
-  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Доход» и расходы во вкладке «Платежи».':'Добавь запись во вкладке «Платежи» или «Доход».'}</p></div></td></tr>`}
+  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Приход» и расходы во вкладке «Расход».':'Добавь запись во вкладке «Расход» или «Приход».'}</p></div></td></tr>`}
   </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${plan.error?'—':money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${plan.error?'—':money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null||plan.error?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
   `;
 }
@@ -533,7 +744,7 @@ function compactDebts(ctx) {
   const total=known.reduce((sum,debt)=>sum+BigInt(debt.amount),0n);
   const totalLabel=debts.length&&!known.length?'—':total>BigInt(Number.MAX_SAFE_INTEGER)?'Сумма вне диапазона':money(Number(total));
 
-  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><div class="debt-tabs" role="tablist" aria-label="Тип платежа">${groups.map(([kind,label])=>`<button role="tab" aria-selected="${debtFilter===kind}" class="tab ${debtFilter===kind?'active':''}" data-action="debt-filter" data-kind="${kind}">${label}<span>${entries.filter(e=>kind==='all'||e.kind===kind).length}</span></button>`).join('')}</div><div class="ledger-actions"><button class="button small subtle" data-action="import">Импорт</button><button class="button small subtle" data-action="export">Экспорт</button>${button('Добавить','add-payment',true)}</div></div>
+  return `<section class="panel ledger-panel payments-panel"><div class="ledger-toolbar management-toolbar payments-toolbar"><div class="debt-tabs" role="tablist" aria-label="Тип платежа">${groups.map(([kind,label])=>`<button type="button" role="tab" aria-selected="${debtFilter===kind}" class="tab ${debtFilter===kind?'active':''}" data-action="debt-filter" data-kind="${kind}">${label}<span class="tab-count">${entries.filter(e=>kind==='all'||e.kind===kind).length}</span></button>`).join('')}</div><div class="ledger-actions"><div class="payment-transfer"><button type="button" class="button subtle" data-action="import">${icon('download')}Импорт</button><button type="button" class="button subtle" data-action="export">${icon('up')}Экспорт</button></div><div class="payment-create">${button('Добавить','add-payment',true)}</div></div></div>
   <div class="ledger-scroll"><table class="ledger management-ledger payment-ledger"><thead><tr><th>Платёж / кому</th><th>Тип</th><th class="numeric">Сумма платежа</th><th>Расписание</th><th class="numeric">Остаток долга</th></tr></thead><tbody>${filtered.map(e=>{
     const action=e.transaction?'edit-transaction':'edit-debt';
     const schedule=e.date?(e.repeat==='monthly'?`Ежемесячно · ${(e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'}`:dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':e.deadline?' · остаток к сроку':' · разово')):'Не задано';
@@ -543,7 +754,7 @@ function compactDebts(ctx) {
 
 function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) {
   const sources=[...(state.incomeSources||[]).map(source=>({...source,legacy:false})),...state.transactions.filter(t=>t.kind==='income').map(({id,name,date,day,repeat,amount})=>({id,name,date,salaryDay:day,repeat,amount,taxRate:0,salaryShare:10000,legacy:true}))];
-  return `<section class="panel ledger-panel"><div class="ledger-toolbar"><h1>Источники дохода</h1><div class="ledger-actions">${button('Добавить источник','add-income',true)}</div></div><div class="ledger-scroll"><table class="ledger management-ledger"><thead><tr><th>Источник</th><th class="numeric">До налога</th><th>Налог</th><th class="numeric">На руки</th><th>Выплаты</th></tr></thead><tbody>${sources.map(s=>{
+  return `<section class="panel ledger-panel income-panel"><div class="ledger-toolbar management-toolbar income-toolbar"><div class="ledger-actions"><div class="payment-transfer"><button type="button" class="button subtle" data-action="import">${icon('download')}Импорт</button><button type="button" class="button subtle" data-action="export">${icon('up')}Экспорт</button></div><div class="payment-create">${button('Добавить','add-income',true)}</div></div></div><div class="ledger-scroll"><table class="ledger management-ledger"><thead><tr><th>Источник</th><th class="numeric">До налога</th><th>Налог</th><th class="numeric">На руки</th><th>Выплаты</th></tr></thead><tbody>${sources.map(s=>{
     const {net,salary,advance}=s.legacy ? {net:s.amount,salary:s.amount,advance:0} : incomeBreakdown(s);
     const schedule=s.repeat==='once'?`${dateLabel(s.date,true)} · разово`:s.repeat==='yearly'?`${dateLabel(s.date)} · ежегодно`:[salary?`${s.salaryShare<10000?'Зарплата · ':''}${(s.salaryDay??Number(s.date.slice(8)))===31?'Последний день месяца':(s.salaryDay??Number(s.date.slice(8)))+'-го'} · ${money(salary)}`:'',advance?`Аванс · ${(s.advanceDay??Number(s.advanceDate.slice(8)))===31?'последний день месяца':(s.advanceDay??Number(s.advanceDate.slice(8)))+'-го'} · ${money(advance)}`:''].filter(Boolean).join('<br>');
     return `<tr class="editable-row" tabindex="0" data-action="edit-income" data-id="${esc(s.id)}" aria-label="Изменить источник ${esc(s.name)}"><td class="name-cell"><button class="row-name" data-action="edit-income" data-id="${esc(s.id)}">${esc(s.name)}</button></td><td class="numeric" data-label="До налога">${s.legacy?'—':money(s.amount)}</td><td data-label="Налог">${s.legacy?'Не задан':s.taxRate/100+'%'}</td><td class="numeric income-text" data-label="На руки">${money(net)}</td><td class="schedule-cell" data-label="Выплаты">${schedule}</td></tr>`;
@@ -552,7 +763,7 @@ function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) 
 function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money}) {
   const selected=forecastEnd || end;
   const amount=selected===end ? plan.balance : forecast(state,now,selected).balance;
-  return `<div class="header-forecast-value"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
+  return `<div class="header-forecast-value" data-date-trigger title="Выбрать дату расчёта"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
 }
 
 return {compactPlan,compactDebts,compactIncome,headerForecast};
@@ -716,6 +927,7 @@ function demoStore(date) {
 return {demoState,demoStore};
 })();
 const module_5 = (() => {
+const {monthEnd} = module_1;
 // A shared, local calendar for every date field, including fields inside dialogs.
 function initDatePickers(){
   const popup=document.createElement('div');
@@ -730,7 +942,7 @@ function initDatePickers(){
   const shiftMonth=(value,offset)=>{const d=date(value);return iso(new Date(d.getFullYear(),d.getMonth()+offset,1));};
   function position(){
     if(!input?.isConnected||!input.getClientRects().length){close(false);return;}
-    const rect=input.getBoundingClientRect(),width=popup.offsetWidth,height=popup.offsetHeight;
+    const rect=(input.closest('[data-date-trigger]')||input).getBoundingClientRect(),width=popup.offsetWidth,height=popup.offsetHeight;
     const left=Math.max(8,Math.min(rect.right-width,innerWidth-width-8));
     const top=rect.bottom+8+height<=innerHeight-8?rect.bottom+8:Math.max(8,rect.top-height-8);
     popup.style.left=left+'px';popup.style.top=top+'px';
@@ -740,11 +952,12 @@ function initDatePickers(){
     const first=date(shown+'-01'),start=new Date(first);
     start.setDate(1-(first.getDay()+6)%7);
     const label=first.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+    const forecast=input.id==='forecast-date',shortcutDate=forecast?monthEnd(today()):today();
     const prev=shiftMonth(shown+'-01',-1).slice(0,7),next=shiftMonth(shown+'-01',1).slice(0,7);
     popup.innerHTML=`<div class="date-picker-heading"><strong aria-live="polite">${label}</strong><button type="button" data-month="-1" aria-label="Предыдущий месяц" ${input.min&&prev<input.min.slice(0,7)?'disabled':''}>‹</button><button type="button" data-month="1" aria-label="Следующий месяц" ${input.max&&next>input.max.slice(0,7)?'disabled':''}>›</button></div><div class="date-picker-week" aria-hidden="true">${['Пн','Вт','Ср','Чт','Пт','Сб','Вс'].map(day=>`<span>${day}</span>`).join('')}</div><div class="date-picker-days" role="group" aria-label="Дни месяца">${Array.from({length:42},(_,i)=>{
       const d=new Date(start);d.setDate(start.getDate()+i);const value=iso(d);
       return `<button type="button" data-date="${value}" tabindex="${value===cursor?0:-1}" class="${value.slice(0,7)!==shown?'outside ':''}${value===input.value?'selected ':''}${value===today()?'today':''}" aria-label="${d.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'})}" aria-pressed="${value===input.value}" ${value===today()?'aria-current="date"':''} ${allowed(value)?'':'disabled'}>${d.getDate()}</button>`;
-    }).join('')}</div><div class="date-picker-footer"><button type="button" data-today ${allowed(today())?'':'disabled'}>Сегодня</button>${!input.required&&input.id!=='forecast-date'?'<button type="button" data-clear>Очистить</button>':''}<button type="button" data-close aria-label="Закрыть календарь">Закрыть</button></div>`;
+    }).join('')}</div><div class="date-picker-footer"><button type="button" data-shortcut ${allowed(shortcutDate)?'':'disabled'}>${forecast?'До конца месяца':'Сегодня'}</button>${!input.required&&input.id!=='forecast-date'?'<button type="button" data-clear>Очистить</button>':''}<button type="button" data-close aria-label="Закрыть календарь">Закрыть</button></div>`;
     if(popup.matches(':popover-open'))position();
     if(focus)popup.querySelector(`[data-date="${cursor}"]`)?.focus({preventScroll:true});
   }
@@ -773,7 +986,7 @@ function initDatePickers(){
   popup.addEventListener('click',event=>{
     const button=event.target.closest('button');if(!button||button.disabled)return;
     if(button.dataset.date)return select(button.dataset.date);
-    if(button.hasAttribute('data-today'))return select(today());
+    if(button.hasAttribute('data-shortcut'))return select(input.id==='forecast-date'?monthEnd(today()):today());
     if(button.hasAttribute('data-clear'))return select('');
     if(button.hasAttribute('data-close'))return close();
     if(button.dataset.month){shown=shiftMonth(shown+'-01',Number(button.dataset.month)).slice(0,7);cursor=clamp(shown+'-01');draw();popup.querySelector(`[data-month="${button.dataset.month}"]`)?.focus({preventScroll:true});}
@@ -794,7 +1007,7 @@ function initDatePickers(){
     event.preventDefault();cursor=clamp(iso(d));shown=cursor.slice(0,7);draw(true);
   });
   popup.addEventListener('toggle',()=>{if(!popup.matches(':popover-open'))input?.setAttribute('aria-expanded','false');});
-  document.addEventListener('click',event=>{const target=event.target.closest('input[type="date"]');if(target&&!target.disabled&&!target.readOnly){event.preventDefault();open(target);}},true);
+  document.addEventListener('click',event=>{const target=event.target.closest('input[type="date"]')||event.target.closest('[data-date-trigger]')?.querySelector('input[type="date"]');if(target&&!target.disabled&&!target.readOnly){event.preventDefault();open(target);}},true);
   document.addEventListener('keydown',event=>{if(event.target.matches('input[type="date"]')&&['Enter',' ','ArrowDown'].includes(event.key)&&!event.target.disabled&&!event.target.readOnly){event.preventDefault();open(event.target);}},true);
   document.addEventListener('close',event=>{if(event.target.contains(popup))close(false);},true);
   window.addEventListener('resize',()=>{if(popup.matches(':popover-open'))position();});
@@ -816,9 +1029,9 @@ const money=(value,sign=false)=>`${sign&&value>0?'+':''}${new Intl.NumberFormat(
 const bigMoney=value=>`${new Intl.NumberFormat('ru-RU',{maximumFractionDigits:value%100?2:0}).format(value/100)}<span class="currency">₽</span>`;
 const dateLabel=(value,year=false)=>new Date(value+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',...(year?{year:'numeric'}:{})});
 const shortDate=value=>new Date(value+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short'}).replace('.','');
-const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h1m5 0h1"/>',payments:'<path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/>',debts:'<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h4"/>',history:'<path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/>',storage:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',plus:'<path d="M12 5v14M5 12h14"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',down:'<path d="M12 4v16m-6-6 6 6 6-6"/>',up:'<path d="M12 20V4m-6 6 6-6 6 6"/>',wallet:'<path d="M19 8V5H6a3 3 0 0 0 0 6h15v9H6a3 3 0 0 1-3-3V8m14 7h4"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/>'};
+const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 4h1m5 0h1"/>',payments:'<path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/>',income:'<path d="m3 17 6-6 4 4 8-10m-6 0h6v6"/>',debts:'<path d="m3 7 6 6 4-4 8 10m-6 0h6v-6"/>',history:'<path d="M3 10a9 9 0 1 1 1 7M3 4v6h6m3-4v6l4 2"/>',storage:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 4 16 4 16 0V5M4 12v7c0 4 16 4 16 0v-7"/>',plus:'<path d="M12 5v14M5 12h14"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',down:'<path d="M12 4v16m-6-6 6 6 6-6"/>',up:'<path d="M12 20V4m-6 6 6-6 6 6"/>',wallet:'<path d="M19 8V5H6a3 3 0 0 0 0 6h15v9H6a3 3 0 0 1-3-3V8m14 7h4"/>',spark:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7l-5-5L4 14Z"/>',check:'<path d="m5 12 4 4L19 6"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12Z"/>'};
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.payments}</svg>`;
-const titles={income:'Доход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Платежи',history:'История',storage:'Мои данные'};
+const titles={income:'Приход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Расход',history:'История',storage:'Мои данные'};
 let store;
 let state,revision,page='overview',busy=false,dialogSubmit=null,toastTimer;
 let debtFilter='all';
@@ -853,10 +1066,22 @@ async function save(next,message=isDemo?'Изменено в примере · �
 function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
+// Repaint the fixed sky behind rounded sticky corners, above scrolling rows.
+const stickySky=$('.night').cloneNode(true);
+stickySky.classList.add('sticky-sky');
+document.body.append(stickySky);
+function updateStickyShield(){
+  const header=$('.terminal-header').getBoundingClientRect();
+  const toolbar=$('.ledger-panel .ledger-toolbar')?.getBoundingClientRect();
+  const bottom=Math.max(0,header.bottom,toolbar?Math.min(toolbar.bottom,header.bottom+toolbar.height):0);
+  stickySky.style.setProperty('--sticky-shield-height',bottom+'px');
+}
+window.addEventListener('scroll',updateStickyShield,{passive:true});
 const headerSizeObserver=new ResizeObserver(()=>{
   const header=$('.terminal-header'),toolbar=$('.ledger-panel .ledger-toolbar');
   document.documentElement.style.setProperty('--app-header-height',header.getBoundingClientRect().height+'px');
   if(toolbar)document.documentElement.style.setProperty('--ledger-toolbar-height',toolbar.getBoundingClientRect().height+'px');
+  updateStickyShield();
 });
 headerSizeObserver.observe($('.terminal-header'));
 function render(){
@@ -871,21 +1096,23 @@ function render(){
   let plan;
   try{plan=forecast(state,now,end);}
   catch(error){plan={points:[],balance:0,income:0,expense:0,firstShortfall:null,error:error.message};}
-  $('#current-date').textContent=new Date(today()+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  $('#current-date').innerHTML=`${icon('calendar')}<time datetime="${now}">${dateLabel(now,true)}</time>`;
   $('#page-name').textContent=titles[page];
-  $('#navigation').innerHTML=[['overview','План'],['debts','Платежи'],['income','Доход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
+  $('#navigation').innerHTML=[['overview','План'],['debts','Расход'],['income','Приход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
   const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
-  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><strong>${state.balance===null?'Указать':money(state.balance)}</strong>${icon('edit')}`;
+  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><span class="header-balance-value"><strong>${money(state.balance??0)}</strong>${icon('edit')}</span>`;
   const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
   const debtSum=knownDebts.reduce((total,debt)=>total+BigInt(debt.amount),0n);
   const totalDebt=debtSum<=BigInt(Number.MAX_SAFE_INTEGER)?Number(debtSum):null,missingDebt=debts.length-knownDebts.length;
-  $('#header-debt').innerHTML=`<small>Долг без ипотеки${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  const debtLabel=state.debts.some(debt=>debt.kind==='mortgage')?'Долг без ипотеки':'Долг';
+  $('#header-debt').innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
   $('#app').innerHTML=page==='debts'?compactDebts(ctx):page==='income'?compactIncome(ctx):compactPlan(ctx);
   const toolbar=$('.ledger-panel .ledger-toolbar');
   if(toolbar)headerSizeObserver.observe(toolbar);
+  updateStickyShield();
 }
 function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
@@ -1045,8 +1272,8 @@ function transactionDialog(kind='expense',id=null,date=today()){
 function debtDialog(id=null,selectedPaymentId=null){return paymentDialog({debtId:id,transactionId:selectedPaymentId});}
 function repaymentDialog(debtId,id=null){return paymentDialog({debtId,transactionId:id});}
 function balanceDialog(){
-  openDialog('Сколько есть сейчас?',field('balance','Доступные деньги, ₽','text',state.balance===null?'':state.balance/100,'required inputmode="decimal" placeholder="Сумма на счетах и наличные"')+`<p class="dialog-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
-    const balance=parseMoney(data.get('balance'));
+  openDialog('Сколько есть сейчас?',`<label class="balance-field" for="balance-amount"><span>Доступные деньги<span class="sr-only">, ₽</span></span><span class="balance-amount"><input id="balance-amount" name="balance" type="text" value="${esc(state.balance===null?'':state.balance/100)}" inputmode="decimal" placeholder="0" aria-describedby="balance-note" autofocus><span class="balance-currency" aria-hidden="true">₽</span></span></label><p class="dialog-note" id="balance-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
+    const balance=parseMoney(String(data.get('balance')??'').trim()||'0');
     await change(s=>{s.balance=balance;s.balanceDate=today();},'Остаток обновлён');
   });
 }
