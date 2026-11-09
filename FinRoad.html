@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ru">
-<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b1021"><title>FinRoad · Финансы под звёздами</title><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTgiIGZpbGw9IiMxMDE3MmMiLz48cGF0aCBkPSJNNDMgMTNBMjIgMjIgMCAxIDAgNTEgNDcgMjQgMjQgMCAwIDEgNDMgMTNaIiBmaWxsPSIjYzljNWZmIi8+PHBhdGggZD0ibTQ4IDEyIDIgNiA2IDItNiAyLTIgNi0yLTYtNi0yIDYtMloiIGZpbGw9IiM5ZGUwZDMiLz48L3N2Zz4K"><style>
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b1021"><title>FinRoad</title><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTgiIGZpbGw9IiMxMDE3MmMiLz48cGF0aCBkPSJNNDMgMTNBMjIgMjIgMCAxIDAgNTEgNDcgMjQgMjQgMCAwIDEgNDMgMTNaIiBmaWxsPSIjYzljNWZmIi8+PHBhdGggZD0ibTQ4IDEyIDIgNiA2IDItNiAyLTIgNi0yLTYtNi0yIDYtMloiIGZpbGw9IiM5ZGUwZDMiLz48L3N2Zz4K"><style>
 html{scrollbar-gutter:stable}
 :root {
   color-scheme: dark;
@@ -22,7 +22,14 @@ html{scrollbar-gutter:stable}
   --hover:#5a81a20a; --active:#7561b218; --button:#ffffff54;
   --primary:#7966ac; --primary-text:#fff; --shadow:#334f6e20;
 }
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button:disabled{cursor:default;opacity:.45}a{color:inherit;text-decoration:none}h1,h2,h3,p{margin:0}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:3px}small{color:var(--muted)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-size:13px;line-height:1.5}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button,a,input,select{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button:disabled{cursor:default;opacity:.45}a{color:inherit;text-decoration:none}h1,h2,h3,p{margin:0}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:3px}small{color:var(--muted)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.author-credit{position:fixed;right:18px;bottom:12px;z-index:4;display:flex;gap:4px;align-items:center;color:var(--faint);font-size:10px;line-height:1.3;opacity:.7}
+.author-credit a{color:inherit;font-weight:500}
+.author-credit:has(a:hover),.author-credit:has(a:focus-visible){opacity:1}
+.author-credit a:hover{color:var(--purple);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){.author-credit{right:10px;bottom:8px;font-size:10px}}
+.github-credit{left:18px;right:auto}
+@media(max-width:640px){.github-credit{left:10px;right:auto}}
 /* The sky changes with the interface, without changing any financial data. */
 .night{position:fixed;inset:0;overflow:hidden;z-index:-1;background:radial-gradient(ellipse at 78% 24%,#29345666,transparent 50%),linear-gradient(145deg,#0b1023 10%,#141c35 62%,#263a4a)}.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 15% 8%,#ccd7f6 70%,transparent),radial-gradient(1px 1px at 45% 22%,#c2b7e7 70%,transparent),radial-gradient(1px 1px at 89% 11%,#ccd7f6 70%,transparent),radial-gradient(1.5px 1.5px at 74% 34%,#ccd7f6 70%,transparent);background-size:337px 319px,479px 401px,277px 431px,727px 657px;opacity:.5}.aurora{position:absolute;width:80vw;height:38vw;right:-25vw;top:15vh;background:radial-gradient(ellipse,#7c80b318,transparent 70%);transform:rotate(-35deg);filter:blur(25px)}.mountain{position:absolute;bottom:0;width:100%;clip-path:polygon(0 85%,10% 56%,18% 68%,27% 22%,35% 52%,44% 32%,54% 65%,68% 12%,73% 27%,80% 0,90% 47%,100% 30%,100% 100%,0 100%)}.mountain-back{background:#14263888;height:24vh}.mountain-front{background:#08132299;transform:scaleX(-1);height:17vh}.sky-sun,.clouds{display:none}
 [data-theme="day"] .night{background:linear-gradient(170deg,#c7e5fa 0%,#e4effc 52%,#f8e9d6 100%)}[data-theme="day"] .stars,[data-theme="day"] .aurora{display:none}[data-theme="day"] .sky-sun{display:block;position:absolute;right:12%;top:8%;width:90px;height:90px;border-radius:50%;background:#fff4ce;box-shadow:0 0 75px 45px #fff7ddaa}[data-theme="day"] .clouds{display:block;position:absolute;inset:0;background:radial-gradient(ellipse 22% 7% at 20% 17%,#ffffff90,transparent),radial-gradient(ellipse 23% 8% at 53% 30%,#ffffff80,transparent),radial-gradient(ellipse 30% 10% at 87% 52%,#ffffff80,transparent);filter:blur(12px)}[data-theme="day"] .mountain-back{background:#8daebd55}[data-theme="day"] .mountain-front{background:#6b98a855}
@@ -43,7 +50,7 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 @media(max-width:360px){.balance-item{padding:0 7px}.balance-item>strong{font-size:15px}.balance-item>span{font-size:8px}.ledger-toolbar .ledger-actions{gap:4px}.ledger-actions .button{padding:6px}.ledger [data-label]{font-size:11px}.ledger .name-cell{grid-column:2/4}.ledger .actions-cell{grid-column:4/7}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 @media(max-width:640px){.balance-item>span{display:block}.balance-item .mini-edit{display:inline-flex;vertical-align:-2px;margin-left:2px}.balance-item.free>span>span{display:none}}
-.forecast-date{padding:0;background:none;border:0;border-bottom:1px dotted var(--faint);border-radius:0;color:inherit;font:inherit;line-height:inherit;white-space:nowrap}.forecast-date:hover{color:var(--purple);border-bottom-color:var(--purple)}
+.forecast-date{padding:0;background:none;border:0;border-radius:0;color:inherit;font:inherit;line-height:inherit;white-space:nowrap}.forecast-date:hover{color:var(--purple)}
 
 .shortfall-warning{align-items:center;background:transparent;color:var(--red);border:0;font:inherit;text-align:left;cursor:pointer;align-self:stretch}
 .shortfall-warning:hover{background:var(--active)}
@@ -61,11 +68,19 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 @media(max-width:640px){.payment-ledger .name-cell{grid-column:1/4}.payment-ledger .actions-cell{grid-column:4/7}.payment-ledger .schedule-cell{grid-column:1/-1}}
 
 .loan-date-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 27px;align-items:end;gap:10px;margin-bottom:12px}.loan-date-row .icon-button{margin-bottom:8px}.loan-date-row .field{min-width:0;margin:0}.loan-date-row input{min-width:0;width:100%}
+
+.loan-date-row .loan-row-label{order:-1}
+#entry-split[data-personal="true"] .loan-date-row .field{position:relative;display:block}
+#entry-split[data-personal="true"] .loan-date-row .field input{height:54px;padding:22px 12px 7px;font-size:15px}
+#entry-split[data-personal="true"] .loan-date-row .loan-row-label{position:absolute;left:13px;top:7px;color:var(--muted);font-size:11px;pointer-events:none;transition:top .12s,font-size .12s}
+#entry-split[data-personal="true"] .loan-date-row input[type="text"]:placeholder-shown:not(:focus)+.loan-row-label{top:16px;font-size:14px}
+#entry-split[data-personal="true"] .loan-date-row.repayment-past input{border-color:var(--mint)}
+#entry-split[data-personal="true"] .repayment-status{position:absolute;right:10px;top:7px;color:var(--mint);font-size:10px;line-height:1.3;pointer-events:none}
+#entry-split[data-personal="true"] .loan-date-row input:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:420px){.loan-date-row{grid-template-columns:minmax(0,1fr) 27px}.loan-date-row .field{grid-column:1}.loan-date-row .icon-button{grid-column:2;grid-row:1/3}}
 
 .editable-row{cursor:pointer}.editable-row:hover{background:var(--active)}.editable-row:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}#delete-dialog{margin-right:auto}#delete-dialog[hidden]{display:none}@media(max-width:640px){.management-ledger .name-cell,.payment-ledger .name-cell{grid-column:1/-1}}
 
-.day-wheel-frame{position:relative;border:1px solid var(--border);border-radius:10px;background:var(--field);overflow:hidden;max-width:160px}.day-wheel-frame:before{content:"";position:absolute;inset:36px 5px;height:36px;border-radius:6px;background:var(--active);pointer-events:none}.day-wheel{height:108px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;padding-block:36px;position:relative;touch-action:pan-y;mask-image:linear-gradient(transparent,#000 28%,#000 72%,transparent)}.day-wheel::-webkit-scrollbar{display:none}.day-option{display:block;width:100%;height:36px;min-height:36px;border:0;background:transparent;font-size:17px;line-height:36px;padding:0;color:var(--muted);scroll-snap-align:center}.day-option.selected{color:var(--purple);font-size:23px;font-weight:600}.day-wheel-frame:focus-within{outline:2px solid var(--purple);outline-offset:2px}.day-wheel:focus-visible{outline:none}.day-wheel-caption{font-size:10px}.day-picker{margin-bottom:12px}
 
 .field input[type="date"]{position:relative;cursor:pointer}.field input[type="date"]::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer}
 
@@ -76,6 +91,9 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 :is(html,dialog,.ledger-scroll,.repayment-list,.history-list)::-webkit-scrollbar-thumb{background:var(--faint);border-radius:10px}
 :is(html,dialog,.ledger-scroll,.repayment-list,.history-list)::-webkit-scrollbar-thumb:hover{background:var(--purple)}
 :is(html,dialog,.ledger-scroll,.repayment-list,.history-list)::-webkit-scrollbar-corner{background:transparent}
+/* Keep the page scrollbar gutter consistent with the selected theme. */
+:root{background-color:var(--bg);scrollbar-color:var(--faint) var(--bg)}
+:root::-webkit-scrollbar,:root::-webkit-scrollbar-track,:root::-webkit-scrollbar-corner{background:var(--bg)}
 
 .plan-shortfall{margin-left:auto;display:flex;align-items:baseline;justify-content:flex-end;gap:12px;color:var(--red);text-align:right}.plan-shortfall span{font-size:11px}.plan-shortfall strong{font-size:18px;line-height:1.3;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}@media(max-width:640px){.plan-shortfall{flex-basis:100%;justify-content:space-between;gap:8px}.plan-shortfall strong{font-size:16px}.plan-shortfall span{font-size:10px}}
 
@@ -88,9 +106,9 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 
 /* Long lists extend the document; only the app header stays in view. */
 .compact-shell{--page-gutter:clamp(12px,2.4vw,42px);padding-bottom:20px}
-/* One gathered row: navigation, balances, then the current date. */
+/* One gathered row: date, navigation and financial summary. */
 .terminal-header{
-  position:sticky;top:0;z-index:5;
+  position:sticky;top:0;z-index:7;
   display:flex;align-items:center;gap:22px;flex-wrap:wrap;
   min-height:94px;margin:0 0 12px;padding:10px 22px;
   border:1px solid var(--border);border-radius:16px;
@@ -123,21 +141,29 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 .nav-button:hover{background:var(--hover);color:var(--text)}
 .nav-button.active{background:var(--active);border-color:var(--border);color:var(--purple)}
 .header-metrics{
-  order:1;display:grid;grid-template-columns:minmax(150px,.85fr) minmax(190px,1.15fr) minmax(185px,1fr);
+  order:1;display:grid;grid-template-columns:minmax(190px,1.15fr) minmax(150px,.85fr) minmax(185px,1fr);
   flex:1;min-width:0;align-items:center;margin-left:auto;
   padding-left:22px;border-left:1px solid var(--border);
 }
 .header-balance,.header-debt,.header-forecast-value{min-width:0;text-align:left}
 .header-balance{
   display:grid;gap:2px;
-  width:100%;padding:0 20px 0 8px;border:0;background:none;letter-spacing:0;
+  width:100%;padding:0 20px;border:0;border-left:1px solid var(--border);background:none;letter-spacing:0;
 }
 .header-balance small{font-weight:400}
+.header-balance-edit{display:flex;align-items:center;gap:14px;min-width:0;width:100%;padding:0;border:0;background:none;text-align:left}
+.header-balance-form{display:flex;align-items:center;gap:4px;min-width:0}
+.header-balance-form input{width:100%;min-width:0;padding:1px 4px;border:1px solid var(--purple);border-radius:6px;background:var(--field);color:var(--text);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.header-balance-form .balance-unit{font-size:20px;font-weight:600}
+.header-balance-error{color:var(--red);font-size:11px;line-height:1.3}
+.header-balance-error:empty{display:none}
 .header-balance-value{display:flex;align-items:center;gap:14px;min-width:0}
 .header-balance-value strong{min-width:0}
 .header-balance .icon{width:16px;height:16px;color:var(--muted)}
 .header-balance:hover .icon,.header-balance:hover small{color:var(--purple)}
-.header-debt{display:grid;gap:2px;padding:0 22px;border-left:1px solid var(--border)}
+.header-debt{display:grid;gap:2px;width:100%;padding:0 22px 0 8px;border:0;background:none;letter-spacing:0}
+.header-debt:disabled{opacity:1;cursor:default}
+.header-debt:not(:disabled):hover small{color:var(--purple)}
 #header-forecast{min-width:0;padding-left:12px;border-left:1px solid var(--border)}
 .header-forecast-value{display:grid;gap:2px;cursor:pointer;padding:10px 18px;background:var(--active);border-radius:10px}
 .header-balance small,.header-debt small,.header-forecast-value>span{font-size:13px;line-height:1.45;color:var(--muted)}
@@ -146,7 +172,7 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
   font-variant-numeric:tabular-nums;overflow-wrap:anywhere;
 }
 .header-forecast-value>span,.header-forecast-value strong{color:var(--purple)}
-.header-right{order:2;flex-shrink:0;padding-left:22px;border-left:1px solid var(--border);font-size:14px;color:var(--muted)}
+.header-right{flex-shrink:0;padding-left:18px;border-left:1px solid var(--border);font-size:14px;color:var(--muted)}
 #current-date{display:flex;align-items:center;gap:12px;white-space:nowrap}
 #current-date .icon{width:23px;height:23px}
 @media(min-width:1241px) and (max-width:1500px){
@@ -154,7 +180,7 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
   .header-navigation{gap:14px}
   .terminal-header nav{padding-left:14px;gap:3px}
   .nav-button{padding-inline:10px;gap:7px}
-  .header-metrics{padding-left:14px;grid-template-columns:minmax(135px,.85fr) minmax(170px,1.15fr) minmax(175px,1fr)}
+  .header-metrics{padding-left:14px;grid-template-columns:minmax(170px,1.15fr) minmax(135px,.85fr) minmax(175px,1fr)}
   .header-balance{padding-right:16px}
   .header-debt{padding-inline:16px}
   .header-forecast-value{padding-inline:14px}
@@ -164,31 +190,30 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 }
 @media(max-width:1240px){
   .terminal-header{gap:12px 18px;padding:12px 18px}
-  .header-right{order:1;margin-left:auto}
   .header-metrics{
-    order:2;flex-basis:100%;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) minmax(0,1fr);
+    order:2;flex-basis:100%;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr) minmax(0,1fr);
     margin:0;padding:12px 0 0;border-left:0;border-top:1px solid var(--border);
   }
-  .header-balance{padding-left:0}
+  .header-debt{padding-left:0}
   .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:24px}
 }
 @media(max-width:640px){
   .terminal-header{gap:10px;padding:12px;border-radius:12px;margin-bottom:9px}
-  .header-navigation{width:100%;gap:10px}
+  .header-navigation{width:100%;gap:10px;flex-wrap:wrap}
   .theme-toggle{width:38px;height:38px;border-radius:10px}
   .theme-toggle svg{width:27px;height:27px}
-  .terminal-header nav{flex:1;justify-content:space-between;gap:2px;padding-left:10px}
+  .terminal-header nav{flex-basis:100%;justify-content:space-between;gap:2px;padding:8px 0 0;border-left:0;border-top:1px solid var(--border)}
   .nav-button{min-height:40px;padding:8px;font-size:12px;gap:5px}
   .nav-button .icon{width:16px;height:16px}
   .header-metrics{grid-template-columns:minmax(0,1fr);gap:10px;padding-top:10px}
-  .header-balance{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:2px 0}
+  .header-balance{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 0 0;border-left:0;border-top:1px solid var(--border)}
   .header-balance-value{gap:8px}
-  .header-debt{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0 0;border-left:0;border-top:1px solid var(--border)}
+  .header-debt{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:2px 0}
   #header-forecast{padding:0;border:0}
   .header-forecast-value{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px}
   .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:20px;letter-spacing:-.3px}
   .header-balance small,.header-debt small,.header-forecast-value>span{font-size:12px}
-  .header-right{order:3;display:block;width:100%;margin:0;padding:10px 0 0;border-left:0;border-top:1px solid var(--border);font-size:12px}
+  .header-right{margin-left:0;padding-left:10px;font-size:12px}
   #current-date{justify-content:flex-end;gap:8px}
   #current-date .icon{width:18px;height:18px}
 }
@@ -229,12 +254,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
   .payment-ledger tbody .schedule-cell{grid-row:3}
 }
 
-/* Keep table headings and column labels attached to the app header. */
+/* Keep a clear gap between the app header and sticky table headings. */
+:root{--header-table-gap:12px}
 .compact-shell:has(.ledger-panel) .terminal-header{margin-bottom:0}
 .ledger-panel{overflow:clip;backdrop-filter:none;border-top:1px solid var(--border);border-radius:16px}
 .ledger-panel .ledger-scroll{overflow:visible}
-.ledger-panel .ledger-toolbar{border-radius:16px 16px 0 0;position:sticky;top:var(--app-header-height,60px);z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
-.ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
+.ledger-panel .ledger-toolbar{border-radius:16px 16px 0 0;position:sticky;top:calc(var(--app-header-height,60px) + var(--header-table-gap));z-index:4;background:var(--dialog);backdrop-filter:blur(20px)}
+.ledger-panel .ledger thead th{position:sticky;top:calc(var(--app-header-height,60px) + var(--header-table-gap) + var(--ledger-toolbar-height,45px));z-index:3;background:var(--head)}
 @media(max-width:640px){.ledger-panel{border-radius:12px}.ledger-panel .ledger-toolbar{border-radius:12px 12px 0 0}.ledger-panel .ledger thead th{position:static}}
 
 /* Payment filters stay together; file actions are separate from creation. */
@@ -293,7 +319,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{display:none!important}
 }
 
 /* Controls use pointer interaction; content text stays available for copying. */
-:focus-visible,.forecast-date:focus-within,.day-wheel-frame:focus-within{outline:none!important}
+
 button,label,legend,svg{user-select:none;-webkit-user-select:none}
 input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-select:text}
 #close-dialog{line-height:1;align-self:center}
@@ -360,9 +386,190 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
   z-index:2;pointer-events:none;
   clip-path:inset(0 0 max(0px,calc(100% - var(--sticky-shield-height,0px))) 0);
 }
+.night.header-shield{
+  z-index:6;pointer-events:none;
+  clip-path:inset(0 0 max(0px,calc(100% - var(--header-shield-height,0px))) 0);
+}
 
 .nav-button[data-action="nav-income"] .icon{color:var(--mint);opacity:.85}
 .nav-button[data-action="nav-debts"] .icon{color:var(--red);opacity:.85}
+
+/* Payment amount and remaining debt are adjacent, but remain separate values. */
+.payments-panel{width:100%;max-width:1080px;margin:12px auto 0;background:var(--field)}
+.payments-panel .management-toolbar{min-height:0;gap:10px;padding:9px 12px}
+.payments-panel .management-toolbar .tab{min-height:34px;padding:6px 8px;gap:5px;font-size:12px}
+.payments-panel .management-toolbar .tab .tab-count{min-width:20px;min-height:20px;font-size:11px}
+.payments-panel .management-toolbar .ledger-actions{gap:10px}
+.payments-panel .payment-transfer{gap:5px}
+.payments-panel .payment-create{padding-left:10px}
+.payments-panel .management-toolbar .ledger-actions .button{min-height:36px;padding:7px 9px;font-size:12px;gap:6px}
+.payments-panel .management-toolbar .ledger-actions .button.primary{padding-inline:10px}
+.payments-panel .management-toolbar .ledger-actions .button .icon{width:16px;height:16px}
+@media(min-width:1001px){.payments-panel .management-toolbar .debt-tabs{flex-basis:auto}}
+.payment-ledger{table-layout:fixed;font-size:14px}
+.payment-ledger th:nth-child(1){width:25%}
+.payment-ledger th:nth-child(2){width:19%}
+.payment-ledger th:nth-child(3){width:25%}
+.payment-ledger th:nth-child(4){width:15%}
+.payment-ledger th:nth-child(5){width:16%;border-left:1px solid var(--border)}
+.payment-ledger thead th{padding:6px 14px;font-size:12px;line-height:1.35;white-space:normal}
+.payment-ledger tbody td{height:33px;padding:4px 14px;vertical-align:middle}
+.payment-ledger .name-cell .row-name{font-size:14px;line-height:1.35;font-weight:600}
+.payment-ledger .schedule-cell{font-size:13px;color:var(--text);white-space:normal;overflow-wrap:anywhere}
+.repayment-past-tag{display:inline-block;margin-left:8px;color:var(--mint);font-size:11px}
+.payment-ledger td[data-label="Тип"]{white-space:normal;overflow-wrap:anywhere}
+.payment-ledger .expense-text{font-size:14px;font-weight:600;white-space:normal;overflow-wrap:anywhere}
+.payment-ledger .expense-text .dash{color:var(--muted)}
+.payment-ledger .payment-debt{border-left:1px solid var(--border);color:var(--muted)}
+.payment-ledger .payment-debt .row-name{color:var(--purple);font-size:14px;font-weight:600;text-align:right;white-space:normal;overflow-wrap:anywhere}
+.payment-ledger .payment-debt .row-name:hover{color:var(--purple);text-decoration:underline}
+.payment-ledger tbody tr:nth-child(even){background:var(--hover)}
+.payment-ledger tbody tr:hover{background:var(--active)}
+.payment-ledger tfoot .debt-total{border-left:1px solid var(--border);color:var(--purple);font-size:14px;font-weight:600}
+@media(min-width:641px) and (max-width:1000px){
+  .payment-ledger thead th,.payment-ledger tbody td{padding-inline:8px}
+  .payment-ledger th:nth-child(1){width:22%}
+  .payment-ledger th:nth-child(2){width:18%}
+  .payment-ledger th:nth-child(3){width:26%}
+  .payment-ledger th:nth-child(4){width:16%}
+  .payment-ledger th:nth-child(5){width:18%}
+  .payment-ledger{font-size:12px}
+  .payment-ledger .name-cell .row-name,.payment-ledger .expense-text,.payment-ledger .payment-debt .row-name{font-size:12px}
+  .payment-ledger .schedule-cell{font-size:12px}
+}
+@media(max-width:640px){
+  .payments-panel .management-toolbar .tab,.payments-panel .management-toolbar .ledger-actions .button{min-height:42px}
+  .payment-ledger tbody td{height:auto;min-height:0}
+  .payment-ledger .payment-debt,.payment-ledger tfoot .debt-total{border-left:0}
+  .payment-ledger .payment-debt .row-name{white-space:normal;overflow-wrap:anywhere}
+  .payment-ledger .name-cell .row-name{font-size:14px}
+}
+
+/* The plan pairs a signed cash flow with the balance after each event. */
+.plan-panel{width:100%;max-width:1080px;margin:12px auto 0;background:var(--field)}
+.plan-panel .ledger-toolbar{min-height:0;padding:8px 14px}
+.plan-panel:not(:has(.ledger-toolbar)) .ledger thead th{top:calc(var(--app-header-height,60px) + var(--header-table-gap))}
+.plan-ledger{table-layout:fixed;font-size:13px}
+.plan-ledger .plan-date-col{width:110px}
+.plan-ledger .plan-type-col{width:165px}
+.plan-ledger .amount-col{width:175px}
+.plan-ledger .balance-col{width:190px}
+.plan-ledger .name-cell{width:auto}
+.plan-ledger thead th{padding:6px 14px;font-size:12px;line-height:1.35}
+.plan-ledger tbody td{height:33px;padding:4px 14px;vertical-align:middle}
+.plan-ledger .row-name{display:inline;font-size:14px;line-height:1.35;font-weight:600}
+.plan-ledger .plan-type{font-size:12px;line-height:1.35;color:var(--muted);white-space:normal;overflow-wrap:anywhere}
+.plan-ledger .transfer-tag,.plan-ledger .calendar-estimate{display:inline;margin:0 0 0 8px;font-size:11px}
+.plan-ledger .plan-amount,.plan-ledger .running-balance{font-size:15px;font-weight:600}
+.plan-ledger .running-balance{color:var(--purple);background:var(--active)}
+.plan-ledger .plan-minimum{color:var(--gold)}
+.plan-ledger .plan-day{display:none}
+.plan-ledger .plan-date{padding:5px 14px;vertical-align:top;border-top:1px solid var(--border);background:var(--head);color:var(--muted);font-size:12px;line-height:1.4;font-weight:600;text-align:left;white-space:normal}
+.plan-ledger .plan-event:nth-child(odd){background:var(--hover)}
+.plan-ledger .plan-event:hover{background:var(--active)}
+.plan-ledger tfoot td{height:auto;padding:10px 14px}
+.plan-totals{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px}
+.plan-event-count{margin-right:auto;font-size:13px;font-weight:600;white-space:nowrap}
+.plan-total{display:flex;align-items:baseline;gap:10px;min-width:0}
+.plan-total>span{color:var(--muted)}
+.plan-total strong{font-size:14px;line-height:1.4;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.plan-final strong{color:var(--purple)}
+@media(min-width:641px) and (max-width:1000px){
+  .plan-panel .ledger-toolbar{padding-inline:16px}
+  .plan-ledger .plan-date-col{width:90px}
+  .plan-ledger .plan-type-col{width:120px}
+  .plan-ledger .amount-col{width:125px}
+  .plan-ledger .balance-col{width:135px}
+  .plan-ledger thead th,.plan-ledger tbody td,.plan-ledger .plan-day th{padding-inline:16px}
+  .plan-ledger .row-name{font-size:14px}
+  .plan-ledger .plan-amount,.plan-ledger .running-balance{font-size:15px}
+  .plan-totals{flex-wrap:wrap;gap:12px 20px}
+  .plan-event-count{flex-basis:100%}
+  .plan-total{flex:1;justify-content:space-between;flex-wrap:wrap;gap:4px 8px}
+  .plan-total strong{font-size:15px}
+}
+@media(max-width:640px){
+  .plan-panel .ledger-toolbar{padding:8px 14px}
+  .plan-ledger tbody tr{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;padding:14px}
+  .plan-ledger tbody td{height:auto;min-height:0}
+  .plan-ledger .plan-day{display:block;padding:0;border:0}
+  .plan-ledger .plan-date{display:none}
+  .plan-ledger .plan-day th{display:block;padding:9px 14px;font-size:13px}
+  .plan-ledger .plan-type{grid-column:1/-1;grid-row:1}
+  .plan-ledger .name-cell{grid-column:1/-1;grid-row:2}
+  .plan-ledger .row-name{font-size:15px}
+  .plan-ledger .plan-amount{grid-column:1;grid-row:3}
+  .plan-ledger .running-balance{grid-column:2;grid-row:3;background:transparent}
+  .plan-ledger .numeric{white-space:normal;overflow-wrap:anywhere}
+  .plan-ledger [data-label]{font-size:16px}
+  .plan-ledger .running-balance{text-align:right}
+  .plan-ledger [data-label]:before{font-size:11px;color:var(--muted)}
+  .plan-ledger tbody td[colspan]{grid-column:1/-1}
+  .plan-ledger tfoot tr{display:block;padding:16px 14px}
+  .plan-ledger tfoot td{display:block}
+  .plan-totals{flex-direction:column;align-items:stretch;gap:12px;font-size:13px}
+  .plan-event-count{font-size:14px}
+  .plan-total{justify-content:space-between;flex-wrap:wrap;gap:4px 10px}
+  .plan-total strong{font-size:16px;white-space:normal;overflow-wrap:anywhere}
+}
+
+.income-ledger tfoot .income-total{color:var(--mint);font-size:14px;font-weight:600}
+.income-ledger th:nth-child(1){width:27%}.income-ledger th:nth-child(2){width:22%}.income-ledger th:nth-child(3){width:31%}.income-ledger th:nth-child(4){width:20%}
+#editor:has(.income-type){width:min(680px,calc(100% - 24px));padding:28px}
+#editor:has(.income-type) .eyebrow{display:none}
+.income-type .choice-field{margin-bottom:16px}
+.income-type .choices{gap:5px}
+.income-type .choices label{flex:0 1 auto;min-width:0}
+.income-type .choices span{padding:8px 10px;font-size:12px}
+/* Compact expense form; legacy payment controls remain available when needed. */
+#editor:has(.expense-type){width:min(620px,calc(100% - 24px));padding:28px}
+#editor:has(.expense-type) .eyebrow{display:none}
+.expense-type{display:flex;align-items:center;gap:18px;margin-bottom:16px;color:var(--muted);font-size:14px}
+.expense-type span{min-width:55px;font-weight:600}
+.expense-type select{flex:1;min-width:0;min-height:42px;padding:8px 12px;border:1px solid var(--purple);border-radius:9px;background:var(--active);color:var(--text)}
+.expense-floating{position:relative;display:block;margin-bottom:12px}
+.expense-floating input{width:100%;min-width:0;min-height:54px;padding:22px 12px 7px;border:1px solid var(--border);border-radius:9px;background:var(--field);color:var(--text);font-size:15px}
+.expense-floating span{position:absolute;left:13px;top:7px;color:var(--muted);font-size:11px;pointer-events:none;transition:top .12s,font-size .12s}
+.expense-floating input:placeholder-shown:not(:focus)+span{top:16px;font-size:14px}
+#credit-monthly strong{display:block;margin:16px 0 9px;color:var(--text);font-size:14px}
+.credit-fields{display:grid;grid-template-columns:minmax(0,1fr) 160px;gap:10px;align-items:center}
+.credit-fields .compact-day{margin:0}
+@media(max-width:480px){#editor:has(.expense-type){padding:20px}.credit-fields{grid-template-columns:minmax(0,1fr) 145px}}
+
+/* Compact services form. */
+#editor:has(.expense-type){width:min(680px,calc(100% - 24px))}
+.expense-type{display:block}
+.expense-type .choice-field{margin-bottom:16px}
+.expense-type .choices{gap:5px}
+.expense-type .choices label{flex:0 1 auto;min-width:0}
+.expense-type .choices span{min-width:0;padding:8px 10px;font-size:12px;white-space:nowrap}
+#service-heading,#other-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 8px}
+#service-heading strong,#other-heading strong{font-size:14px}
+.service-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,.48fr);gap:10px;align-items:center}
+.service-fields .expense-floating,.service-fields .field{margin:0}
+#service-monthly,#service-once-date,#other-monthly,#other-once{display:flex;align-items:center;min-height:54px;min-width:0}
+#service-monthly .compact-day,#other-monthly .compact-day{width:100%}
+.number-stepper{position:relative;display:flex;min-width:0}
+.number-stepper input{padding-right:42px;appearance:textfield;-moz-appearance:textfield}
+.number-stepper input::-webkit-inner-spin-button,.number-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.number-stepper-buttons{position:absolute;right:5px;top:5px;bottom:5px;width:30px;display:grid;grid-template-rows:1fr 1fr;overflow:hidden;border:1px solid var(--border);border-radius:6px;background:var(--dialog)}
+.number-stepper-buttons button{display:grid;place-items:center;min-height:0;padding:0;border:0;background:transparent;color:var(--muted)}
+.number-stepper-buttons button+button{border-top:1px solid var(--border)}
+.number-stepper-buttons button:hover{background:var(--active);color:var(--purple)}
+.number-stepper-buttons button::before{content:"";width:6px;height:6px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor;transform:translateY(2px) rotate(45deg)}
+.number-stepper-buttons button[data-direction="down"]::before{transform:translateY(-2px) rotate(225deg)}
+.day-number{appearance:textfield;-moz-appearance:textfield}
+.day-number::-webkit-inner-spin-button,.day-number::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+#service-once-date .expense-floating,#other-once .expense-floating{width:100%}
+#service-once-date .expense-floating input,#other-once .expense-floating input{height:54px}
+#service-once-date .expense-floating input+span,#other-once .expense-floating input+span{top:7px;font-size:11px}
+.service-switch{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap;cursor:pointer}
+.service-switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch-track{position:relative;width:40px;height:22px;border-radius:20px;background:var(--purple);flex-shrink:0}
+.switch-track:after{content:"";position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:var(--primary-text);transition:transform .15s}
+.service-switch input:checked+.switch-track:after{transform:translateX(18px)}
+.service-switch input:focus-visible+.switch-track{outline:2px solid var(--purple);outline-offset:2px}
+@media(max-width:640px){.service-fields{grid-template-columns:minmax(0,1fr) minmax(145px,.5fr)}.expense-type .choices span{white-space:normal}}
 
 </style></head>
 <body>
@@ -371,20 +578,23 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
     <header class="terminal-header">
       <div class="header-navigation">
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" title="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <div class="header-right" title="Текущая дата"><span id="current-date"></span></div>
         <nav id="navigation" aria-label="Разделы"></nav>
       </div>
       <div class="header-metrics">
-        <button id="header-balance" class="header-balance" type="button" data-action="balance" aria-label="Изменить текущий остаток"></button>
-        <div id="header-debt" class="header-debt" aria-live="polite"></div>
+        <button id="header-debt" class="header-debt" type="button" data-action="toggle-mortgage-debt" aria-live="polite"></button>
+        <div id="header-balance" class="header-balance"></div>
         <div id="header-forecast" aria-live="polite"></div>
       </div>
-      <div class="header-right" title="Текущая дата"><span id="current-date"></span></div>
     </header>
     <main><span id="page-name" hidden></span><div id="app" aria-live="polite"><p>Открываем данные…</p></div></main>
   </div>
+  <div class="author-credit github-credit"><span>by GitHub</span><a href="https://github.com/Sad-Jack" target="_blank" rel="noopener noreferrer">Sad-Jack</a></div>
+  <div class="author-credit"><span>by TG</span><a href="https://t.me/jack_ripper" target="_blank" rel="noopener noreferrer">@jack_ripper</a></div>
   <dialog id="editor"><form id="editor-form"><div class="dialog-heading"><div><div class="eyebrow" id="dialog-eyebrow">ТВОЙ ПЛАН</div><h2 id="dialog-title"></h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Закрыть"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div id="dialog-fields"></div><p class="form-error" id="form-error" role="alert"></p><div class="dialog-actions"><button type="button" class="button danger" id="delete-dialog" hidden>Удалить</button><button type="button" class="button subtle" id="cancel-dialog">Отмена</button><button type="submit" class="button primary" id="submit-dialog">Сохранить</button></div></form></dialog>
   <div id="toast" role="status"></div><input id="import-file" type="file" accept="application/json,.json" hidden>
   <script>
+const incomeTypeNames={salary:'Зарплата',side:'Подработка',support:'Выплаты и поступления',other:'Другое'};
 const module_0 = (() => {
 // Russia, five-day workweek. Source: https://xmlcalendar.ru/ (2026-11-01).
 const daysOff = {"2025":["2025-01-01","2025-01-02","2025-01-03","2025-01-04","2025-01-05","2025-01-06","2025-01-07","2025-01-08","2025-01-11","2025-01-12","2025-01-18","2025-01-19","2025-01-25","2025-01-26","2025-02-01","2025-02-02","2025-02-08","2025-02-09","2025-02-15","2025-02-16","2025-02-22","2025-02-23","2025-03-01","2025-03-02","2025-03-08","2025-03-09","2025-03-15","2025-03-16","2025-03-22","2025-03-23","2025-03-29","2025-03-30","2025-04-05","2025-04-06","2025-04-12","2025-04-13","2025-04-19","2025-04-20","2025-04-26","2025-04-27","2025-05-01","2025-05-02","2025-05-03","2025-05-04","2025-05-08","2025-05-09","2025-05-10","2025-05-11","2025-05-17","2025-05-18","2025-05-24","2025-05-25","2025-05-31","2025-06-01","2025-06-07","2025-06-08","2025-06-12","2025-06-13","2025-06-14","2025-06-15","2025-06-21","2025-06-22","2025-06-28","2025-06-29","2025-07-05","2025-07-06","2025-07-12","2025-07-13","2025-07-19","2025-07-20","2025-07-26","2025-07-27","2025-08-02","2025-08-03","2025-08-09","2025-08-10","2025-08-16","2025-08-17","2025-08-23","2025-08-24","2025-08-30","2025-08-31","2025-09-06","2025-09-07","2025-09-13","2025-09-14","2025-09-20","2025-09-21","2025-09-27","2025-09-28","2025-10-04","2025-10-05","2025-10-11","2025-10-12","2025-10-18","2025-10-19","2025-10-25","2025-10-26","2025-11-02","2025-11-03","2025-11-04","2025-11-08","2025-11-09","2025-11-15","2025-11-16","2025-11-22","2025-11-23","2025-11-29","2025-11-30","2025-12-06","2025-12-07","2025-12-13","2025-12-14","2025-12-20","2025-12-21","2025-12-27","2025-12-28","2025-12-31"],"2026":["2026-01-01","2026-01-02","2026-01-03","2026-01-04","2026-01-05","2026-01-06","2026-01-07","2026-01-08","2026-01-09","2026-01-10","2026-01-11","2026-01-17","2026-01-18","2026-01-24","2026-01-25","2026-01-31","2026-02-01","2026-02-07","2026-02-08","2026-02-14","2026-02-15","2026-02-21","2026-02-22","2026-02-23","2026-02-28","2026-03-01","2026-03-07","2026-03-08","2026-03-09","2026-03-14","2026-03-15","2026-03-21","2026-03-22","2026-03-28","2026-03-29","2026-04-04","2026-04-05","2026-04-11","2026-04-12","2026-04-18","2026-04-19","2026-04-25","2026-04-26","2026-05-01","2026-05-02","2026-05-03","2026-05-09","2026-05-10","2026-05-11","2026-05-16","2026-05-17","2026-05-23","2026-05-24","2026-05-30","2026-05-31","2026-06-06","2026-06-07","2026-06-12","2026-06-13","2026-06-14","2026-06-20","2026-06-21","2026-06-27","2026-06-28","2026-07-04","2026-07-05","2026-07-11","2026-07-12","2026-07-18","2026-07-19","2026-07-25","2026-07-26","2026-08-01","2026-08-02","2026-08-08","2026-08-09","2026-08-15","2026-08-16","2026-08-22","2026-08-23","2026-08-29","2026-08-30","2026-09-05","2026-09-06","2026-09-12","2026-09-13","2026-09-19","2026-09-20","2026-09-26","2026-09-27","2026-10-03","2026-10-04","2026-10-10","2026-10-11","2026-10-17","2026-10-18","2026-10-24","2026-10-25","2026-10-31","2026-11-01","2026-11-04","2026-11-07","2026-11-08","2026-11-14","2026-11-15","2026-11-21","2026-11-22","2026-11-28","2026-11-29","2026-12-05","2026-12-06","2026-12-12","2026-12-13","2026-12-19","2026-12-20","2026-12-26","2026-12-27","2026-12-31"],"2027":["2027-01-01","2027-01-02","2027-01-03","2027-01-04","2027-01-05","2027-01-06","2027-01-07","2027-01-08","2027-01-09","2027-01-10","2027-01-16","2027-01-17","2027-01-23","2027-01-24","2027-01-30","2027-01-31","2027-02-06","2027-02-07","2027-02-13","2027-02-14","2027-02-21","2027-02-22","2027-02-23","2027-02-27","2027-02-28","2027-03-06","2027-03-07","2027-03-08","2027-03-13","2027-03-14","2027-03-20","2027-03-21","2027-03-27","2027-03-28","2027-04-03","2027-04-04","2027-04-10","2027-04-11","2027-04-17","2027-04-18","2027-04-24","2027-04-25","2027-05-01","2027-05-02","2027-05-03","2027-05-08","2027-05-09","2027-05-10","2027-05-15","2027-05-16","2027-05-22","2027-05-23","2027-05-29","2027-05-30","2027-06-05","2027-06-06","2027-06-12","2027-06-13","2027-06-14","2027-06-19","2027-06-20","2027-06-26","2027-06-27","2027-07-03","2027-07-04","2027-07-10","2027-07-11","2027-07-17","2027-07-18","2027-07-24","2027-07-25","2027-07-31","2027-08-01","2027-08-07","2027-08-08","2027-08-14","2027-08-15","2027-08-21","2027-08-22","2027-08-28","2027-08-29","2027-09-04","2027-09-05","2027-09-11","2027-09-12","2027-09-18","2027-09-19","2027-09-25","2027-09-26","2027-10-02","2027-10-03","2027-10-09","2027-10-10","2027-10-16","2027-10-17","2027-10-23","2027-10-24","2027-10-30","2027-10-31","2027-11-04","2027-11-05","2027-11-06","2027-11-07","2027-11-13","2027-11-14","2027-11-20","2027-11-21","2027-11-27","2027-11-28","2027-12-04","2027-12-05","2027-12-11","2027-12-12","2027-12-18","2027-12-19","2027-12-25","2027-12-26","2027-12-31"]};
@@ -453,13 +663,12 @@ function unplannedDebtAmount(state, debtId, excludeId=null,referenceDate=today()
 }
 function scheduleRepayment(state,{id,debtId,amount,date}) {
   const debt=state.debts.find(d=>d.id===debtId);
-  if(!debt || !['card','personal'].includes(debt.kind)) throw new Error('Погашение доступно для кредитных карт и личных долгов');
+  if(!debt || !['card','personal'].includes(debt.kind)) throw new Error('Погашение доступно для кредитных карт и частных долгов');
   const existing=state.transactions.find(t=>t.id===id);
   if(existing && (existing.debtId!==debtId || state.completed[`${id}:${existing.date}`])) throw new Error('Нельзя изменить учтённое погашение');
   if(!Number.isSafeInteger(amount) || amount<=0) throw new Error('Сумма должна быть больше нуля');
   if(amount>unplannedDebtAmount(state,debtId,id)) throw new Error('Сумма превышает остаток с учётом других запланированных погашений');
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || date<'2000-01-01' || date>'2100-12-31' || Number.isNaN(Date.parse(date)) || new Date(date+'T12:00:00Z').toISOString().slice(0,10)!==date) throw new Error('Укажи корректную дату');
-  if(debt.due && date>debt.due) throw new Error('Дата позже срока полного погашения. Сначала измени срок долга');
   const item={id,debtId,name:debt.name,kind:'expense',repeat:'once',amount,date};
   if(existing) state.transactions=state.transactions.map(t=>t.id===id?item:t);else state.transactions.push(item);
 }
@@ -499,7 +708,7 @@ function saveLoanPayments(state,debt,payments,previous=loanPayments(state,debt))
 function paymentTiming(repeat,day,date,existing=null,now=today()) {
   if(repeat==='monthly'){
     if(!Number.isInteger(day)||day<1||day>31)throw new Error('Выбери число платежа от 1 до 31');
-    const anchor=existing?.repeat==='monthly'?existing.date:now;
+    const anchor=existing?.repeat==='monthly'&&existing.date?existing.date:now;
     return {date:anchor.slice(0,7)+'-01',day};
   }
   if(!['once','yearly'].includes(repeat))throw new Error('Выбери повторение платежа');
@@ -532,7 +741,7 @@ function eventsBetween(state, start, end) {
       push(linked?{...item,name:`Погашение · ${linked.name}`}:item,item.date); continue;
     }
     const [sy,sm,sd] = item.date.split('-').map(Number);
-    const shiftIncome=item.kind==='income'&&item.repeat==='monthly';
+    const shiftIncome=item.kind==='income'&&item.repeat==='monthly'&&(item.incomeType==null||item.incomeType==='salary');
     const until=shiftIncome?addDays(monthEnd(end),1):end;
     const [ey,em] = until.split('-').map(Number);
     for(let year=Number(start.slice(0,4));year<=ey;year++) {
@@ -544,10 +753,6 @@ function eventsBetween(state, start, end) {
         if(scheduledDate>=item.date) push({...item,calendarEstimated:adjusted.estimated},adjusted.date,false,scheduledDate);
       }
     }
-  }
-  for (const debt of state.debts) {
-    const amount=unplannedDebtAmount(state,debt.id,null,start);
-    if(!['loan','mortgage'].includes(debt.kind) && debt.due && amount>0) push({...debt,amount},debt.due,true);
   }
   // Same-day income first, consistently in the plan and running-balance forecast.
   return events.sort((a,b)=>a.date.localeCompare(b.date) || (a.kind==='income'?-1:1)-(b.kind==='income'?-1:1) || a.name.localeCompare(b.name));
@@ -608,12 +813,14 @@ function incomeBreakdown(source) {
 function incomeTransactions(source) {
   const amounts=incomeBreakdown(source),split=source.repeat==='monthly'&&source.salaryShare>0&&source.salaryShare<10000;
   return [
-    {id:source.id,sourceId:source.id,name:source.name+(split?' · Зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
-    {id:source.id+'-advance',sourceId:source.id,name:source.name+' · Аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
+    {id:source.id,sourceId:source.id,incomeType:source.incomeType||'salary',name:source.name+(split?' · Зарплата':''),kind:'income',repeat:source.repeat,date:source.date,day:source.salaryDay,amount:amounts.salary},
+    {id:source.id+'-advance',sourceId:source.id,incomeType:source.incomeType||'salary',name:source.name+' · Аванс',kind:'income',repeat:source.repeat,date:source.advanceDate,day:source.advanceDay,amount:amounts.advance}
   ].filter(t=>t.amount>0);
 }
 function saveIncomeSource(state,source) {
   incomeBreakdown(source);
+  if(source.incomeType!=null&&!Object.hasOwn(incomeTypeNames,source.incomeType))throw new Error('Выбери тип поступления');
+  if(source.incomeType!=null&&source.incomeType!=='salary'&&(source.taxRate!==0||source.salaryShare!==10000))throw new Error('Некорректные настройки поступления');
   if(!['monthly','once'].includes(source.repeat))throw new Error('Выбери периодичность');
   for(const value of [source.date,...(source.repeat==='monthly'&&source.salaryShare<10000?[source.advanceDate]:[])]){
     if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||value<'2000-01-01'||value>'2100-12-31'||Number.isNaN(Date.parse(value))||new Date(value+'T12:00:00Z').toISOString().slice(0,10)!==value)throw new Error('Укажи корректные даты выплат');
@@ -631,7 +838,7 @@ function saveIncomeSource(state,source) {
   if(exists)state.incomeSources=state.incomeSources.map(s=>s.id===source.id?source:s);else state.incomeSources.push(source);
 }
 
-// Every expense in the plan has a settings row, including implicit debt deadlines.
+// Every expense in the plan has a settings row.
 function paymentEntries(state,referenceDate=today()) {
   const entries=[];
   const represented=new Set();
@@ -643,16 +850,18 @@ function paymentEntries(state,referenceDate=today()) {
     entries.push({id:transaction.id,name:transaction.debtId&&debt?`Погашение · ${debt.name}`:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
   }
   for(const debt of state.debts){
-    const amount=unplannedDebtAmount(state,debt.id,null,referenceDate);
-    const deadline=!['loan','mortgage'].includes(debt.kind)&&debt.due&&amount>0;
-    if(deadline||!represented.has(debt.id))entries.push({id:debt.id,name:debt.name,kind:debt.kind,amount:deadline?amount:null,repeat:'once',date:deadline?debt.due:null,debt,deadline:Boolean(deadline)});
+    if(!represented.has(debt.id))entries.push({id:debt.id,name:debt.name,kind:debt.kind,amount:null,repeat:'once',date:null,debt,deadline:false});
   }
   const sortDate=entry=>{
     if(!entry.date)return '9999-12-31';
     if(entry.repeat==='once')return entry.date;
     const base=entry.date>referenceDate?entry.date:referenceDate;
-    const [year,month]=base.split('-').map(Number);
-    return occurrenceDate(year,entry.repeat==='yearly'?Number(entry.date.slice(5,7)):month,entry.day??Number(entry.date.slice(8)));
+    let [year,month]=base.split('-').map(Number);
+    if(entry.repeat==='yearly')month=Number(entry.date.slice(5,7));
+    const day=entry.day??Number(entry.date.slice(8));
+    let next=occurrenceDate(year,month,day);
+    if(next<base){if(entry.repeat==='yearly')year++;else if(month===12){year++;month=1;}else month++;next=occurrenceDate(year,month,day);}
+    return next;
   };
   return entries.sort((a,b)=>sortDate(a).localeCompare(sortDate(b)));
 }
@@ -662,7 +871,7 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
   if(!['regular','loan','mortgage','personal','card'].includes(type))throw new Error('Выбери тип платежа');
   if(!name.trim())throw new Error('Укажи название');
   const oldDebt=state.debts.find(d=>d.id===debtId),oldTransaction=state.transactions.find(t=>t.id===transactionId);
-  const previous=oldDebt?(['loan','mortgage'].includes(oldDebt.kind)?loanPayments(state,oldDebt):plannedRepayments(state,oldDebt.id)):[oldTransaction].filter(Boolean);
+  const previous=oldDebt?(['loan','mortgage'].includes(oldDebt.kind)?loanPayments(state,oldDebt):state.transactions.filter(t=>t.debtId===oldDebt.id)):[oldTransaction].filter(Boolean);
   const owned=new Set(previous.map(t=>t.id));
   const draft={
     ...state,
@@ -676,13 +885,13 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
   const isDebt=type!=='regular',id=isDebt?(debtId||crypto.randomUUID()):null;
   if(isDebt){
     if(amount!==null&&(!Number.isSafeInteger(amount)||amount<0))throw new Error('Укажи корректный остаток долга');
-    if(due)paymentTiming('once',null,due);
-    draft.debts.push({id,name:name.trim(),kind:type,amount,...(type==='card'?{creditLimit,cardBalance}:{}),explicitSchedule:true,due:['card','personal'].includes(type)?due:null});
+    draft.debts.push({id,name:name.trim(),kind:type,amount,...(type==='card'?{creditLimit,cardBalance}:{}),explicitSchedule:true,due:null});
   }
   if(type==='regular'&&!payments.length)payments=[{id:oldTransaction?.id,repeat:'once',amount:null,date:null}];
-  if(type==='regular'&&payments.length!==1)throw new Error('Для личного платежа доступно одно расписание');
+  if(type==='regular'&&payments.length!==1)throw new Error('Для категории «Услуги и покупки» доступно одно расписание');
   if(type==='mortgage'&&payments.some(p=>p.repeat!=='monthly'))throw new Error('Ипотека оплачивается ежемесячно');
   if(['loan','mortgage'].includes(type)&&payments.length>1&&payments.some(p=>p.repeat!=='once'))throw new Error('Ежемесячный платёж должен быть один');
+  if(['personal','card'].includes(type)&&amount!==null&&payments.reduce((sum,p)=>sum+(!state.completed[`${p.id}:${p.date}`]&&(!p.date||p.date>=today())?(p.amount??0):0),0)>amount)throw new Error('Сумма платежей не может превышать сумму долга');
   const used=new Set();
   let scheduled=0;
   for(const p of payments){
@@ -690,13 +899,12 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
     if(!(['monthly','once'].includes(p.repeat)||type==='regular'&&p.repeat==='yearly'&&previous.some(t=>t.id===p.id&&t.repeat==='yearly')))throw new Error('Выбери периодичность платежа');
     if(p.id&&(!owned.has(p.id)||used.has(p.id)))throw new Error('Некорректная запись платежа');
     const paymentId=p.id||crypto.randomUUID();used.add(paymentId);
-    const timing=p.repeat==='once'&&!p.date?{date:null}:paymentTiming(p.repeat,p.day,p.date,previous.find(t=>t.id===p.id));
+    const timing=(p.repeat==='once'&&!p.date)||(p.repeat==='monthly'&&p.day==null)?{date:null}:paymentTiming(p.repeat,p.day,p.date,previous.find(t=>t.id===p.id));
     const incomplete=p.amount==null||!timing.date;
     const isRepayment=['card','personal'].includes(type);
     if(isRepayment){
       if(p.repeat!=='once')throw new Error('Для погашения укажи конкретную дату');
-      if(due&&timing.date&&timing.date>due)throw new Error('Дата позже срока полного погашения');
-      if(!incomplete&&timing.date>=today())scheduled+=p.amount;
+      if(!incomplete&&!state.completed[`${p.id}:${timing.date}`]&&timing.date>=today())scheduled+=p.amount;
       if(amount!==null&&scheduled>amount)throw new Error('Сумма превышает остаток долга');
     }
     draft.transactions.push({id:paymentId,name:name.trim(),kind:'expense',amount:p.amount??null,repeat:p.repeat,...timing,...(incomplete?{draft:true}:{}),...(isDebt?(isRepayment?{debtId:id}:{loanDebtId:id}):{explicitSchedule:true})});
@@ -708,36 +916,55 @@ return {today,addDays,monthEnd,parseMoney,cardDebtAmount,plannedRepayments,unpla
 })();
 const module_2 = (() => {
 function compactPlan(ctx) {
-  const {state,now,end,plan,dateLabel,shortDate,money,esc,kindNames}=ctx;
+  const {state,now,end,plan,dateLabel,money,esc,kindNames}=ctx;
   const rows=plan.points
     .filter(point=>point.event)
     .map(({event,balance})=>({...event,running:balance}));
-  const eventName=e=>{
-    if(e.kind==='income')return e.name;
+  const eventDetails=e=>{
+    if(e.kind==='income'){
+      const source=state.incomeSources?.find(item=>item.id===e.sourceId);
+      for(const type of ['Зарплата','Аванс']){
+        if(source&&e.name===`${source.name} · ${type}`)return {name:source.name,type};
+      }
+      return {name:e.name,type:source?(incomeTypeNames[source.incomeType||'salary']||'Приход'):'Приход'};
+    }
     const debt=state.debts.find(d=>d.id===(e.debtId||e.loanDebtId||(e.debt?e.id:null)));
-    const type=kindNames?.[debt?.kind]||'Личное';
+    const type=kindNames?.[debt?.kind]||'Услуги и покупки';
     const rawName=(debt?.name||e.name).replace(/^Погашение\s*·\s*/i,'').trim();
     const suffix=` · ${type}`;
-    const name=rawName.toLocaleLowerCase('ru').endsWith(suffix.toLocaleLowerCase('ru'))?rawName.slice(0,-suffix.length).trim():rawName;
-    return `${name||e.name} · ${type}`;
+    const legacySuffix=debt?.kind==='personal'?' · Личный долг':!debt?' · Личное':null;
+    const existingSuffix=[suffix,legacySuffix].filter(Boolean).find(value=>rawName.toLocaleLowerCase('ru').endsWith(value.toLocaleLowerCase('ru')));
+    const name=existingSuffix?rawName.slice(0,-existingSuffix.length).trim():rawName;
+    return {name:name||e.name,type};
   };
+  const days=[];
+  for(const event of rows){
+    if(days[days.length-1]?.date!==event.date)days.push({date:event.date,events:[]});
+    days[days.length-1].events.push(event);
+  }
+  const minimumBalance=rows.reduce((minimum,e)=>Math.min(minimum,e.running),Infinity);
   const countForm=new Intl.PluralRules('ru').select(rows.length);
   const countLabel={one:'событие',few:'события',many:'событий'}[countForm] || 'событий';
   const crossesYear=now.slice(0,4)!==end.slice(0,4);
-  const rangeTitle=`${dateLabel(now,crossesYear)} — ${dateLabel(end,crossesYear)}`;
   const problem=state.balance!==null ? plan.firstShortfall : null;
   const warning=problem?`<div class="plan-shortfall" role="status"><span>Уходим в минус <b>${dateLabel(problem.date,problem.date.slice(0,4)!==now.slice(0,4))}</b></span><strong>${money(problem.balance)}</strong></div>`:'';
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
-  return `<section class="panel ledger-panel plan-panel"><div class="ledger-toolbar"><h1>${rangeTitle}</h1>${warning}</div>
-  <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th class="date-col">Дата</th><th>Событие</th><th class="numeric">Приход</th><th class="numeric">Расход</th><th class="numeric balance-col">Остаток</th></tr></thead><tbody>
-  ${rows.length?rows.map(e=>`<tr><td title="${e.scheduledDate&&e.scheduledDate!==e.date?'Перенос с '+dateLabel(e.scheduledDate,true):''}" class="date-cell">${shortDate(e.date)}</td><td class="name-cell"><span class="row-name">${esc(eventName(e))}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}<span class="repeat-tag">${e.debt||e.debtId?'погашение':e.repeat==='monthly'?'ежемесячно':e.repeat==='yearly'?'ежегодно':'разово'}</span></td><td class="numeric income-text" data-label="Приход">${e.kind==='income'?money(e.amount):'<span class="dash">—</span>'}</td><td class="numeric expense-text" data-label="Расход">${e.kind==='expense'?money(e.amount):'<span class="dash">—</span>'}</td><td data-label="Остаток" class="numeric running-balance ${e.running<0?'negative':''}">${state.balance===null?'—':money(e.running)}</td></tr>`).join(''):`<tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Приход» и расходы во вкладке «Расход».':'Добавь запись во вкладке «Расход» или «Приход».'}</p></div></td></tr>`}
-  </tbody><tfoot><tr><td class="total-label" colspan="2">${rows.length} ${countLabel}</td><td class="numeric income-text" data-label="Приход">${plan.error?'—':money(plan.income)}</td><td class="numeric expense-text" data-label="Расход">${plan.error?'—':money(plan.expense)}</td><td class="numeric ${plan.balance<0?'negative':''}" data-label="Остаток">${state.balance===null||plan.error?'—':money(plan.balance)}</td></tr></tfoot></table></div></section>
-  `;
+  const renderEvent=(e,index,day)=>{
+    const {name,type}=eventDetails(e);
+    const minimum=state.balance!==null&&e.kind==='expense'&&e.running>=0&&e.running===minimumBalance;
+    const balanceClass=e.running<0?'negative':minimum?'plan-minimum':'';
+    const signedAmount=e.kind==='income'?money(e.amount,true):money(-e.amount).replace(/^-/,'−');
+    return `<tr class="plan-event">${index===0?`<th scope="rowgroup" rowspan="${day.events.length}" class="plan-date"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th>`:''}<td class="plan-type" data-label="Тип">${esc(type)}</td><td class="name-cell"><span class="row-name">${esc(name)}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}</td><td class="numeric plan-amount ${e.kind==='income'?'income-text':'expense-text'}" data-label="Сумма">${signedAmount}</td><td data-label="Остаток" class="numeric running-balance ${balanceClass}"${minimum?' title="Минимальный остаток после события за выбранный период"':''}>${state.balance===null?'—':money(e.running)}</td></tr>`;
+  };
+  return `<section class="panel ledger-panel plan-panel">${warning?`<div class="ledger-toolbar">${warning}</div>`:''}
+  <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th scope="col" class="plan-date-col">Дата</th><th scope="col" class="plan-type-col">Тип</th><th scope="col">Событие</th><th scope="col" class="numeric amount-col">Сумма</th><th scope="col" class="numeric balance-col">Остаток</th></tr></thead>
+  ${days.length?days.map(day=>`<tbody class="plan-day-group"><tr class="plan-day"><th scope="rowgroup" colspan="5"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th></tr>${day.events.map((event,index)=>renderEvent(event,index,day)).join('')}</tbody>`).join(''):`<tbody><tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Приход» и расходы во вкладке «Расход».':'Добавь запись во вкладке «Расход» или «Приход».'}</p></div></td></tr></tbody>`}
+  <tfoot><tr><td colspan="5"><div class="plan-totals"><span class="plan-event-count">${rows.length} ${countLabel}</span><span class="plan-total"><span>Приход</span><strong class="income-text">${plan.error?'—':money(plan.income)}</strong></span><span class="plan-total"><span>Расход</span><strong class="expense-text">${plan.error?'—':money(plan.expense)}</strong></span><span class="plan-total plan-final"><span>Остаток</span><strong class="${plan.balance<0?'negative':''}">${state.balance===null||plan.error?'—':money(plan.balance)}</strong></span></div></td></tr></tfoot></table></div></section>`;
 }
 
 function compactDebts(ctx) {
   const {state,money,icon,button,esc,dateLabel,kindNames,debtFilter,paymentEntries}=ctx;
-  const entries=paymentEntries(state),groups=[['all','Все'],['regular','Личное'],['mortgage','Ипотека'],['loan','Кредиты'],['card','Кредитные карты'],['personal','Личные долги']];
+  const entries=paymentEntries(state),groups=[['all','Все'],['regular','Услуги и покупки'],['personal','Частные долги'],['card','Кредитные карты'],['loan','Кредиты'],['mortgage','Ипотека']];
   const filtered=entries.filter(e=>debtFilter==='all'||e.kind===debtFilter);
   const debts=state.debts.filter(debt=>debtFilter==='all'||debt.kind===debtFilter);
   const known=debts.filter(debt=>debt.amount!==null),missing=debts.length-known.length;
@@ -745,20 +972,25 @@ function compactDebts(ctx) {
   const totalLabel=debts.length&&!known.length?'—':total>BigInt(Number.MAX_SAFE_INTEGER)?'Сумма вне диапазона':money(Number(total));
 
   return `<section class="panel ledger-panel payments-panel"><div class="ledger-toolbar management-toolbar payments-toolbar"><div class="debt-tabs" role="tablist" aria-label="Тип платежа">${groups.map(([kind,label])=>`<button type="button" role="tab" aria-selected="${debtFilter===kind}" class="tab ${debtFilter===kind?'active':''}" data-action="debt-filter" data-kind="${kind}">${label}<span class="tab-count">${entries.filter(e=>kind==='all'||e.kind===kind).length}</span></button>`).join('')}</div><div class="ledger-actions"><div class="payment-transfer"><button type="button" class="button subtle" data-action="import">${icon('download')}Импорт</button><button type="button" class="button subtle" data-action="export">${icon('up')}Экспорт</button></div><div class="payment-create">${button('Добавить','add-payment',true)}</div></div></div>
-  <div class="ledger-scroll"><table class="ledger management-ledger payment-ledger"><thead><tr><th>Платёж / кому</th><th>Тип</th><th class="numeric">Сумма платежа</th><th>Расписание</th><th class="numeric">Остаток долга</th></tr></thead><tbody>${filtered.map(e=>{
+  <div class="ledger-scroll"><table class="ledger management-ledger payment-ledger"><thead><tr><th scope="col">Платёж / кому</th><th scope="col">Тип</th><th scope="col">Расписание</th><th scope="col" class="numeric">Сумма платежа</th><th scope="col" class="numeric">Остаток долга</th></tr></thead><tbody>${filtered.map(e=>{
     const action=e.transaction?'edit-transaction':'edit-debt';
+    const pastRepayment=Boolean(e.transaction?.debtId&&e.amount!=null&&e.date&&e.date<ctx.now);
     const schedule=e.date?(e.repeat==='monthly'?`Ежемесячно · ${(e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'}`:dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':e.deadline?' · остаток к сроку':' · разово')):'Не задано';
-    return `<tr class="editable-row" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Личное'}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'—':money(e.amount)}</td><td class="schedule-cell" data-label="Расписание">${schedule}</td><td class="numeric" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
+    return `<tr class="editable-row" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?'<span class="repayment-past-tag">Дата прошла</span>':''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
   }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="4" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric debt-total">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 
-function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown}) {
-  const sources=[...(state.incomeSources||[]).map(source=>({...source,legacy:false})),...state.transactions.filter(t=>t.kind==='income').map(({id,name,date,day,repeat,amount})=>({id,name,date,salaryDay:day,repeat,amount,taxRate:0,salaryShare:10000,legacy:true}))];
-  return `<section class="panel ledger-panel income-panel"><div class="ledger-toolbar management-toolbar income-toolbar"><div class="ledger-actions"><div class="payment-transfer"><button type="button" class="button subtle" data-action="import">${icon('download')}Импорт</button><button type="button" class="button subtle" data-action="export">${icon('up')}Экспорт</button></div><div class="payment-create">${button('Добавить','add-income',true)}</div></div></div><div class="ledger-scroll"><table class="ledger management-ledger"><thead><tr><th>Источник</th><th class="numeric">До налога</th><th>Налог</th><th class="numeric">На руки</th><th>Выплаты</th></tr></thead><tbody>${sources.map(s=>{
-    const {net,salary,advance}=s.legacy ? {net:s.amount,salary:s.amount,advance:0} : incomeBreakdown(s);
-    const schedule=s.repeat==='once'?`${dateLabel(s.date,true)} · разово`:s.repeat==='yearly'?`${dateLabel(s.date)} · ежегодно`:[salary?`${s.salaryShare<10000?'Зарплата · ':''}${(s.salaryDay??Number(s.date.slice(8)))===31?'Последний день месяца':(s.salaryDay??Number(s.date.slice(8)))+'-го'} · ${money(salary)}`:'',advance?`Аванс · ${(s.advanceDay??Number(s.advanceDate.slice(8)))===31?'последний день месяца':(s.advanceDay??Number(s.advanceDate.slice(8)))+'-го'} · ${money(advance)}`:''].filter(Boolean).join('<br>');
-    return `<tr class="editable-row" tabindex="0" data-action="edit-income" data-id="${esc(s.id)}" aria-label="Изменить источник ${esc(s.name)}"><td class="name-cell"><button class="row-name" data-action="edit-income" data-id="${esc(s.id)}">${esc(s.name)}</button></td><td class="numeric" data-label="До налога">${s.legacy?'—':money(s.amount)}</td><td data-label="Налог">${s.legacy?'Не задан':s.taxRate/100+'%'}</td><td class="numeric income-text" data-label="На руки">${money(net)}</td><td class="schedule-cell" data-label="Выплаты">${schedule}</td></tr>`;
-  }).join('')||'<tr><td colspan="5"><div class="empty">Добавь первый источник дохода.</div></td></tr>'}</tbody></table></div></section>`;
+function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown,incomeFilter}) {
+  const sources=[...(state.incomeSources||[]).map(source=>({...source,legacy:false,incomeType:source.incomeType||'salary'})),...state.transactions.filter(t=>t.kind==='income').map(({id,name,date,day,repeat,amount})=>({id,name,date,salaryDay:day,repeat,amount,taxRate:0,salaryShare:10000,legacy:true,incomeType:'other'}))];
+  const groups=[['all','Все'],...Object.entries(incomeTypeNames)];
+  const filtered=sources.filter(source=>incomeFilter==='all'||source.incomeType===incomeFilter);
+  const total=filtered.reduce((sum,source)=>sum+BigInt(source.legacy?source.amount:incomeBreakdown(source).net),0n);
+  const totalLabel=total>BigInt(Number.MAX_SAFE_INTEGER)?'Сумма вне диапазона':money(Number(total));
+  return `<section class="panel ledger-panel payments-panel income-panel"><div class="ledger-toolbar management-toolbar payments-toolbar"><div class="debt-tabs" role="tablist" aria-label="Тип поступления">${groups.map(([kind,label])=>`<button type="button" role="tab" aria-selected="${incomeFilter===kind}" class="tab ${incomeFilter===kind?'active':''}" data-action="income-filter" data-kind="${kind}">${label}<span class="tab-count">${sources.filter(source=>kind==='all'||source.incomeType===kind).length}</span></button>`).join('')}</div><div class="ledger-actions"><div class="payment-transfer"><button type="button" class="button subtle" data-action="import">${icon('download')}Импорт</button><button type="button" class="button subtle" data-action="export">${icon('up')}Экспорт</button></div><div class="payment-create">${button('Добавить','add-income',true)}</div></div></div><div class="ledger-scroll"><table class="ledger management-ledger payment-ledger income-ledger"><thead><tr><th scope="col">Источник</th><th scope="col">Тип</th><th scope="col">Расписание</th><th scope="col" class="numeric">Сумма на руки</th></tr></thead><tbody>${filtered.map(source=>{
+    const {net,salary,advance}=source.legacy?{net:source.amount,salary:source.amount,advance:0}:incomeBreakdown(source);
+    const schedule=source.repeat==='once'?`${dateLabel(source.date,true)} · разово`:source.repeat==='yearly'?`${dateLabel(source.date)} · ежегодно`:[salary?`${source.salaryShare<10000?'Зарплата · ':''}${(source.salaryDay??Number(source.date.slice(8)))===31?'последний день месяца':(source.salaryDay??Number(source.date.slice(8)))+'-го'} · ${money(salary)}`:'',advance?`Аванс · ${(source.advanceDay??Number(source.advanceDate.slice(8)))===31?'последний день месяца':(source.advanceDay??Number(source.advanceDate.slice(8)))+'-го'} · ${money(advance)}`:''].filter(Boolean).join('<br>');
+    return `<tr class="editable-row" tabindex="0" data-action="edit-income" data-id="${esc(source.id)}" aria-label="Изменить источник ${esc(source.name)}"><td class="name-cell"><button class="row-name" data-action="edit-income" data-id="${esc(source.id)}">${esc(source.name)}</button></td><td data-label="Тип">${incomeTypeNames[source.incomeType]}</td><td class="schedule-cell" data-label="Расписание">${schedule}</td><td class="numeric income-text" data-label="Сумма на руки">${money(net)}</td></tr>`;
+  }).join('')||'<tr><td colspan="4"><div class="empty">В этом разделе поступлений пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего</td><td class="numeric income-total" title="Сумма отображённых поступлений; регулярные и разовые сложены вместе">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money}) {
   const selected=forecastEnd || end;
@@ -794,6 +1026,8 @@ function validateState(input) {
     for(const row of state[collection]) {
       check(object(row),'Некорректная запись');id(row.id);name(row.name,collection==='incomeSources'?100:120);
       if(collection==='incomeSources') {
+        if(row.incomeType!=null)check(Object.hasOwn(incomeTypeNames,row.incomeType),'Некорректный тип поступления');
+        if(row.incomeType!=null&&row.incomeType!=='salary')check(row.taxRate===0&&row.salaryShare===10000,'Некорректные настройки поступления');
         check(!ids.has(row.id+'-advance'),'Некорректный идентификатор дохода');ids.add(row.id+'-advance');
         money(row.amount);check(row.amount>0&&['once','monthly'].includes(row.repeat),'Некорректный доход');
         for(const key of ['taxRate','salaryShare'])check(Number.isInteger(row[key])&&row[key]>=0&&row[key]<=10000,'Процент должен быть от 0 до 100');
@@ -814,7 +1048,8 @@ function validateState(input) {
           const calculated=cardDebtAmount(row.creditLimit??null,row.cardBalance??null);
           if(calculated!==null)check(row.amount===calculated,'Остаток долга не совпадает с лимитом и балансом карты');
         }
-        if(row.due)date(row.due);
+        if(['card','personal'].includes(row.kind))row.due=null;
+        else if(row.due)date(row.due);
       } else {
         check(['income','expense'].includes(row.kind)&&['once','monthly','yearly'].includes(row.repeat),'Некорректный тип операции');
         if(row.date!=null||!draft)date(row.date);
@@ -846,7 +1081,6 @@ function validateState(input) {
     if(Object.hasOwn(state.completed,`${row.id}:${row.date}`))continue;
     check(['card','personal'].includes(debt.kind),'Некорректное погашение долга');
     if(row.draft||row.date<today())continue;
-    check(!debt.due||row.date<=debt.due,'Запланированное погашение позже срока долга');
     const amount=(scheduled.get(debt.id)||0)+row.amount;scheduled.set(debt.id,amount);
     check(debt.amount===null||amount<=debt.amount,'Погашения превышают остаток долга');
   }
@@ -859,7 +1093,8 @@ function browserStore(storage) {
     let record;
     try{record=JSON.parse(raw);}catch{throw new Error('Сохранённые данные повреждены. Они не были перезаписаны. Восстанови резервную копию через импорт.');}
     if(!record||!Number.isSafeInteger(record.revision)||record.revision<1)throw new Error('Неизвестный формат сохранённых данных');
-    return {revision:record.revision,state:validateState(record.state)};
+    const needsDueCleanup=Array.isArray(record.state?.debts)&&record.state.debts.some(debt=>['card','personal'].includes(debt?.kind)&&debt.due!=null);
+    return {revision:record.revision,state:validateState(record.state),needsDueCleanup};
   }
   function save(state,revision) {
     const latest=read();
@@ -879,7 +1114,7 @@ function browserStore(storage) {
     catch{throw new Error('Браузер не смог сохранить импорт. Текущие данные не заменены.');}
     return record;
   }
-  return {read,save,restore,load(date){return read()||save(emptyState(date),0);}};
+  return {read,save,restore,load(date){const current=read();if(!current)return save(emptyState(date),0);return current.needsDueCleanup?save(current.state,current.revision):current;}};
 }
 
 return {STORAGE_KEY,emptyState,validateState,browserStore};
@@ -1033,10 +1268,12 @@ const icons={overview:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x=
 const icon=name=>`<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.payments}</svg>`;
 const titles={income:'Приход',overview:'Обзор',calendar:'Календарь',payments:'Поступления и платежи',debts:'Расход',history:'История',storage:'Мои данные'};
 let store;
-let state,revision,page='overview',busy=false,dialogSubmit=null,toastTimer;
-let debtFilter='all';
+let state,revision,page='overview',busy=false,dialogSubmit=null,toastTimer,editingBalance=false,showMortgageDebt=false;
+const pageStorageKey=isDemo?'finroad-demo-page':'finroad-page';
+try{const savedPage=sessionStorage.getItem(pageStorageKey);if(['overview','debts','income'].includes(savedPage))page=savedPage;}catch{}
+let debtFilter='all',incomeFilter='all';
 let forecastEnd=null, renderedDay, dayTimer;
-const kindNames={loan:'Кредит',card:'Кредитная карта',personal:'Личный долг',mortgage:'Ипотека'};
+const kindNames={loan:'Кредит',card:'Кредитная карта',personal:'Частный долг',mortgage:'Ипотека'};
 const repeatNames={once:'Разово',monthly:'Каждый месяц',yearly:'Каждый год'};
 function applyTheme(theme){
   document.documentElement.dataset.theme=theme;
@@ -1070,11 +1307,16 @@ function button(label,action,primary=false,ic='plus'){return `<button type="butt
 const stickySky=$('.night').cloneNode(true);
 stickySky.classList.add('sticky-sky');
 document.body.append(stickySky);
+const headerShield=$('.night').cloneNode(true);
+headerShield.classList.add('header-shield');
+document.body.append(headerShield);
 function updateStickyShield(){
   const header=$('.terminal-header').getBoundingClientRect();
   const toolbar=$('.ledger-panel .ledger-toolbar')?.getBoundingClientRect();
-  const bottom=Math.max(0,header.bottom,toolbar?Math.min(toolbar.bottom,header.bottom+toolbar.height):0);
+  const gap=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-table-gap'))||0;
+  const bottom=Math.max(0,header.bottom+gap,toolbar?Math.min(toolbar.bottom,header.bottom+gap+toolbar.height):0);
   stickySky.style.setProperty('--sticky-shield-height',bottom+'px');
+  headerShield.style.setProperty('--header-shield-height',Math.max(0,header.bottom+gap)+'px');
 }
 window.addEventListener('scroll',updateStickyShield,{passive:true});
 const headerSizeObserver=new ResizeObserver(()=>{
@@ -1099,13 +1341,18 @@ function render(){
   $('#current-date').innerHTML=`${icon('calendar')}<time datetime="${now}">${dateLabel(now,true)}</time>`;
   $('#page-name').textContent=titles[page];
   $('#navigation').innerHTML=[['overview','План'],['debts','Расход'],['income','Приход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
-  const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
-  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><span class="header-balance-value"><strong>${money(state.balance??0)}</strong>${icon('edit')}</span>`;
-  const debts=state.debts.filter(d=>d.kind!=='mortgage'),knownDebts=debts.filter(d=>d.amount!==null);
+  const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,incomeFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
+  if(!editingBalance)renderBalance();
+  const hasMortgage=state.debts.some(debt=>debt.kind==='mortgage');
+  if(!hasMortgage)showMortgageDebt=false;
+  const debts=state.debts.filter(debt=>showMortgageDebt||debt.kind!=='mortgage'),knownDebts=debts.filter(debt=>debt.amount!==null);
   const debtSum=knownDebts.reduce((total,debt)=>total+BigInt(debt.amount),0n);
   const totalDebt=debtSum<=BigInt(Number.MAX_SAFE_INTEGER)?Number(debtSum):null,missingDebt=debts.length-knownDebts.length;
-  const debtLabel=state.debts.some(debt=>debt.kind==='mortgage')?'Долг без ипотеки':'Долг';
-  $('#header-debt').innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:'Кредиты, кредитные карты и личные долги'}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  const debtLabel=hasMortgage?(showMortgageDebt?'Долг с ипотекой':'Долг без ипотеки'):'Долг';
+  const debtButton=$('#header-debt');debtButton.disabled=!hasMortgage;
+  if(hasMortgage)debtButton.setAttribute('aria-pressed',String(showMortgageDebt));else debtButton.removeAttribute('aria-pressed');
+  debtButton.title=hasMortgage?(showMortgageDebt?'Показать долг без ипотеки':'Показать долг с ипотекой'):'';
+  debtButton.innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:''}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
@@ -1114,29 +1361,58 @@ function render(){
   if(toolbar)headerSizeObserver.observe(toolbar);
   updateStickyShield();
 }
-function field(name,label,type='text',value='',extra=''){return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;}
+function field(name,label,type='text',value='',extra=''){
+  if(type==='number'&&['tax-rate','salary-share','advance-share','salary-day','advance-day'].includes(name)){
+    const id='number-'+name;
+    return `<div class="field"><label for="${id}">${label}</label><div class="number-stepper"><input id="${id}" name="${name}" type="number" value="${esc(value)}" ${extra}><span class="number-stepper-buttons"><button type="button" data-action="number-step" data-direction="up" aria-label="Увеличить: ${label}"></button><button type="button" data-action="number-step" data-direction="down" aria-label="Уменьшить: ${label}"></button></span></div></div>`;
+  }
+  return `<label class="field">${label}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;
+}
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
-function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();}
+function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();queueMicrotask(()=>{if(!$('#editor').open)return;const inputs=[...$('#dialog-fields').querySelectorAll('input:not([type=hidden]):not([type=radio]):not([type=checkbox]),textarea,select')];inputs.find(input=>!input.disabled&&input.getClientRects().length)?.focus();});}
 function dialogDelete(action,id){if(!id)return;const button=$('#delete-dialog');button.hidden=false;button.dataset.action=action;button.dataset.id=id;}
 function closeDialog(){$('#editor').close();dialogSubmit=null;}
 function incomeDialog(id=null){
-  const legacy=state.transactions.find(t=>t.id===id&&t.kind==='income');
-  if(legacy?.repeat==='yearly')return transactionDialog('income',id);
-  const source=(state.incomeSources||[]).find(s=>s.id===id)||(legacy?{...legacy,taxRate:0,salaryShare:10000}:{name:'',amount:'',taxRate:1300,salaryShare:5000,repeat:'monthly',date:'',advanceDate:''});
-  openDialog(id?'Изменить источник':'Новый источник дохода',field('name','Источник','text',source.name,'required maxlength="100"')+select('income-repeat','Периодичность',{monthly:'Ежемесячно',once:'Разово'},source.repeat)+`<div class="field-row">${field('gross','Сумма до налога, ₽','text',source.amount===''?'':source.amount/100,'required inputmode="decimal"')}${field('tax-rate','Налог, %','number',source.taxRate/100,'required min="0" max="100" step="0.01"')}</div><div id="income-split"><div class="field-row">${field('salary-share','Зарплата, %','number',source.salaryShare/100,'required min="0" max="100" step="0.01"')}${field('advance-share','Аванс, %','number',(10000-source.salaryShare)/100,'required min="0" max="100" step="0.01"')}</div></div><div class="field-row" id="income-days"><div id="salary-day-field">${field('salary-day','Число зарплаты','number',source.salaryDay??(source.date?Number(source.date.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="advance-day-field">${field('advance-day','Число аванса','number',source.advanceDay??(source.advanceDate?Number(source.advanceDate.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div></div><div id="income-once-date">${field('income-date','Дата поступления','date',source.repeat==='once'?source.date:'','min="2000-01-01" max="2100-12-31"')}</div><div class="income-preview" id="income-preview" aria-live="polite"></div>`,async data=>{
-    const repeat=data.get('income-repeat'),salaryShare=repeat==='once'?10000:parseMoney(data.get('salary-share'));
-    const anchor=source.repeat==='monthly'&&source.date?source.date.slice(0,7)+'-01':today().slice(0,7)+'-01';
-    await change(s=>saveIncomeSource(s,{id:id||crypto.randomUUID(),name:data.get('name').trim(),amount:parseMoney(data.get('gross')),taxRate:parseMoney(data.get('tax-rate')),salaryShare,repeat,date:repeat==='monthly'?anchor:data.get('income-date'),advanceDate:repeat==='monthly'&&salaryShare<10000?(source.advanceDate?source.advanceDate.slice(0,7)+'-01':anchor):null,salaryDay:repeat==='monthly'&&salaryShare>0?Number(data.get('salary-day')):null,advanceDay:repeat==='monthly'&&salaryShare<10000?Number(data.get('advance-day')):null}),'Источник сохранён');
-  });
+  const source=(state.incomeSources||[]).find(item=>item.id===id);
+  const type=source?(source.incomeType||'salary'):incomeFilter==='all'?'salary':incomeFilter;
+  const salary=source&&type==='salary'?source:{amount:'',taxRate:1300,salaryShare:5000,repeat:'monthly',date:'',advanceDate:''};
+  const other=source&&type!=='salary'?source:{amount:'',repeat:'monthly',date:'',salaryDay:1};
+  const floating=(name,label,value,extra='')=>`<label class="expense-floating"><input name="${name}" type="text" value="${esc(value)}" placeholder=" " ${extra}><span>${label}</span></label>`;
+  openDialog(id?'Изменить поступление':'Добавить поступление',
+    `<div class="income-type">${select('income-type','Тип',incomeTypeNames,type)}</div>`+
+    floating('name','Источник',source?.name||'','required maxlength="100"')+
+    `<div id="income-salary" data-legacy-once="${salary.repeat==='once'}">${salary.repeat==='once'?'<p class="dialog-note">Эта запись ранее добавлена как разовое поступление.</p>':''}<div class="field-row">${field('gross','Сумма до налога, ₽','text',salary.amount===''?'':salary.amount/100,'required inputmode="decimal"')}${field('tax-rate','Налог, %','number',salary.taxRate/100,'required min="0" max="100" step="0.01"')}</div><div id="income-split"><div class="field-row">${field('salary-share','Зарплата, %','number',salary.salaryShare/100,'required min="0" max="100" step="0.01"')}${field('advance-share','Аванс, %','number',(10000-salary.salaryShare)/100,'required min="0" max="100" step="0.01"')}</div></div><div class="field-row" id="income-days"><div id="salary-day-field">${field('salary-day','Число зарплаты','number',salary.salaryDay??(salary.date?Number(salary.date.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="advance-day-field">${field('advance-day','Число аванса','number',salary.advanceDay??(salary.advanceDate?Number(salary.advanceDate.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div></div><div id="income-once-date">${field('income-date','Дата поступления','date',salary.repeat==='once'?salary.date:'','min="2000-01-01" max="2100-12-31"')}</div><div class="income-preview" id="income-preview" aria-live="polite"></div></div>`+
+    `<div id="income-other"><div id="other-heading"><strong>Поступление</strong><label class="service-switch"><span>Регулярно</span><input type="checkbox" name="other-once-switch" value="once" ${other.repeat==='once'?'checked':''} role="switch" aria-label="Разовое поступление"><span class="switch-track" aria-hidden="true"></span><span>Разово</span></label></div><div class="service-fields">${floating('other-amount','Сумма, ₽',other.amount===''?'':other.amount/100,'required inputmode="decimal"')}<div id="other-monthly">${dayInput('other-day',other.salaryDay??(other.date?Number(other.date.slice(8)):1),true)}</div><div id="other-once"><label class="expense-floating"><input name="other-date" type="date" value="${esc(other.repeat==='once'?other.date||'':'')}" min="2000-01-01" max="2100-12-31"><span>Дата поступления</span></label></div></div></div>`,async data=>{
+      const selected=data.get('income-type'),isSalary=selected==='salary';
+      const original=isSalary?salary:other;
+      const repeat=isSalary?(salary.repeat==='once'?'once':'monthly'):(data.has('other-once-switch')?'once':'monthly');
+      const salaryShare=isSalary&&repeat==='monthly'?parseMoney(data.get('salary-share')):10000;
+      const anchor=original.repeat==='monthly'&&original.date?original.date.slice(0,7)+'-01':today().slice(0,7)+'-01';
+      await change(s=>saveIncomeSource(s,{id:id||crypto.randomUUID(),incomeType:selected,name:data.get('name').trim(),amount:parseMoney(data.get(isSalary?'gross':'other-amount')),taxRate:isSalary?parseMoney(data.get('tax-rate')):0,salaryShare,repeat,date:repeat==='monthly'?anchor:data.get(isSalary?'income-date':'other-date'),advanceDate:isSalary&&repeat==='monthly'&&salaryShare<10000?(original.advanceDate?original.advanceDate.slice(0,7)+'-01':anchor):null,salaryDay:repeat==='monthly'&&salaryShare>0?Number(data.get(isSalary?'salary-day':'other-day')):null,advanceDay:isSalary&&repeat==='monthly'&&salaryShare<10000?Number(data.get('advance-day')):null}),'Поступление сохранено');
+    },id?'Сохранить':'Добавить');
   dialogDelete('delete-income',id);
-  updateIncomeFields();
+  updateIncomeType();
 }
+function updateIncomeType(){
+  if(!$('#income-salary'))return;
+  const salary=$('#editor [name="income-type"]:checked').value==='salary';
+  for(const [selector,enabled] of [['#income-salary',salary],['#income-other',!salary]]){
+    const section=$(selector);section.hidden=!enabled;section.querySelectorAll('input').forEach(input=>input.disabled=!enabled);
+  }
+  if(salary)updateIncomeFields();else updateOtherIncomeFields();
+}
+function updateOtherIncomeFields(){
+  if(!$('#income-other')||$('#income-other').hidden)return;
+  const monthly=!$('#editor [name="other-once-switch"]').checked;
+  for(const [selector,enabled] of [['#other-monthly',monthly],['#other-once',!monthly]]){const section=$(selector);section.hidden=!enabled;section.querySelectorAll('input').forEach(input=>{input.disabled=!enabled;input.required=enabled;});}
+}
+$('#editor-form').addEventListener('change',event=>{if(event.target.name==='income-type')updateIncomeType();else if(event.target.name==='other-once-switch')updateOtherIncomeFields();});
 function updateIncomeFields(event){
-  if(!$('#income-split'))return;
+  if(!$('#income-split')||$('#income-salary')?.hidden)return;
   if(['salary-share','advance-share'].includes(event?.target.name)){
     try{const value=parseMoney(event.target.value);if(value>=0&&value<=10000)$('#editor [name="'+(event.target.name==='salary-share'?'advance-share':'salary-share')+'"]').value=(10000-value)/100;}catch{}
   }
-  const monthly=$('#editor [name="income-repeat"]:checked').value==='monthly';
+  const monthly=$('#income-salary').dataset.legacyOnce!=='true';
   const share=Number($('#editor [name="salary-share"]').value);
   $('#income-split').hidden=!monthly;
   $('#income-split').querySelectorAll('input').forEach(i=>i.disabled=!monthly);
@@ -1154,34 +1430,18 @@ function updateIncomeFields(event){
 }
 $('#editor-form').addEventListener('input',updateIncomeFields);
 $('#editor-form').addEventListener('change',updateIncomeFields);
-function dayWheel(name,value){
-  const day=Math.max(1,Math.min(31,Number(value)||1));
-  return `<div class="field day-picker"><span id="${name}-label">Число платежа</span><input type="hidden" name="${name}" value="${day}"><div class="day-wheel-frame"><div class="day-wheel" role="spinbutton" tabindex="0" aria-labelledby="${name}-label" aria-valuemin="1" aria-valuemax="31" aria-valuenow="${day}">${Array.from({length:31},(_,i)=>`<button type="button" tabindex="-1" data-day="${i+1}" class="day-option">${i+1}</button>`).join('')}</div></div><small class="day-wheel-caption">31 — последний день месяца</small></div>`;
-}
-function initDayWheels(){
-  for(const wheel of document.querySelectorAll('#editor .day-wheel')){
-    const input=wheel.closest('.day-picker').querySelector('input');
-    const paint=day=>{input.value=day;wheel.setAttribute('aria-valuenow',day);wheel.setAttribute('aria-valuetext',day===31?'31 — последний день месяца':String(day));wheel.querySelectorAll('[data-day]').forEach(option=>option.classList.toggle('selected',Number(option.dataset.day)===day));};
-    const choose=day=>{day=Math.max(1,Math.min(31,day));paint(day);wheel.scrollTop=(day-1)*36;};
-    if(!wheel.dataset.ready){
-      wheel.dataset.ready='true';
-      wheel.addEventListener('scroll',()=>{if(wheel.getClientRects().length)paint(Math.max(1,Math.min(31,Math.round(wheel.scrollTop/36)+1)));});
-      wheel.addEventListener('wheel',event=>{event.preventDefault();if(!event.deltaY)return;choose(Number(input.value)+Math.sign(event.deltaY));},{passive:false});
-      wheel.addEventListener('click',event=>{const option=event.target.closest('[data-day]');if(option)choose(Number(option.dataset.day));});
-      wheel.addEventListener('keydown',event=>{
-        const day=Number(input.value),keys={ArrowUp:day-1,ArrowDown:day+1,PageUp:day-5,PageDown:day+5,Home:1,End:31};
-        if(event.key in keys){event.preventDefault();choose(keys[event.key]);}
-      });
-    }
-    if(wheel.getClientRects().length)choose(Number(input.value));
-  }
+function dayInput(name,value,compact=false){
+  const day=value==null||value===''?'':Math.max(1,Math.min(31,Number(value)||1));
+  const input=`<input name="${name}" class="day-number" type="number" value="${day}" min="1" max="31" step="1" inputmode="numeric" placeholder=" " title="Укажите число от 1 до 31. Если в месяце нет такого числа, событие будет показано в последний день месяца.">`;
+  return compact?`<label class="expense-floating compact-day">${input}<span>Число от 1 до 31</span></label>`:`<label class="field">Число платежа${input}</label>`;
 }
 function paymentDateFields(prefix,item,useWheel=true){
   const day=item?.day??(item?.date?Number(item.date.slice(8)):'');
-  return `<div id="${prefix}-day-field">${useWheel?dayWheel(prefix+'-day',day):field(prefix+'-day','Число платежа','number',day,'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="${prefix}-date-field">${field(prefix+'-date','Дата платежа','date',item?.repeat!=='monthly'?item?.date||'':'','min="2000-01-01" max="2100-12-31"')}</div>`;
+  return `<div id="${prefix}-day-field">${useWheel?dayInput(prefix+'-day',day):field(prefix+'-day','Число платежа','number',day,'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="${prefix}-date-field">${field(prefix+'-date','Дата платежа','date',item?.repeat!=='monthly'?item?.date||'':'','min="2000-01-01" max="2100-12-31"')}</div>`;
 }
 function loanDateRow(payment=null){
-  return `<div class="loan-date-row" data-payment-id="${esc(payment?.id||'')}">${field('loan-amount','Сумма платежа, ₽','text',payment?.amount!=null?payment.amount/100:'','inputmode="decimal"')}${field('loan-date','Дата платежа','date',payment?.date||'','min="2000-01-01" max="2100-12-31"')}<button type="button" class="icon-button" data-action="remove-loan-date" aria-label="Удалить дату платежа">${icon('trash')}</button></div>`;
+  const completed=Boolean(payment?.debtId&&state.completed[`${payment.id}:${payment.date}`]);
+  return `<div class="loan-date-row" data-completed="${completed}" data-payment-id="${esc(payment?.id||'')}"><label class="field"><input name="loan-amount" type="text" value="${esc(payment?.amount!=null?payment.amount/100:'')}" inputmode="decimal" placeholder=" "><span class="loan-row-label">Сумма платежа, ₽</span></label><label class="field"><input name="loan-date" type="date" value="${esc(payment?.date||'')}" min="2000-01-01" max="2100-12-31"><span class="loan-row-label">Дата платежа</span><span class="repayment-status" hidden>Дата прошла</span></label><button type="button" class="icon-button" data-action="remove-loan-date" aria-label="Удалить дату платежа">${icon('trash')}</button></div>`;
 }
 function updatePaymentDateFields(){
   if($('#loan-monthly')){
@@ -1199,48 +1459,115 @@ function updatePaymentDateFields(){
       wrapper.hidden=!active;input.disabled=!enabled||!active||(prefix==='payment'&&suffix==='date');input.required=prefix==='transaction'&&!input.disabled;
     }
   }
-  initDayWheels();
 }
 $('#editor-form').addEventListener('change',event=>{if(['repeat','payment-repeat'].includes(event.target.name))updatePaymentDateFields();});
 function paymentDialog({debtId=null,transactionId=null}={}){
   const transaction=state.transactions.find(t=>t.id===transactionId);
   const debt=state.debts.find(d=>d.id===(debtId||transaction?.debtId||transaction?.loanDebtId))||state.debts.find(d=>['loan','mortgage'].includes(d.kind)&&loanPayment(state,d)?.id===transactionId);
-  const existing=debt?(['loan','mortgage'].includes(debt.kind)?loanPayments(state,debt):plannedRepayments(state,debt.id)):[transaction].filter(Boolean);
+  const existing=debt?(['loan','mortgage'].includes(debt.kind)?loanPayments(state,debt):state.transactions.filter(t=>t.debtId===debt.id).sort((a,b)=>(a.date||'9999-12-31').localeCompare(b.date||'9999-12-31'))):[transaction].filter(Boolean);
   const item=existing[0],type=debt?.kind||'regular',name=debt?.name||transaction?.name||'';
   const repeat=type==='mortgage'?'monthly':item?.repeat||'monthly';
-  openDialog(debt||transaction?'Изменить платёж':'Добавить платёж',
-    field('name','Название','text',name,'required maxlength="100"')+
-    select('entry-type','Тип',{regular:'Личное',loan:'Кредит',mortgage:'Ипотека',personal:'Личный долг',card:'Кредитная карта'},type)+
-    `<div id="entry-principal">${field('principal','Остаток долга, ₽','text',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
-    `<div id="entry-card"><div class="field-row">${field('credit-limit','Максимальный лимит, ₽','text',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${field('card-balance','Текущий баланс, ₽','text',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
+  const legacyLoan=type==='loan'&&existing.some(payment=>payment.repeat==='once');
+  const legacyRegular=type==='regular'&&repeat==='yearly';
+  const options={regular:'Услуги и покупки',personal:'Частный долг',card:'Кредитная карта',loan:'Кредит',mortgage:'Ипотека'};
+  const floating=(name,label,value,extra='')=>`<label class="expense-floating"><input name="${name}" type="text" value="${esc(value)}" placeholder=" " ${extra}><span>${label}</span></label>`;
+  openDialog(debt||transaction?'Изменить расход':'Добавить расход',
+    `<div class="expense-type">${select('entry-type','Тип',options,type)}</div>`+
+    floating('name','Название',name,'required maxlength="100"')+
+    `<div id="entry-principal">${floating('principal','Остаток долга, ₽',debt?.amount!=null?debt.amount/100:'','inputmode="decimal"')}</div>`+
+    `<div id="entry-card"><div class="field-row">${floating('credit-limit','Максимальный лимит, ₽',debt?.creditLimit!=null?debt.creditLimit/100:'','inputmode="decimal"')}${floating('card-balance','Текущий баланс, ₽',debt?.cardBalance!=null?debt.cardBalance/100:'','inputmode="decimal"')}</div><div id="card-debt-preview" data-saved-debt="${debt?.amount??''}" class="income-preview" aria-live="polite"></div></div>`+
+    `<div id="service-entry"><div id="service-heading"><strong>Платёж</strong><label class="service-switch"><span>Регулярно</span><input type="checkbox" name="service-once" value="once" ${type==='regular'&&item?.repeat==='once'?'checked':''} role="switch" aria-label="Разовый платёж"><span class="switch-track" aria-hidden="true"></span><span>Разово</span></label></div><div class="service-fields">${floating('service-amount','Сумма, ₽',type==='regular'&&item?.amount!=null?item.amount/100:'','inputmode="decimal"')}<div id="service-monthly">${dayInput('service-day',type==='regular'&&item?.repeat==='monthly'?(item.day??(item.date?Number(item.date.slice(8)):'')):1,true)}</div><div id="service-once-date"><label class="expense-floating"><input name="service-date" type="date" value="${esc(type==='regular'&&item?.repeat==='once'?item.date||'':'')}" min="2000-01-01" max="2100-12-31"><span>Дата платежа</span></label></div></div></div>`+
     `<div id="entry-repeat">${select('entry-repeat','Платёж',{monthly:'Ежемесячно',once:'Определённая дата',...(type==='regular'&&repeat==='yearly'?{yearly:'Ежегодно'}:{})},repeat)}</div>`+
     `<div id="entry-payment">${field('entry-amount','Сумма платежа, ₽','text',item?.amount!=null?item.amount/100:'','inputmode="decimal"')}</div>`+
-    `<div id="entry-day">${dayWheel('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
+    `<div id="entry-day">${dayInput('entry-day',item?.day??(item?.date?Number(item.date.slice(8)):1))}</div>`+
+    `<div id="credit-monthly"><strong>Платёж</strong><div class="credit-fields">${floating('credit-amount','Сумма, ₽',item?.repeat==='monthly'&&item.amount!=null?item.amount/100:'','inputmode="decimal"')}${dayInput('credit-day',item?.repeat==='monthly'?(item.day??(item.date?Number(item.date.slice(8)):'')):1,true)}</div></div>`+
     `<div id="entry-single-date">${field('entry-date','Дата платежа','date',item&&item.repeat!=='monthly'?item.date:'')}</div>`+
     `<div id="entry-due">${field('entry-due','Погасить до','date',debt?.due||'')}</div>`+
     `<div id="entry-split"><div id="entry-rows">${(existing.filter(p=>p.repeat==='once').length?existing.filter(p=>p.repeat==='once'):[null]).map(loanDateRow).join('')}</div><button type="button" class="button small" data-action="add-entry-date">Разбить платёж</button></div>`,async data=>{
       const type=data.get('entry-type'),repeat=type==='mortgage'?'monthly':data.get('entry-repeat');
       let payments=[];
-      if(type==='regular'||(['loan','mortgage'].includes(type)&&repeat==='monthly')){
+      if(type==='regular'&&!legacyRegular){
+        const amount=data.get('service-amount')?.trim(),once=data.has('service-once');
+        payments=[{id:transaction?.id||item?.id,amount:amount?parseMoney(amount):null,repeat:once?'once':'monthly',day:once||!data.get('service-day')?.trim()?null:Number(data.get('service-day')),date:once?data.get('service-date'):null}];
+      }else if(type==='mortgage'||type==='loan'&&!legacyLoan){
+        const amount=data.get('credit-amount')?.trim(),day=data.get('credit-day')?.trim();
+        payments=amount||day?[{id:item?.repeat==='monthly'?item.id:undefined,amount:amount?parseMoney(amount):null,repeat:'monthly',day:day?Number(day):null}]:[];
+      }else if(type==='regular'||(['loan','mortgage'].includes(type)&&repeat==='monthly')){
         const amount=data.get('entry-amount')?.trim();
-        payments=[{id:type==='regular'?transaction?.id||item?.id:(item?.repeat==='monthly'?item.id:undefined),amount:amount?parseMoney(amount):null,repeat,day:Number(data.get('entry-day')),date:data.get('entry-date')}];
+        payments=[{id:type==='regular'?transaction?.id||item?.id:(item?.repeat==='monthly'?item.id:undefined),amount:amount?parseMoney(amount):null,repeat,day:data.get('entry-day')?.trim()?Number(data.get('entry-day')):null,date:data.get('entry-date')}];
       }else payments=[...$('#entry-rows').children].map(row=>({id:row.dataset.paymentId||undefined,amount:row.querySelector('[name="loan-amount"]').value.trim(),date:row.querySelector('[name="loan-date"]').value})).filter(p=>p.amount||p.date).map(p=>({...p,amount:p.amount?parseMoney(p.amount):null,repeat:'once'}));
-      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,due:data.get('entry-due')||null,payments}));
-    });
+      await change(s=>savePaymentEntry(s,{debtId:debt?.id,transactionId:transaction?.id,type,name:data.get('name'),amount:type==='card'?debt?.amount??null:type==='regular'||!data.get('principal')?.trim()?null:parseMoney(data.get('principal')),creditLimit:type==='card'&&data.get('credit-limit')?.trim()?parseMoney(data.get('credit-limit')):null,cardBalance:type==='card'&&data.get('card-balance')?.trim()?parseMoney(data.get('card-balance')):null,payments}));
+    },debt||transaction?'Сохранить':'Добавить');
+  $('#editor').dataset.legacyLoan=String(legacyLoan);
+  $('#editor').dataset.legacyRegular=String(legacyRegular);
   dialogDelete(debt?'delete-debt':'delete-transaction',debt?.id||transaction?.id);
   updateEntryFields();
 }
 function updateEntryFields(){
   if(!$('#entry-principal'))return;
   const type=$('#editor [name="entry-type"]:checked').value;
-  const monthly=type==='mortgage'||$('#editor [name="entry-repeat"]:checked').value==='monthly';
+  const simpleRegular=type==='regular'&&$('#editor').dataset.legacyRegular!=='true';
+  const simpleLoan=type==='mortgage'||type==='loan'&&$('#editor').dataset.legacyLoan!=='true';
+  const monthly=type==='mortgage'||simpleLoan||$('#editor [name="entry-repeat"]:checked').value==='monthly';
   const split=['card','personal'].includes(type)||type==='loan'&&!monthly;
-  for(const [selector,enabled] of [['#entry-principal',!['regular','card'].includes(type)],['#entry-card',type==='card'],['#entry-repeat',['regular','loan'].includes(type)],['#entry-payment',!split],['#entry-day',!split&&monthly],['#entry-single-date',type==='regular'&&!monthly],['#entry-due',['card','personal'].includes(type)],['#entry-split',split]]){
+  for(const [selector,enabled] of [['#entry-principal',!['regular','card'].includes(type)],['#entry-card',type==='card'],['#entry-repeat',['regular','loan'].includes(type)&&!simpleLoan&&!simpleRegular],['#entry-payment',!split&&!simpleLoan&&!simpleRegular],['#entry-day',!split&&monthly&&!simpleLoan&&!simpleRegular],['#service-entry',simpleRegular],['#credit-monthly',simpleLoan],['#entry-single-date',type==='regular'&&!monthly&&!simpleRegular],['#entry-due',false],['#entry-split',split]]){
     const section=$(selector);section.hidden=!enabled;section.querySelectorAll('input').forEach(input=>input.disabled=!enabled);
   }
-  $('#entry-split [data-action="add-entry-date"]').textContent=type==='loan'?'Добавить дату':'Разбить платёж';
+  const addDate=$('#entry-split [data-action="add-entry-date"]');
+  addDate.hidden=['personal','card'].includes(type);
+  $('#entry-split').dataset.personal=String(['personal','card'].includes(type));
+  addDate.textContent=type==='loan'?'Добавить дату':'Разбить платёж';
+  $('#entry-principal .expense-floating span').textContent=type==='personal'?'Сумма долга, ₽':'Остаток долга, ₽';
+  if(['personal','card'].includes(type))updateRepaymentRows();
+  else $('#entry-rows').querySelectorAll('[data-action="remove-loan-date"]').forEach(button=>button.hidden=false);
+  updateServiceTiming();
   updateCardDebtPreview();
-  initDayWheels();
+}
+function updateServiceTiming(){
+  const section=$('#service-entry');if(!section||section.hidden)return;
+  const once=section.querySelector('[name="service-once"]').checked;
+  const monthly=$('#service-monthly'),date=$('#service-once-date');
+  monthly.hidden=once;date.hidden=!once;
+  monthly.querySelectorAll('input').forEach(input=>input.disabled=once);
+  date.querySelectorAll('input').forEach(input=>input.disabled=!once);
+}
+function updateRepaymentRows(changed=null,sort=false){
+  const rows=$('#entry-rows');
+  const type=$('#editor [name="entry-type"]:checked')?.value;
+  if(!rows||!['personal','card'].includes(type))return;
+  let total=null;
+  try{
+    if(type==='personal'){const principal=$('#editor [name="principal"]').value.trim();if(principal)total=parseMoney(principal);}
+    else{const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim(),saved=$('#card-debt-preview').dataset.savedDebt;total=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null)??(saved!==''?Number(saved):null);}
+  }catch{return;}
+  const amountOf=row=>{try{const value=row.querySelector('[name="loan-amount"]').value.trim();return value?Math.max(0,parseMoney(value)):0;}catch{return 0;}};
+  const isPast=row=>{const date=row.querySelector('[name="loan-date"]').value;return row.dataset.completed==='true'||Boolean(date&&date<today()&&amountOf(row)>0);};
+  const outstandingOf=row=>isPast(row)?0:amountOf(row);
+  if(changed?.name==='loan-amount'&&total!==null){
+    const changedRow=changed.closest('.loan-date-row');
+    const others=[...rows.children].filter(row=>row!==changedRow).reduce((sum,row)=>sum+outstandingOf(row),0);
+    try{if(!isPast(changedRow)&&changed.value&&parseMoney(changed.value)>Math.max(0,total-others))changed.value=String(Math.max(0,total-others)/100);}catch{}
+  }
+  let list=[...rows.children],sum=list.reduce((value,row)=>value+outstandingOf(row),0);
+  const empty=row=>!row.dataset.paymentId&&!row.querySelector('[name="loan-amount"]').value.trim()&&!row.querySelector('[name="loan-date"]').value;
+  const spare=list.filter(empty);
+  const needsSpare=sum>0&&(total===null||sum<total);
+  for(const row of spare.slice(needsSpare?1:0))if(rows.children.length>1)row.remove();
+  if((needsSpare||list.every(row=>row.dataset.completed==='true'))&&!spare.length)rows.insertAdjacentHTML('beforeend',loanDateRow());
+  if(sort){
+    list=[...rows.children];
+    list.sort((a,b)=>(a.querySelector('[name="loan-date"]').value||'9999-12-31').localeCompare(b.querySelector('[name="loan-date"]').value||'9999-12-31'));
+    list.forEach(row=>rows.appendChild(row));
+  }
+  const single=rows.children.length===1;
+  for(const row of rows.children){
+    const amount=row.querySelector('[name="loan-amount"]'),date=row.querySelector('[name="loan-date"]');
+    const completed=row.dataset.completed==='true';
+    amount.disabled=completed;date.disabled=completed||amountOf(row)<=0;
+    const past=isPast(row);row.classList.toggle('repayment-past',past);
+    const status=row.querySelector('.repayment-status');status.hidden=!past;status.textContent=completed?'Оплачено':'Дата прошла';
+    row.querySelector('[data-action="remove-loan-date"]').hidden=completed||single||(!amount.value.trim()&&!date.value);
+  }
 }
 function updateCardDebtPreview(){
   const preview=$('#card-debt-preview');
@@ -1251,7 +1578,9 @@ function updateCardDebtPreview(){
     preview.textContent=amount===null?(preview.dataset.savedDebt!==''?'Сохранённый долг '+money(Number(preview.dataset.savedDebt)):'Долг —'):'Долг '+money(amount);
   }catch(error){preview.textContent=error.message;}
 }
-$('#editor-form').addEventListener('change',event=>{if(['entry-type','entry-repeat'].includes(event.target.name))updateEntryFields();});
+$('#editor-form').addEventListener('change',event=>{if(['entry-type','entry-repeat'].includes(event.target.name))updateEntryFields();else if(event.target.name==='service-once')updateServiceTiming();});
+$('#editor-form').addEventListener('input',event=>{if(['principal','credit-limit','card-balance','loan-amount'].includes(event.target.name))updateRepaymentRows(event.target);});
+$('#editor-form').addEventListener('change',event=>{if(event.target.name==='loan-date')updateRepaymentRows(null,true);});
 function transactionDialog(kind='expense',id=null,date=today()){
   const item=state.transactions.find(t=>t.id===id)||{name:'',kind,amount:'',date,repeat:'monthly'};
   if(item.kind==='expense')return paymentDialog({transactionId:id});
@@ -1271,31 +1600,52 @@ function transactionDialog(kind='expense',id=null,date=today()){
 }
 function debtDialog(id=null,selectedPaymentId=null){return paymentDialog({debtId:id,transactionId:selectedPaymentId});}
 function repaymentDialog(debtId,id=null){return paymentDialog({debtId,transactionId:id});}
-function balanceDialog(){
-  openDialog('Сколько есть сейчас?',`<label class="balance-field" for="balance-amount"><span>Доступные деньги<span class="sr-only">, ₽</span></span><span class="balance-amount"><input id="balance-amount" name="balance" type="text" value="${esc(state.balance===null?'':state.balance/100)}" inputmode="decimal" placeholder="0" aria-describedby="balance-note" autofocus><span class="balance-currency" aria-hidden="true">₽</span></span></label><p class="dialog-note" id="balance-note">Прогноз начнётся с указанной суммы и учтёт события с сегодняшнего дня.</p>`,async data=>{
-    const balance=parseMoney(String(data.get('balance')??'').trim()||'0');
-    await change(s=>{s.balance=balance;s.balanceDate=today();},'Остаток обновлён');
+function renderBalance(){
+  $('#header-balance').innerHTML=`<small>Сейчас в наличии</small><button class="header-balance-edit" type="button" data-action="balance" aria-label="Изменить текущий остаток"><span class="header-balance-value"><strong>${money(state.balance??0)}</strong>${icon('edit')}</span></button>`;
+}
+function editBalance(){
+  if(editingBalance)return;
+  editingBalance=true;
+  const container=$('#header-balance');
+  container.innerHTML=`<label for="header-balance-input"><small>Сейчас в наличии</small></label><form id="header-balance-form" class="header-balance-form"><input id="header-balance-input" type="text" inputmode="decimal" value="${esc((state.balance??0)/100)}" aria-label="Сейчас в наличии, рублей" aria-describedby="header-balance-error"><span class="balance-unit" aria-hidden="true">₽</span></form><span id="header-balance-error" class="header-balance-error" role="alert"></span>`;
+  const input=$('#header-balance-input'),form=$('#header-balance-form');
+  let saving=false,cancelled=false;
+  form.addEventListener('submit',async event=>{
+    event.preventDefault();if(saving||cancelled)return;
+    let value;
+    try{value=parseMoney(input.value.trim()||'0');}catch(error){$('#header-balance-error').textContent=error.message;return;}
+    saving=true;editingBalance=false;
+    try{await change(s=>{s.balance=value;s.balanceDate=today();},'Остаток обновлён');}
+    catch(error){editingBalance=true;saving=false;$('#header-balance-error').textContent=error.message;}
   });
+  input.addEventListener('input',()=>{$('#header-balance-error').textContent='';});
+  input.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();cancelled=true;editingBalance=false;renderBalance();$('#header-balance .header-balance-edit')?.focus();}});
+  input.addEventListener('blur',()=>{if(!cancelled&&!saving&&form.isConnected)form.requestSubmit();});
+  input.focus();input.select();
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
+  if(action==='number-step'){const input=el.closest('.number-stepper').querySelector('input');if(input.disabled)return;try{el.dataset.direction==='up'?input.stepUp():input.stepDown();input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}catch{}return;}
   if(action==='reset-demo'&&isDemo){
     store=demoStore(today());({state,revision}=store.load());
-    forecastEnd=null;page='overview';debtFilter='all';render();notify('Исходный пример восстановлен');return;
+    forecastEnd=null;page='overview';try{sessionStorage.setItem(pageStorageKey,page);}catch{}debtFilter='all';render();notify('Исходный пример восстановлен');return;
   }
   if(action==='debt-filter'){debtFilter=el.dataset.kind;render();return;}
+  if(action==='income-filter'){incomeFilter=el.dataset.kind;render();return;}
   if(action==='add-entry-date'){$('#entry-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
   if(action==='add-loan-date'){$('#loan-date-rows').insertAdjacentHTML('beforeend',loanDateRow());return;}
-  if(action==='remove-loan-date'){el.closest('.loan-date-row').remove();return;}
+  if(action==='remove-loan-date'){const row=el.closest('.loan-date-row'),personal=row.parentElement.id==='entry-rows'&&['personal','card'].includes($('#editor [name="entry-type"]:checked')?.value);if(personal&&(row.dataset.completed==='true'||row.parentElement.children.length===1||(!row.querySelector('[name="loan-amount"]').value.trim()&&!row.querySelector('[name="loan-date"]').value)))return;row.remove();if(personal)updateRepaymentRows();return;}
   if(action==='repayment')return repaymentDialog(el.dataset.id);
   if(action==='repayment-full'){const input=$('#editor [name="amount"]');input.value=Number(el.dataset.amount)/100;input.dispatchEvent(new Event('input',{bubbles:true}));return;}
-  if(action.startsWith('nav-')){page=action.slice(4);render();window.scrollTo(0,0);return;}
-  if(action==='add-income'||action==='edit-income')return incomeDialog(el.dataset.id);
+  if(action.startsWith('nav-')){const next=action.slice(4);if(!['overview','debts','income'].includes(next))return;page=next;try{sessionStorage.setItem(pageStorageKey,page);}catch{}render();window.scrollTo(0,0);return;}
+  if(action==='add-income')return incomeDialog();
+  if(action==='edit-income'){const source=state.incomeSources.find(item=>item.id===el.dataset.id),legacy=state.transactions.find(item=>item.id===el.dataset.id&&item.kind==='income');return legacy?transactionDialog('income',el.dataset.id):incomeDialog(el.dataset.id);}
   if(action==='add-payment')return paymentDialog();
   if(action==='add-expense')return transactionDialog('expense');
   if(action==='edit-transaction')return transactionDialog('expense',el.dataset.id);
   if(action==='add-debt'||action==='edit-debt')return debtDialog(el.dataset.id);
-  if(action==='balance')return balanceDialog();
+  if(action==='balance')return editBalance();
+  if(action==='toggle-mortgage-debt'){if(state.debts.some(debt=>debt.kind==='mortgage')){showMortgageDebt=!showMortgageDebt;render();}return;}
   if(action==='delete-income'){
     const item=(state.incomeSources||[]).find(s=>s.id===el.dataset.id)||state.transactions.find(t=>t.id===el.dataset.id&&t.kind==='income');
     if(!item)return;
@@ -1311,7 +1661,14 @@ async function handle(action,el){
   if(action==='import'){$('#import-file').click();return;}
 
 }
-document.addEventListener('keydown',event=>{if(event.key==='Tab')event.preventDefault();},true);
+document.addEventListener('keydown',event=>{
+  if(event.key!=='Tab'||!event.target.closest('#editor-form'))return;
+  const selector='input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),textarea,select';
+  if(!event.target.matches(selector))return;
+  const fields=[...$('#editor-form').querySelectorAll(selector)].filter(input=>!input.disabled&&input.getClientRects().length);
+  const index=fields.indexOf(event.target);if(index<0||!fields.length)return;
+  event.preventDefault();fields[(index+(event.shiftKey?-1:1)+fields.length)%fields.length].focus();
+},true);
 document.addEventListener('keydown',event=>{const row=event.target.closest('tr[data-action]');if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();row.click();}});
 document.addEventListener('change',event=>{
   if(event.target.id!=='forecast-date')return;
@@ -1324,22 +1681,8 @@ document.addEventListener('change',event=>{
 document.addEventListener('click',event=>{const target=event.target.closest('[data-action]');if(target)Promise.resolve(handle(target.dataset.action,target)).catch(error=>notify(error.message));});
 $('#editor-form').addEventListener('input',event=>{
   const input=event.target;
+  if(input.matches('.day-number')&&Number(input.value)>31)input.value='31';
   if(['credit-limit','card-balance'].includes(input.name))updateCardDebtPreview();
-  if(input.name==='loan-amount'&&$('#entry-rows')&&['card','personal'].includes($('#editor [name="entry-type"]:checked')?.value)){
-    try{
-      const card=$('#editor [name="entry-type"]:checked').value==='card';
-      const principal=$('#editor [name="principal"]').value.trim();
-      const limit=$('#editor [name="credit-limit"]').value.trim(),balance=$('#editor [name="card-balance"]').value.trim();
-      const savedDebt=$('#card-debt-preview').dataset.savedDebt;
-      let total=principal?parseMoney(principal):null;
-      if(card)total=cardDebtAmount(limit?parseMoney(limit):null,balance?parseMoney(balance):null)??(savedDebt!==''?Number(savedDebt):null);
-      if(total===null)return;
-      const other=[...$('#entry-rows').querySelectorAll('[name="loan-amount"]')].filter(el=>el!==input&&el.closest('.loan-date-row').querySelector('[name="loan-date"]').value>=today()).reduce((sum,el)=>sum+(el.value?parseMoney(el.value):0),0);
-      const paymentDate=input.closest('.loan-date-row').querySelector('[name="loan-date"]').value;
-      if(paymentDate&&paymentDate<today())return;
-      const max=Math.max(0,total-other);if(input.value&&parseMoney(input.value)>max)input.value=String(max/100);
-    }catch{}
-  }
   if(!input.matches('[data-repayment-max]'))return;
   const raw=input.value.replace(/\s/g,''),normalized=raw.replace(',','.');
   if(!/^\d*(?:\.\d{0,2})?$/.test(normalized)){
