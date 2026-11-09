@@ -25,11 +25,10 @@ def build(demo=False):
         html = html.replace('<body>', '<body data-demo="true">')
         html = html.replace('<title>FinRoad · Финансы под звёздами</title>', '<title>FinRoad · Попробовать на примере</title>')
         banner = '''<section class="demo-intro" aria-label="Знакомство с FinRoad">
-          <div class="demo-copy"><a class="demo-brand" href="https://github.com/Sad-Jack/FinRoad">FinRoad</a><span class="demo-badge">ДЕМО · ВЫМЫШЛЕННЫЕ ДАННЫЕ</span>
-          <h1>Хватит ли денег до зарплаты?</h1>
-          <p>В исходном примере итог за месяц положительный, но до зарплаты денег не хватает. Меняй суммы и даты во вкладках «Платежи» и «Доход» — прогноз пересчитается.</p>
-          <small>Изменения в демо действуют до перезагрузки. Скачанный файл откроется с пустым планом и будет сохранять твои записи в браузере.</small></div>
-          <div class="demo-actions"><a class="button primary" href="FinRoad.html" download="FinRoad.html">Скачать для себя</a><button class="button" type="button" data-action="reset-demo">Вернуть пример</button><a class="demo-source" href="https://github.com/Sad-Jack/FinRoad">Код и инструкция на GitHub ↗</a></div>
+          <div class="demo-copy"><a class="demo-brand" href="https://github.com/Sad-Jack/FinRoad" title="Код и инструкция на GitHub">FinRoad ↗</a><span class="demo-badge">ДЕМО · ВЫМЫШЛЕННЫЕ ДАННЫЕ</span>
+          <p>Меняй суммы и даты — прогноз пересчитается.</p>
+          <small>Демо сбрасывается при перезагрузке. Скачанный файл — с пустым планом.</small></div>
+          <div class="demo-actions"><a class="button primary" href="FinRoad.html" download="FinRoad.html">Скачать для себя</a><button class="button" type="button" data-action="reset-demo">Вернуть пример</button></div>
         </section>'''
         html = html.replace('</main>', '</main>' + banner)
     favicon = base64.b64encode((ROOT / 'public/favicon.svg').read_bytes()).decode()

@@ -149,17 +149,15 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .transfer-tag{display:block;font-size:10px;color:var(--muted);white-space:normal}
 
 /* A short introduction only appears in the public, temporary demo. */
-.demo-intro{display:flex;justify-content:space-between;align-items:center;gap:32px;padding:34px 0 28px;max-width:1180px;margin:auto}
-.demo-copy{max-width:740px}.demo-brand{color:var(--text);font-size:22px;font-weight:600;letter-spacing:-.5px;text-decoration:none}
-.demo-badge{display:inline-block;margin:0 0 0 14px;font-size:9px;letter-spacing:1px;color:var(--mint)}
-.demo-copy h1{font-size:clamp(23px,3vw,34px);font-weight:500;letter-spacing:-.7px;margin:12px 0 10px;line-height:1.2}
-.demo-copy p{font-size:13px;line-height:1.7;color:var(--muted);margin:0 0 10px}
-.demo-copy small{display:block;font-size:11px;line-height:1.6;color:var(--muted)}
-.demo-actions{display:flex;flex-direction:column;gap:9px;flex-shrink:0;min-width:190px}
-.demo-actions .button{justify-content:center;text-decoration:none;font-size:12px;padding:11px 16px}
-.demo-source{font-size:11px;color:var(--muted);text-align:center;text-decoration:none;padding-top:3px}
-.demo-source:hover,.demo-brand:hover{color:var(--purple)}
-@media(max-width:640px){.demo-intro{display:block;padding:24px 0 22px}.demo-badge{margin-left:10px;font-size:8px;letter-spacing:.5px}.demo-copy p{font-size:12px}.demo-copy small{font-size:10px}.demo-actions{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;min-width:0;gap:8px}.demo-actions .button{padding:10px 8px;font-size:11px}.demo-source{grid-column:1/-1;padding:6px 0 0}}
+.demo-intro{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;max-width:1180px;margin:auto}
+.demo-copy{min-width:0}.demo-brand{color:var(--text);font-size:15px;font-weight:600;text-decoration:none}
+.demo-badge{display:inline-block;margin-left:10px;font-size:8px;letter-spacing:.5px;color:var(--mint)}
+.demo-copy p{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 3px}
+.demo-copy small{display:block;font-size:10px;line-height:1.5;color:var(--muted)}
+.demo-actions{display:flex;gap:8px;flex-shrink:0}
+.demo-actions .button{justify-content:center;text-decoration:none;font-size:11px;padding:9px 12px;white-space:nowrap}
+.demo-brand:hover{color:var(--purple)}
+@media(max-width:640px){.demo-intro{display:block;padding:14px 0}.demo-actions{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.demo-actions .button{padding:10px 8px}}
 
 @media(max-width:640px){
   .payment-ledger tfoot tr{display:flex;justify-content:space-between;gap:12px}
