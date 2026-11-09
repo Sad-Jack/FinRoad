@@ -185,3 +185,12 @@ test('debt header toggles mortgage and shows just debt when there is none', () =
   ctx.showMortgageDebt=true;vm.runInContext(block,ctx);assert(button.innerHTML.includes('Долг с ипотекой'));assert(button.innerHTML.includes('60000'));
   ctx.state.debts=[{kind:'loan',amount:10000}];vm.runInContext(block,ctx);assert(button.disabled);assert(button.innerHTML.includes('Долг</small>'));assert.equal(ctx.showMortgageDebt,false);
 });
+
+test('repayment rows display the creditor name without a generated prefix', () => {
+  for(const type of ['personal','card']){
+    const s=empty(),item={type,name:'Влад',amount:100000,payments:[{amount:50000,repeat:'once',date:'2026-12-01'}]};
+    if(type==='card')Object.assign(item,{creditLimit:200000,cardBalance:100000});
+    finance.savePaymentEntry(s,item);
+    assert.equal(finance.paymentEntries(s,'2026-11-10')[0].name,'Влад');
+  }
+});

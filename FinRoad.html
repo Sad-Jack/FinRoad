@@ -847,7 +847,7 @@ function paymentEntries(state,referenceDate=today()) {
     if(transaction.debtId&&state.completed[`${transaction.id}:${transaction.date}`])continue;
     const debt=state.debts.find(d=>d.id===(transaction.debtId||transaction.loanDebtId))||loans.get(transaction.id);
     if(debt)represented.add(debt.id);
-    entries.push({id:transaction.id,name:transaction.debtId&&debt?`Погашение · ${debt.name}`:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
+    entries.push({id:transaction.id,name:transaction.debtId&&debt?debt.name:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
   }
   for(const debt of state.debts){
     if(!represented.has(debt.id))entries.push({id:debt.id,name:debt.name,kind:debt.kind,amount:null,repeat:'once',date:null,debt,deadline:false});
