@@ -31,7 +31,7 @@ def build(demo=False):
           <small>Изменения в демо действуют до перезагрузки. Скачанный файл откроется с пустым планом и будет сохранять твои записи в браузере.</small></div>
           <div class="demo-actions"><a class="button primary" href="FinRoad.html" download="FinRoad.html">Скачать для себя</a><button class="button" type="button" data-action="reset-demo">Вернуть пример</button><a class="demo-source" href="https://github.com/Sad-Jack/FinRoad">Код и инструкция на GitHub ↗</a></div>
         </section>'''
-        html = html.replace('<header class="terminal-header">', banner + '<header class="terminal-header">')
+        html = html.replace('</main>', '</main>' + banner)
     favicon = base64.b64encode((ROOT / 'public/favicon.svg').read_bytes()).decode()
     html = html.replace('href="/favicon.svg"', f'href="data:image/svg+xml;base64,{favicon}"')
     css = (ROOT / 'public/style.css').read_text()
