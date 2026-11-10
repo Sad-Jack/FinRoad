@@ -194,3 +194,26 @@ test('repayment rows display the creditor name without a generated prefix', () =
     assert.equal(finance.paymentEntries(s,'2026-11-10')[0].name,'Влад');
   }
 });
+
+test('expense totals sum displayed payment amounts separately from unique debt totals', () => {
+  const s=empty();
+  finance.savePaymentEntry(s,{type:'loan',name:'Кредит',amount:100000,payments:[{amount:10000,repeat:'monthly',day:5}]});
+  finance.savePaymentEntry(s,{type:'personal',name:'Друг',amount:60000,payments:[{amount:20000,repeat:'once',date:'2026-11-20'},{amount:20000,repeat:'once',date:'2026-12-20'}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Связь',payments:[{amount:null,repeat:'monthly',day:5}]});
+  const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{loan:'Кредит',personal:'Частный долг'},paymentEntries:finance.paymentEntries};
+  const footer=debtFilter=>views.compactDebts({...ctx,debtFilter}).split('<tfoot>')[1].split('</tfoot>')[0];
+  assert.match(footer('all'),/class="numeric payments-total"[^>]*>50000</);assert.match(footer('all'),/class="numeric debt-total"[^>]*>160000</);
+  assert.match(footer('personal'),/class="numeric payments-total"[^>]*>40000</);assert.match(footer('personal'),/class="numeric debt-total"[^>]*>60000</);
+  assert.match(footer('regular'),/class="numeric payments-total"[^>]*>—</);
+});
+
+test('expense schedules omit monthly and one-time labels but retain annual recurrence', () => {
+  const s=empty();
+  finance.savePaymentEntry(s,{type:'regular',name:'Ежемесячный',payments:[{amount:10000,repeat:'monthly',day:10}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Разовый',payments:[{amount:20000,repeat:'once',date:'2026-11-20'}]});
+  s.transactions.push({id:'annual',name:'Ежегодный',kind:'expense',amount:5000,repeat:'yearly',date:'2026-12-01'});
+  const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},debtFilter:'all',paymentEntries:finance.paymentEntries};
+  const out=views.compactDebts(ctx);
+  assert(out.includes('>10-го</td>'));assert(out.includes('>2026-11-20</td>'));assert(out.includes('2026-12-01 · ежегодно'));
+  assert(!out.includes('Ежемесячно ·'));assert(!out.includes(' · разово'));
+});
