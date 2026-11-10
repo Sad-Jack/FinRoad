@@ -251,3 +251,13 @@ test('expense table groups undated items after dated items within the selected f
   const onlyDated=views.compactDebts({...ctx,debtFilter:'loan'});assert(!onlyDated.includes('<strong>Без даты</strong>'));
   const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(allUndated.includes('<strong>Без даты</strong>'));
 });
+
+test('only undated expense rows receive the group indentation class', () => {
+  const s=empty();
+  finance.savePaymentEntry(s,{type:'regular',name:'С датой',payments:[{amount:10000,repeat:'once',date:'2026-11-20'}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Без даты',payments:[{amount:5000,repeat:'once',date:null}]});
+  const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},debtFilter:'regular',paymentEntries:finance.paymentEntries};
+  const out=views.compactDebts(ctx),dated=s.transactions.find(t=>t.name==='С датой'),undated=s.transactions.find(t=>t.name==='Без даты');
+  assert(out.includes(`class="editable-row expense-undated-row" tabindex="0" data-action="edit-transaction" data-id="${undated.id}"`));
+  assert(out.includes(`class="editable-row " tabindex="0" data-action="edit-transaction" data-id="${dated.id}"`));
+});
