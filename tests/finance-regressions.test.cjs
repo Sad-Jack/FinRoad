@@ -261,3 +261,7 @@ test('only undated expense rows receive the group indentation class', () => {
   assert(out.includes(`class="editable-row expense-undated-row" tabindex="0" data-action="edit-transaction" data-id="${undated.id}"`));
   assert(out.includes(`class="editable-row " tabindex="0" data-action="edit-transaction" data-id="${dated.id}"`));
 });
+
+test('indentation applies to all expense rows without affecting income rows', () => {
+  assert(html.includes('.payments-panel:not(.income-panel) .payment-ledger .editable-row .name-cell .row-name{margin-inline-start:16px;'));
+});
