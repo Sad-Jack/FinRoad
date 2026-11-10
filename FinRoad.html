@@ -152,9 +152,9 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 }
 .header-balance small{font-weight:400}
 .header-balance-edit{display:flex;align-items:center;gap:14px;min-width:0;width:100%;padding:0;border:0;background:none;text-align:left}
-.header-balance-form{display:flex;align-items:center;gap:4px;min-width:0}
+.header-balance-form{display:flex;align-items:center;gap:14px;min-width:0}
 .header-balance-form input{width:100%;min-width:0;padding:1px 4px;border:1px solid var(--purple);border-radius:6px;background:var(--field);color:var(--text);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
-.header-balance-form .balance-unit{font-size:20px;font-weight:600}
+.header-balance-form .balance-unit{flex-shrink:0;font-size:20px;font-weight:600}
 .header-balance-error{color:var(--red);font-size:11px;line-height:1.3}
 .header-balance-error:empty{display:none}
 .header-balance-value{display:flex;align-items:center;gap:14px;min-width:0}
@@ -479,6 +479,12 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .plan-ledger .plan-event.completed td{position:relative;opacity:.7}
 .plan-ledger .plan-event.completed td::after{content:"";position:absolute;top:50%;left:0;right:0;height:1px;background:var(--muted);pointer-events:none}
 @media(max-width:640px){.plan-ledger .plan-event.completed td::after{display:none}.plan-ledger .plan-event.completed td{text-decoration:line-through}}
+ .auto-history{border-top:1px solid var(--border);padding:8px 14px;color:var(--muted);font-size:12px}
+.auto-history summary{cursor:pointer;width:fit-content}
+.auto-history-list{max-height:240px;overflow:auto;margin-top:8px}
+.auto-history-row{display:flex;align-items:center;gap:12px;padding:6px 0;border-top:1px solid var(--border)}
+.auto-history-row time{white-space:nowrap}.auto-history-row .auto-name{flex:1;min-width:0;overflow-wrap:anywhere}
+.auto-history-row strong{white-space:nowrap;font-variant-numeric:tabular-nums}.auto-history-row button{flex-shrink:0}
 .plan-ledger tfoot td{height:auto;padding:10px 14px}
 .plan-totals{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px}
 .plan-event-count{margin-right:auto;font-size:13px;font-weight:600;white-space:nowrap}
@@ -660,6 +666,20 @@ function parseMoney(value) {
   if (!Number.isSafeInteger(amount) || Math.abs(amount)>1e13) throw new Error('Слишком большая сумма');
   return amount;
 }
+function parseBalanceExpression(value) {
+  const text=String(value).replace(/\s/g,'');
+  if(!text)return 0;
+  if(text.length>1000||!/^[+-]?\d+(?:[.,]\d{1,2})?(?:[+-]\d+(?:[.,]\d{1,2})?)*$/.test(text))
+    throw new Error('Введи суммы через + или −, не больше двух знаков после запятой');
+  let total=0n;
+  for(const part of text.match(/[+-]?\d+(?:[.,]\d{1,2})?/g)){
+    const negative=part[0]==='-',number=part.replace(/^[+-]/,''),[rubles,kopecks='']=number.split(/[.,]/);
+    const amount=BigInt(rubles)*100n+BigInt(kopecks.padEnd(2,'0'));
+    total+=negative?-amount:amount;
+  }
+  if(total>10000000000000n||total< -10000000000000n)throw new Error('Слишком большая сумма');
+  return Number(total);
+}
 function cardDebtAmount(limit,balance) {
   for(const value of [limit,balance]){
     if(value!==null&&(!Number.isSafeInteger(value)||Math.abs(value)>1e13))throw new Error('Укажи корректную сумму карты');
@@ -798,17 +818,19 @@ function forecast(state,start,end) {
 function nextIncomeDate(state,start) {
   return eventsBetween(state,start,addDays(start,370)).find(e=>e.kind==='income' && e.date>start)?.date;
 }
-function settle(state,event,paidOn=today()) {
+function settle(state,event,paidOn=today(),automatic=false) {
   if(!event.debt && state.completed[event.key]) throw new Error('Эта операция уже учтена');
   const debtId=event.debt?event.id:event.debtId;
   const debt=debtId?state.debts.find(d=>d.id===debtId):null;
-  if(debtId && (!debt || debt.amount===null || event.amount>debt.amount)) throw new Error('Погашение превышает текущий остаток долга');
+  if(debtId && (!debt || (!automatic&&(debt.amount===null || event.amount>debt.amount)))) throw new Error('Погашение превышает текущий остаток долга');
+  const debtDelta=debt?.amount==null?0:Math.min(event.amount,debt.amount);
   const completionKey=event.debt?`${event.key}:${crypto.randomUUID()}`:event.key;
   const delta=event.kind==='income'?event.amount:-event.amount;
   state.balance=addMoney(state.balance??0,delta);
   const planEvent=Object.fromEntries(['id','sourceId','incomeType','name','kind','amount','date','scheduledDate','key','debtId','loanDebtId','calendarEstimated'].filter(key=>event[key]!=null).map(key=>[key,event[key]]));
-  state.completed[completionKey]={delta,balanceDelta:delta,paidOn,name:event.name.slice(0,120),date:event.date,kind:event.kind,amount:event.amount,debtId:debtId||null,balanceAfter:state.balance,planEvent};
-  if(debt){debt.amount-=event.amount;if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,event.amount);}
+  planEvent.name=planEvent.name.slice(0,120);
+  state.completed[completionKey]={delta,balanceDelta:delta,paidOn,name:event.name.slice(0,120),date:event.date,kind:event.kind,amount:event.amount,debtId:debtId||null,balanceAfter:state.balance,planEvent,...(automatic?{automatic:true,debtDelta}: {})};
+  if(debt&&debt.amount!==null){debt.amount-=debtDelta;if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,debtDelta);}
   return completionKey;
 }
 function undoSettlement(state,key) {
@@ -817,8 +839,19 @@ function undoSettlement(state,key) {
   const debt=entry.debtId?state.debts.find(d=>d.id===entry.debtId):null;
   if(entry.debtId && !debt) throw new Error('Долг удалён. Восстанови его из резервной копии перед отменой погашения');
   state.balance=addMoney(state.balance??0,-(entry.balanceDelta??entry.delta));
-  if(debt){debt.amount=addMoney(debt.amount,entry.amount);if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,-entry.amount);}
+  const debtDelta=entry.debtDelta??entry.amount;
+  if(debt&&debtDelta){if(debt.amount===null)throw new Error('Сначала укажи текущий остаток долга');debt.amount=addMoney(debt.amount,debtDelta);if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,-debtDelta);}
   delete state.completed[key];
+}
+
+// The watermark is the first calendar day whose events have not yet been closed.
+function closePastDays(state,now=today()) {
+  if(!state.autoFromDate){state.autoFromDate=now;return {changed:true,count:0,activated:true};}
+  if(state.autoFromDate>=now)return {changed:false,count:0,activated:false};
+  const events=eventsBetween(state,state.autoFromDate,addDays(now,-1));
+  for(const event of events)settle(state,event,event.date,true);
+  state.autoFromDate=now;
+  return {changed:true,count:events.length,activated:false};
 }
 
 // Percentages are integer hundredths of a percent; rounding is to kopecks.
@@ -931,7 +964,7 @@ function savePaymentEntry(state,{debtId=null,transactionId=null,type,name,amount
   state.debts=draft.debts;state.transactions=draft.transactions;
 }
 
-return {today,addDays,monthEnd,parseMoney,cardDebtAmount,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,saveLoanPayments,paymentTiming,saveLoanPayment,eventsBetween,forecast,nextIncomeDate,settle,undoSettlement,incomeBreakdown,incomeTransactions,saveIncomeSource,paymentEntries,savePaymentEntry};
+return {today,addDays,monthEnd,parseMoney,parseBalanceExpression,cardDebtAmount,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,saveLoanPayments,paymentTiming,saveLoanPayment,eventsBetween,forecast,nextIncomeDate,settle,undoSettlement,closePastDays,incomeBreakdown,incomeTransactions,saveIncomeSource,paymentEntries,savePaymentEntry};
 })();
 const module_2 = (() => {
 function compactPlan(ctx) {
@@ -976,6 +1009,9 @@ function compactPlan(ctx) {
   const crossesYear=now.slice(0,4)!==end.slice(0,4);
   const problem=state.balance!==null ? plan.firstShortfall : null;
   const warning=problem?`<div class="plan-shortfall" role="status"><span>Уходим в минус <b>${dateLabel(problem.date,problem.date.slice(0,4)!==now.slice(0,4))}</b></span><strong>${money(problem.balance)}</strong></div>`:'';
+  const automatic=Object.entries(state.completed).filter(([,entry])=>entry.automatic&&entry.planEvent&&entry.date<now)
+    .sort((a,b)=>b[1].date.localeCompare(a[1].date));
+  const history=automatic.length?`<details class="auto-history"><summary>Автоматически учтено: ${automatic.length}</summary><div class="auto-history-list">${automatic.map(([key,entry])=>`<div class="auto-history-row"><time datetime="${entry.date}">${dateLabel(entry.date,entry.date.slice(0,4)!==now.slice(0,4))}</time><span class="auto-name">${esc(entry.name)}</span><strong class="${entry.kind==='income'?'income-text':'expense-text'}">${money(entry.delta,true)}</strong><button type="button" class="button small subtle" data-action="undo-auto" data-id="${esc(key)}" aria-label="Отменить автоматический учёт: ${esc(entry.name)}">Отменить</button></div>`).join('')}</div></details>`:'';
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
   const renderEvent=(e,index,day)=>{
     const {name,type}=eventDetails(e);
@@ -987,7 +1023,7 @@ function compactPlan(ctx) {
   return `<section class="panel ledger-panel plan-panel">${warning?`<div class="ledger-toolbar">${warning}</div>`:''}
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th scope="col" class="plan-date-col">Дата</th><th scope="col" class="plan-type-col">Тип</th><th scope="col">Событие</th><th scope="col" class="numeric amount-col">Сумма</th><th scope="col" class="numeric balance-col">Остаток</th></tr></thead>
   ${days.length?days.map(day=>`<tbody class="plan-day-group"><tr class="plan-day"><th scope="rowgroup" colspan="5"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th></tr>${day.events.map((event,index)=>renderEvent(event,index,day)).join('')}</tbody>`).join(''):`<tbody><tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Приход» и расходы во вкладке «Расход».':'Добавь запись во вкладке «Расход» или «Приход».'}</p></div></td></tr></tbody>`}
-  <tfoot><tr><td colspan="5"><div class="plan-totals"><span class="plan-event-count">${rows.length} ${countLabel}</span><span class="plan-total"><span data-tooltip="Только невыполненные события">Приход</span><strong class="income-text">${plan.error?'—':money(plan.income)}</strong></span><span class="plan-total"><span data-tooltip="Только невыполненные события">Расход</span><strong class="expense-text">${plan.error?'—':money(plan.expense)}</strong></span><span class="plan-total plan-final"><span>Остаток</span><strong class="${plan.balance<0?'negative':''}">${state.balance===null||plan.error?'—':money(plan.balance)}</strong></span></div></td></tr></tfoot></table></div></section>`;
+  <tfoot><tr><td colspan="5"><div class="plan-totals"><span class="plan-event-count">${rows.length} ${countLabel}</span><span class="plan-total"><span data-tooltip="Только невыполненные события">Приход</span><strong class="income-text">${plan.error?'—':money(plan.income)}</strong></span><span class="plan-total"><span data-tooltip="Только невыполненные события">Расход</span><strong class="expense-text">${plan.error?'—':money(plan.expense)}</strong></span><span class="plan-total plan-final"><span>Остаток</span><strong class="${plan.balance<0?'negative':''}">${state.balance===null||plan.error?'—':money(plan.balance)}</strong></span></div></td></tr></tfoot></table></div>${history}</section>`;
 }
 
 function compactDebts(ctx) {
@@ -1007,8 +1043,9 @@ function compactDebts(ctx) {
   <div class="ledger-scroll"><table class="ledger management-ledger payment-ledger"><thead><tr><th scope="col">Платёж / кому</th><th scope="col">Тип</th><th scope="col">Расписание</th><th scope="col" class="numeric">Сумма платежа</th><th scope="col" class="numeric">Остаток долга</th></tr></thead><tbody>${filtered.map((e,index)=>{
     const action=e.transaction?'edit-transaction':'edit-debt';
     const pastRepayment=Boolean(e.transaction?.debtId&&e.amount!=null&&e.date&&e.date<ctx.now);
+    const completedRepayment=pastRepayment&&Boolean(state.completed[`${e.id}:${e.date}`]);
     const schedule=e.date?(e.repeat==='monthly'?((e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'):dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':'')):'Не задано';
-    return `${index===firstUndated?'<tr class="expense-undated-heading"><td colspan="5"><strong>Без даты</strong></td></tr>':''}<tr class="editable-row ${!e.date?'expense-undated-row':''}" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?'<span class="repayment-past-tag">Дата прошла</span>':''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
+    return `${index===firstUndated?'<tr class="expense-undated-heading"><td colspan="5"><strong>Без даты</strong></td></tr>':''}<tr class="editable-row ${!e.date?'expense-undated-row':''}" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?`<span class="repayment-past-tag">${completedRepayment?'Учтено':'Дата прошла'}</span>`:''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
   }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric payments-total" data-label="Платежи" data-tooltip="Сумма отображённых платежей, включая регулярные, разовые и прошедшие">${paymentsTotalLabel}</td><td class="numeric debt-total" data-label="Долг">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 
@@ -1037,7 +1074,7 @@ const {cardDebtAmount,today} = module_1;
 // Persistent browser storage for the standalone file. No HTTP requests.
 const STORAGE_KEY = 'finroad-state-v1';
 function emptyState(date) {
-  return {schema:1,demo:false,balance:null,balanceDate:date,transactions:[],debts:[],incomeSources:[],completed:{}};
+  return {schema:1,demo:false,balance:null,balanceDate:date,autoFromDate:date,transactions:[],debts:[],incomeSources:[],completed:{}};
 }
 function validateState(input) {
   const state=structuredClone(input);
@@ -1047,6 +1084,7 @@ function validateState(input) {
   const date=value=>check(typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&value>='2000-01-01'&&value<='2100-12-31'&&!Number.isNaN(Date.parse(value))&&new Date(value+'T12:00:00Z').toISOString().slice(0,10)===value,'Некорректная дата');
   check(object(state)&&state.schema===1,'Это не резервная копия FinRoad');
   money(state.balance,true,true);date(state.balanceDate);
+  if('autoFromDate' in state)date(state.autoFromDate);
   check(typeof state.demo==='boolean','Некорректный формат данных');
   delete state.reserve;
   state.incomeSources??=[];
@@ -1094,6 +1132,8 @@ function validateState(input) {
     check(key.length<=160&&object(row),'Некорректная история');money(row.delta,false,true);date(row.paidOn);
     if('balanceDelta' in row)money(row.balanceDelta,false,true);
     if('balanceAfter' in row)money(row.balanceAfter,false,true);
+    if('automatic' in row)check(typeof row.automatic==='boolean','Некорректная история');
+    if('debtDelta' in row){money(row.debtDelta);check(row.debtDelta<=(row.amount??0),'Некорректная история долга');}
     if('planEvent' in row){
       const event=row.planEvent;check(object(event)&&typeof event.key==='string'&&event.key===key&&typeof event.id==='string'&&event.id.length<=108,'Некорректная запись плана');
       name(event.name);date(event.date);date(event.scheduledDate);money(event.amount);check(['income','expense'].includes(event.kind)&&event.amount===row.amount&&event.date===row.date&&event.kind===row.kind,'Некорректная запись плана');
@@ -1108,6 +1148,7 @@ function validateState(input) {
     if(row.debtId!=null)check(typeof row.debtId==='string'&&row.debtId.length<=100&&'amount' in row,'Некорректная история долга');
   }
   const debts=new Map(state.debts.map(d=>[d.id,d])),scheduled=new Map();
+  const automaticallyReducedDebts=new Set(Object.values(state.completed).filter(row=>row.automatic&&row.debtId&&row.debtDelta>0).map(row=>row.debtId));
   for(const row of state.transactions) {
     if(row.loanDebtId!=null) {
       const debt=debts.get(row.loanDebtId);
@@ -1122,7 +1163,7 @@ function validateState(input) {
     check(['card','personal'].includes(debt.kind),'Некорректное погашение долга');
     if(row.draft||row.date<today())continue;
     const amount=(scheduled.get(debt.id)||0)+row.amount;scheduled.set(debt.id,amount);
-    check(debt.amount===null||amount<=debt.amount,'Погашения превышают остаток долга');
+    check(debt.amount===null||amount<=debt.amount||automaticallyReducedDebts.has(debt.id),'Погашения превышают остаток долга');
   }
   return state;
 }
@@ -1357,7 +1398,7 @@ return {positionTooltip,initTooltips};
 const module_6 = (() => {
 const {initDatePickers} = module_5;
 const {browserStore,validateState,STORAGE_KEY} = module_3;
-const {today,addDays,parseMoney,forecast,eventsBetween,settle,undoSettlement,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
+const {today,addDays,parseMoney,parseBalanceExpression,forecast,eventsBetween,settle,undoSettlement,closePastDays,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
 const {compactPlan,compactDebts,compactIncome,headerForecast} = module_2;
 const {demoStore} = module_4;
 const isDemo=document.body.dataset.demo==='true';
@@ -1403,7 +1444,13 @@ async function save(next,message=isDemo?'Изменено в примере · �
     revision=result.revision;state=result.state;render();notify(message);
   }finally{busy=false;}
 }
-function change(mutator,message){const next=structuredClone(state);mutator(next);return save(next,message);}
+function advancePastDays(){
+  const next=structuredClone(state),result=closePastDays(next,today());
+  if(!result.changed)return result;
+  ({state,revision}=store.save(next,revision));
+  return result;
+}
+function change(mutator,message){advancePastDays();const next=structuredClone(state);mutator(next);return save(next,message);}
 function head(title,subtitle,actions=''){return `<div class="page-heading"><div><h1>${title}</h1><p>${subtitle}</p></div><div class="heading-actions">${actions}</div></div>`;}
 function button(label,action,primary=false,ic='plus'){return `<button type="button" class="button ${primary?'primary':''}" data-action="${action}">${icon(ic)}${label}</button>`;}
 // Repaint the fixed sky behind rounded sticky corners, above scrolling rows.
@@ -1430,6 +1477,10 @@ const headerSizeObserver=new ResizeObserver(()=>{
 });
 headerSizeObserver.observe($('.terminal-header'));
 function render(){
+  if(state&&!editingBalance&&!$('#editor').open){
+    try{const result=advancePastDays();if(result.count)notify(`Автоматически учтено событий: ${result.count}`);}
+    catch(error){notify('Не удалось автоматически учесть прошедшие события: '+error.message);}
+  }
   const now=today();
   renderedDay=now;
   clearTimeout(dayTimer);
@@ -1474,7 +1525,7 @@ function field(name,label,type='text',value='',extra=''){
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
 function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();queueMicrotask(()=>{if(!$('#editor').open)return;const inputs=[...$('#dialog-fields').querySelectorAll('input:not([type=hidden]):not([type=radio]):not([type=checkbox]),textarea,select')];inputs.find(input=>!input.disabled&&input.getClientRects().length)?.focus();});}
 function dialogDelete(action,id){if(!id)return;const button=$('#delete-dialog');button.hidden=false;button.dataset.action=action;button.dataset.id=id;}
-function closeDialog(){$('#editor').close();dialogSubmit=null;}
+function closeDialog(){$('#editor').close();dialogSubmit=null;if(state?.autoFromDate!==today())render();}
 function incomeDialog(id=null){
   const source=(state.incomeSources||[]).find(item=>item.id===id);
   const type=source?(source.incomeType||'salary'):incomeFilter==='all'?'salary':incomeFilter;
@@ -1710,24 +1761,25 @@ function editBalance(){
   if(editingBalance)return;
   editingBalance=true;
   const container=$('#header-balance');
-  container.innerHTML=`<label for="header-balance-input"><small>Сейчас в наличии</small></label><form id="header-balance-form" class="header-balance-form"><input id="header-balance-input" type="text" inputmode="decimal" value="${esc((state.balance??0)/100)}" aria-label="Сейчас в наличии, рублей" aria-describedby="header-balance-error"><span class="balance-unit" aria-hidden="true">₽</span></form><span id="header-balance-error" class="header-balance-error" role="alert"></span>`;
+  container.innerHTML=`<label for="header-balance-input"><small>Сейчас в наличии</small></label><form id="header-balance-form" class="header-balance-form"><input id="header-balance-input" type="text" inputmode="text" value="${esc((state.balance??0)/100)}" aria-label="Сейчас в наличии, рублей" aria-describedby="header-balance-error"><span class="balance-unit" aria-hidden="true">₽</span></form><span id="header-balance-error" class="header-balance-error" role="alert"></span>`;
   const input=$('#header-balance-input'),form=$('#header-balance-form');
   let saving=false,cancelled=false;
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(saving||cancelled)return;
     let value;
-    try{value=parseMoney(input.value.trim()||'0');}catch(error){$('#header-balance-error').textContent=error.message;return;}
+    try{value=parseBalanceExpression(input.value);}catch(error){$('#header-balance-error').textContent=error.message;return;}
     saving=true;editingBalance=false;
     try{await change(s=>{s.balance=value;s.balanceDate=today();},'Остаток обновлён');}
     catch(error){editingBalance=true;saving=false;$('#header-balance-error').textContent=error.message;}
   });
   input.addEventListener('input',()=>{$('#header-balance-error').textContent='';});
-  input.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();cancelled=true;editingBalance=false;renderBalance();$('#header-balance .header-balance-edit')?.focus();}});
+  input.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();cancelled=true;editingBalance=false;render();$('#header-balance .header-balance-edit')?.focus();}});
   input.addEventListener('blur',()=>{if(!cancelled&&!saving&&form.isConnected)form.requestSubmit();});
-  input.focus();input.select();
+  input.focus();input.setSelectionRange(input.value.length,input.value.length);
 }
 function confirmDialog(title,text,action,label='Подтвердить'){openDialog(title,`<div class="dialog-note">${text}</div>`,action,label);}
 async function handle(action,el){
+  if(action==='undo-auto')return change(s=>undoSettlement(s,el.dataset.id),'Автоматический учёт отменён');
   if(action==='number-step'){const input=el.closest('.number-stepper').querySelector('input');if(input.disabled)return;try{el.dataset.direction==='up'?input.stepUp():input.stepDown();input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}));}catch{}return;}
   if(action==='reset-demo'&&isDemo){
     store=demoStore(today());({state,revision}=store.load());
@@ -1834,7 +1886,12 @@ function syncStoredState(){
 window.addEventListener('storage',event=>{if(event.key===STORAGE_KEY)syncStoredState();});
 window.addEventListener('focus',()=>{
   syncStoredState();
-  if(state && renderedDay!==today())render();
+  if(state && (renderedDay!==today()||state.autoFromDate!==today())&&!editingBalance&&!$('#editor').open)render();
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible')return;
+  syncStoredState();
+  if(state&&(renderedDay!==today()||state.autoFromDate!==today())&&!editingBalance&&!$('#editor').open)render();
 });
 try{store=isDemo?demoStore(today()):browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}

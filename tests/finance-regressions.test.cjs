@@ -146,9 +146,9 @@ test('income totals follow filter and include net amounts only once', () => {
 
 test('inline balance accepts a decimal value and an empty value becomes zero', async () => {
   const start=script.indexOf('function renderBalance(){'),end=script.indexOf('function confirmDialog(',start);assert(start>=0&&end>start);
-  const handlers={},formHandlers={},input={value:'',addEventListener:(name,fn)=>handlers[name]=fn,focus(){},select(){}},form={isConnected:true,addEventListener:(name,fn)=>formHandlers[name]=fn,requestSubmit(){return formHandlers.submit({preventDefault(){}})}},error={textContent:''},container={innerHTML:''};
+  const handlers={},formHandlers={},input={value:'',addEventListener:(name,fn)=>handlers[name]=fn,focus(){},setSelectionRange(start,end){this.selection=[start,end];}},form={isConnected:true,addEventListener:(name,fn)=>formHandlers[name]=fn,requestSubmit(){return formHandlers.submit({preventDefault(){}})}},error={textContent:''},container={innerHTML:''};
   const s={balance:12345,balanceDate:'2026-11-01'},mapping={'#header-balance':container,'#header-balance-input':input,'#header-balance-form':form,'#header-balance-error':error};
-  const ctx={state:s,editingBalance:false,$:selector=>mapping[selector],money:String,icon:()=>'',esc:String,parseMoney:finance.parseMoney,today:()=> '2026-11-10',change:async fn=>fn(s)};
+  const ctx={state:s,editingBalance:false,$:selector=>mapping[selector],money:String,icon:()=>'',esc:String,parseBalanceExpression:finance.parseBalanceExpression,today:()=> '2026-11-10',change:async fn=>fn(s)};
   vm.createContext(ctx);vm.runInContext(script.slice(start,end),ctx);ctx.editBalance();input.value='123,45';await formHandlers.submit({preventDefault(){}});
   assert.equal(s.balance,12345);assert.equal(s.balanceDate,'2026-11-10');
   ctx.editBalance();input.value='';await formHandlers.submit({preventDefault(){}});assert.equal(s.balance,0);
@@ -353,4 +353,102 @@ test('keyboard focus displays a themed tooltip and Escape restores its descripti
   handlers.focusin({target:owner});callback();assert.equal(tip.textContent,'Подсказка');assert.equal(tip.hidden,false);
   assert.equal(owner.attrs['aria-describedby'],'existing app-tooltip');assert.equal(tip.style.left,'192px');assert.equal(tip.style.top,'100px');
   handlers.keydown({key:'Escape'});assert.equal(tip.hidden,true);assert.equal(owner.attrs['aria-describedby'],'existing');
+});
+
+
+test('balance expressions add and subtract exact kopecks, ignoring spaces', () => {
+  for(const [expression,expected] of [['50000 + 3000',5300000],['50 000- 3 000 + 12,34',4701234],['-10.25 + 20,50 - 0,01',1024],[' + 0,10 + 0,20 ',30],['',0]])
+    assert.equal(finance.parseBalanceExpression(expression),expected,expression);
+  for(const expression of ['50000+', '1--2', '1*2', '1/2', '1.234', 'abc', '1+(2)', '100000000001'])
+    assert.throws(()=>finance.parseBalanceExpression(expression));
+});
+
+test('submitting a balance expression saves the result and rejects invalid input', async () => {
+  const start=script.indexOf('function renderBalance(){'),end=script.indexOf('function confirmDialog(',start);
+  const handlers={},input={value:'50000',addEventListener(){},focus(){},setSelectionRange(start,end){this.selection=[start,end];}};
+  const form={isConnected:true,addEventListener:(name,fn)=>handlers[name]=fn},error={textContent:''},container={innerHTML:''};
+  const state={balance:5000000,balanceDate:'2026-11-01'},mapping={'#header-balance':container,'#header-balance-input':input,'#header-balance-form':form,'#header-balance-error':error};
+  const ctx={state,editingBalance:false,$:selector=>mapping[selector],esc:String,parseBalanceExpression:finance.parseBalanceExpression,today:()=> '2026-11-10',change:async fn=>fn(state)};
+  vm.createContext(ctx);vm.runInContext(script.slice(start,end),ctx);ctx.editBalance();assert.deepEqual(input.selection,[5,5]);
+  input.value='50000 + 3000';await handlers.submit({preventDefault(){}});assert.equal(state.balance,5300000);
+  ctx.editBalance();input.value='53000 * 2';await handlers.submit({preventDefault(){}});assert.equal(state.balance,5300000);assert(error.textContent);
+});
+
+test('past days are settled once while today and previously settled items stay untouched', () => {
+  const s=empty();s.balance=0;
+  s.transactions=[
+    {id:'salary',name:'Зарплата',kind:'income',amount:100000,repeat:'once',date:'2026-11-10'},
+    {id:'early',name:'Оплачено',kind:'expense',amount:10000,repeat:'once',date:'2026-11-10'},
+    {id:'recurring',name:'Связь',kind:'expense',amount:5000,repeat:'monthly',date:'2026-11-01',day:11},
+    {id:'today',name:'Сегодня',kind:'expense',amount:2000,repeat:'once',date:'2026-11-13'}
+  ];
+  const early=finance.eventsBetween(s,'2026-11-10','2026-11-13').find(e=>e.id==='early');
+  finance.settle(s,early,'2026-11-10');
+  const result=finance.closePastDays(s,'2026-11-13');
+  assert.equal(result.count,2);assert.equal(s.balance,85000);assert.equal(s.autoFromDate,'2026-11-13');
+  assert(s.completed['salary:2026-11-10'].automatic);assert(s.completed['recurring:2026-11-11'].automatic);
+  assert(!s.completed['today:2026-11-13']);assert(!s.completed['early:2026-11-10'].automatic);
+  assert.equal(finance.closePastDays(s,'2026-11-13').changed,false);assert.equal(s.balance,85000);
+  assert.equal(finance.forecast(s,'2026-11-13','2026-11-30').balance,83000);
+  storage.validateState(JSON.parse(JSON.stringify(s)));
+  assert.equal(finance.closePastDays(s,'2026-11-14').count,1);assert.equal(s.balance,83000);
+});
+
+test('automatic settlement uses the shifted salary date and survives a storage round trip', () => {
+  const s=empty();s.balance=0;
+  finance.saveIncomeSource(s,{id:'salary',name:'Работа',incomeType:'salary',amount:100000,taxRate:0,salaryShare:10000,repeat:'monthly',date:'2026-11-01',salaryDay:15,advanceDate:null});
+  assert.equal(finance.closePastDays(s,'2026-11-13').count,0);
+  assert.equal(finance.closePastDays(s,'2026-11-14').count,1);
+  assert.equal(s.balance,100000);assert(s.completed['salary:2026-11-15']);
+  const records=new Map(),mock={getItem:key=>records.get(key)??null,setItem:(key,value)=>records.set(key,value)},store=storage.browserStore(mock);
+  const saved=store.save(s,0),reopened=store.load('2026-11-14');assert.equal(reopened.revision,saved.revision);
+  assert.equal(finance.closePastDays(reopened.state,'2026-11-14').changed,false);assert.equal(reopened.state.balance,100000);
+});
+
+test('automatic debt settlement tracks the cash expense and the debt adjustment separately', () => {
+  for(const kind of ['card','personal']){
+    const s=empty();s.balance=100000;
+    s.debts=[{id:'d',kind,name:'Долг',amount:20000,...(kind==='card'?{creditLimit:100000,cardBalance:80000}:{})}];
+    s.transactions=[{id:'p',name:'Долг',kind:'expense',amount:30000,repeat:'once',date:'2026-11-10',debtId:'d'}];
+    assert.equal(finance.closePastDays(s,'2026-11-11').count,1);
+    assert.equal(s.balance,70000);assert.equal(s.debts[0].amount,0);assert.equal(s.completed['p:2026-11-10'].debtDelta,20000);
+    if(kind==='card')assert.equal(s.debts[0].cardBalance,100000);
+    storage.validateState(s);finance.undoSettlement(s,'p:2026-11-10');
+    assert.equal(s.balance,100000);assert.equal(s.debts[0].amount,20000);
+    assert.equal(finance.closePastDays(s,'2026-11-11').count,0);
+  }
+});
+
+test('existing backups begin automatic accounting on activation instead of replaying older events', () => {
+  const s=empty();delete s.autoFromDate;s.balance=50000;
+  s.transactions=[{id:'old',name:'Старый платёж',kind:'expense',amount:10000,repeat:'once',date:'2026-11-01'}];
+  const activated=finance.closePastDays(s,'2026-11-10');assert(activated.activated);assert.equal(s.balance,50000);assert(!s.completed['old:2026-11-01']);
+  assert.equal(finance.closePastDays(s,'2026-11-11').count,0);assert.equal(s.balance,50000);
+});
+
+test('automatic settlements remain saveable when a later planned repayment exceeds the reduced debt', () => {
+  const s=empty();s.balance=100000;
+  s.debts=[{id:'d',name:'Долг',kind:'personal',amount:100000}];
+  s.transactions=[{id:'past',name:'Долг',kind:'expense',amount:80000,repeat:'once',date:'2026-11-10',debtId:'d'},
+    {id:'future',name:'Долг',kind:'expense',amount:100000,repeat:'once',date:'2026-11-20',debtId:'d'}];
+  finance.closePastDays(s,'2026-11-11');assert.equal(s.debts[0].amount,20000);assert.equal(s.balance,20000);
+  storage.validateState(s);
+  assert(finance.forecast(s,'2026-11-11','2026-11-30').events.some(e=>e.id==='future'));
+});
+
+test('automatic events are listed with an undo action', () => {
+  const s=empty();s.balance=10000;
+  s.transactions=[{id:'bill',name:'Связь',kind:'expense',amount:1000,repeat:'once',date:'2026-11-10'}];
+  finance.closePastDays(s,'2026-11-11');
+  const now='2026-11-11',end='2026-12-10',plan=finance.forecast(s,now,end);
+  const out=views.compactPlan({state:s,now,end,plan,dateLabel:String,money:String,esc:String,kindNames:{}});
+  assert.match(out,/Автоматически учтено: 1/);assert.match(out,/data-action="undo-auto" data-id="bill:2026-11-10"/);
+});
+
+test('long creditor names do not block automatic settlement', () => {
+  const s=empty();s.balance=2000;const name='А'.repeat(120);
+  s.debts=[{id:'d',name,kind:'personal',amount:1000}];
+  s.transactions=[{id:'p',name,kind:'expense',amount:1000,repeat:'once',date:'2026-11-10',debtId:'d'}];
+  assert.equal(finance.closePastDays(s,'2026-11-11').count,1);
+  storage.validateState(s);assert.equal(s.balance,1000);
 });
