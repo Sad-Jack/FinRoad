@@ -1035,8 +1035,9 @@ function compactDebts(ctx) {
   const selected=entries.filter(e=>debtFilter==='all'||e.kind===debtFilter);
   const paid=entry=>Boolean((entry.debt&&entry.debt.amount===0)||(entry.transaction?.repeat==='once'&&entry.transaction.date&&state.completed[`${entry.transaction.id}:${entry.transaction.date}`]));
   const sections=[
-    {label:'',items:selected.filter(entry=>!paid(entry)&&entry.date)},
-    {label:'Без даты',items:selected.filter(entry=>!paid(entry)&&!entry.date)},
+    {label:'Регулярные',items:selected.filter(entry=>!paid(entry)&&entry.date&&entry.repeat!=='once')},
+    {label:'Разовые',items:selected.filter(entry=>!paid(entry)&&entry.date&&entry.repeat==='once')},
+    {label:'Без дат',items:selected.filter(entry=>!paid(entry)&&!entry.date)},
     {label:'Выплатил',items:selected.filter(paid)}
   ].filter(section=>section.items.length);
   const filtered=sections.flatMap(section=>section.items);

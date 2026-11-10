@@ -243,13 +243,13 @@ test('expense table groups undated items after dated items within the selected f
   finance.savePaymentEntry(s,{type:'regular',name:'Без даты 2',payments:[{amount:4000,repeat:'once',date:null}]});
   finance.savePaymentEntry(s,{type:'personal',name:'Лена',amount:null,payments:[]});
   const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries};
-  const out=views.compactDebts({...ctx,debtFilter:'regular'}),group=out.indexOf('<strong>Без даты</strong>');
+  const out=views.compactDebts({...ctx,debtFilter:'regular'}),group=out.indexOf('<strong>Без дат</strong>');
   assert(group>out.indexOf('data-id="'+s.transactions.find(t=>t.name==='С датой').id+'"'));
   assert(group<out.indexOf('data-id="'+s.transactions.find(t=>t.name==='Без даты 1').id+'"'));
-  assert.equal((out.match(/<strong>Без даты<\/strong>/g)||[]).length,1);
+  assert.equal((out.match(/<strong>Без дат<\/strong>/g)||[]).length,1);
   assert.match(out,/<td class="numeric payments-total"[^>]*>19000<\/td>/);
-  const onlyDated=views.compactDebts({...ctx,debtFilter:'loan'});assert(!onlyDated.includes('<strong>Без даты</strong>'));
-  const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(!allUndated.includes('<strong>Без даты</strong>'));
+  const onlyDated=views.compactDebts({...ctx,debtFilter:'loan'});assert(!onlyDated.includes('<strong>Без дат</strong>'));
+  const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(!allUndated.includes('<strong>Без дат</strong>'));
 });
 
 test('only undated expense rows receive the group indentation class', () => {
@@ -462,8 +462,8 @@ test('closed debts follow active dated and undated entries in the paid group', (
   finance.savePaymentEntry(s,{type:'regular',name:'По дате',payments:[{amount:1000,repeat:'once',date:'2026-11-20'}]});
   const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{personal:'Частный долг'},paymentEntries:finance.paymentEntries};
   const out=views.compactDebts({...ctx,debtFilter:'all'}),row=name=>out.indexOf('>'+name+'</button>');
-  assert(row('По дате')<out.indexOf('<strong>Без даты</strong>'));
-  assert(out.indexOf('<strong>Без даты</strong>')<row('Не указан'));
+  assert(row('По дате')<out.indexOf('<strong>Без дат</strong>'));
+  assert(out.indexOf('<strong>Без дат</strong>')<row('Не указан'));
   assert(row('Открыт')<out.indexOf('<strong>Выплатил</strong>'));
   assert(out.indexOf('<strong>Выплатил</strong>')<row('Закрыт'));
   const closed=s.debts.find(debt=>debt.name==='Закрыт');
@@ -477,7 +477,7 @@ test('a single paid or undated section has no heading', () => {
   for(const amount of [0,1000,null]){
     const s=empty();finance.savePaymentEntry(s,{type:'personal',name:'Долг',amount,payments:[]});
     const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'personal'});
-    assert(!out.includes('<strong>Без даты</strong>'));assert(!out.includes('<strong>Выплатил</strong>'));
+    assert(!out.includes('<strong>Без дат</strong>'));assert(!out.includes('<strong>Выплатил</strong>'));
     assert.equal(out.includes('expense-paid-row'),amount===0);
   }
 });
@@ -522,4 +522,35 @@ test('paid partial debt repayments remain visible without hiding the outstanding
   const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
   assert.match(out,new RegExp(`expense-paid-row"[^>]*data-id="${event.id}"`));
   assert(out.includes('<strong>Выплатил</strong>'));assert.equal(s.debts[0].amount,50000);
+});
+
+
+test('expense groups separate recurring, one-time, undated and completed entries in order', () => {
+  const s=empty();s.balance=50000;
+  finance.savePaymentEntry(s,{type:'regular',name:'Разовый',payments:[{amount:1000,repeat:'once',date:'2026-11-12'}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Ежемесячный',payments:[{amount:2000,repeat:'monthly',day:25}]});
+  s.transactions.push({id:'yearly',name:'Ежегодный',kind:'expense',amount:3000,repeat:'yearly',date:'2025-12-01'});
+  finance.savePaymentEntry(s,{type:'regular',name:'Без даты',payments:[{amount:4000,repeat:'monthly',day:null}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Оплаченный',payments:[{amount:5000,repeat:'once',date:'2026-11-10'}]});
+  const paid=s.transactions.find(row=>row.name==='Оплаченный');
+  finance.settle(s,finance.eventsBetween(s,'2026-11-10','2026-12-10').find(e=>e.id===paid.id));
+  const render=filter=>views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:filter});
+  const out=render('regular'),at=text=>out.indexOf(text);
+  assert(at('<strong>Регулярные</strong>')<at('>Ежемесячный</button>'));
+  assert(at('>Ежемесячный</button>')<at('<strong>Разовые</strong>'));
+  assert(at('>Ежегодный</button>')<at('<strong>Разовые</strong>'));
+  assert(at('<strong>Разовые</strong>')<at('>Разовый</button>'));
+  assert(at('>Разовый</button>')<at('<strong>Без дат</strong>'));
+  assert(at('<strong>Без дат</strong>')<at('>Без даты</button>'));
+  assert(at('>Без даты</button>')<at('<strong>Выплатил</strong>'));
+  assert(at('<strong>Выплатил</strong>')<at('>Оплаченный</button>'));
+  assert.equal((out.match(/expense-paid-row/g)||[]).length,1);
+});
+
+test('a single regular or one-time group hides its heading', () => {
+  for(const payment of [{amount:1000,repeat:'monthly',day:25},{amount:1000,repeat:'once',date:'2026-11-12'}]){
+    const s=empty();finance.savePaymentEntry(s,{type:'regular',name:'Платёж',payments:[payment]});
+    const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+    assert(!out.includes('<strong>Регулярные</strong>'));assert(!out.includes('<strong>Разовые</strong>'));
+  }
 });
