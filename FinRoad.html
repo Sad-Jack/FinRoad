@@ -141,14 +141,14 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 .nav-button:hover{background:var(--hover);color:var(--text)}
 .nav-button.active{background:var(--active);border-color:var(--border);color:var(--purple)}
 .header-metrics{
-  order:1;display:grid;grid-template-columns:minmax(190px,1.15fr) minmax(150px,.85fr) minmax(185px,1fr);
+  order:1;display:grid;grid-template-columns:minmax(150px,.85fr) minmax(190px,1.15fr) minmax(185px,1fr);
   flex:1;min-width:0;align-items:center;margin-left:auto;
   padding-left:22px;border-left:1px solid var(--border);
 }
 .header-balance,.header-debt,.header-forecast-value{min-width:0;text-align:left}
 .header-balance{
   display:grid;gap:2px;
-  width:100%;padding:0 20px;border:0;border-left:1px solid var(--border);background:none;letter-spacing:0;
+  width:100%;padding:0 22px 0 8px;border:0;background:none;letter-spacing:0;
 }
 .header-balance small{font-weight:400}
 .header-balance-edit{display:flex;align-items:center;gap:14px;min-width:0;width:100%;padding:0;border:0;background:none;text-align:left}
@@ -161,7 +161,7 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 .header-balance-value strong{min-width:0}
 .header-balance .icon{width:16px;height:16px;color:var(--muted)}
 .header-balance:hover .icon,.header-balance:hover small{color:var(--purple)}
-.header-debt{display:grid;gap:2px;width:100%;padding:0 22px 0 8px;border:0;background:none;letter-spacing:0}
+.header-debt{display:grid;gap:2px;width:100%;padding:0 20px;border:0;border-left:1px solid var(--border);background:none;letter-spacing:0}
 .header-debt:disabled{opacity:1;cursor:default}
 .header-debt:not(:disabled):hover small{color:var(--purple)}
 #header-forecast{min-width:0;padding-left:12px;border-left:1px solid var(--border)}
@@ -180,7 +180,7 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
   .header-navigation{gap:14px}
   .terminal-header nav{padding-left:14px;gap:3px}
   .nav-button{padding-inline:10px;gap:7px}
-  .header-metrics{padding-left:14px;grid-template-columns:minmax(170px,1.15fr) minmax(135px,.85fr) minmax(175px,1fr)}
+  .header-metrics{padding-left:14px;grid-template-columns:minmax(135px,.85fr) minmax(170px,1.15fr) minmax(175px,1fr)}
   .header-balance{padding-right:16px}
   .header-debt{padding-inline:16px}
   .header-forecast-value{padding-inline:14px}
@@ -191,10 +191,10 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
 @media(max-width:1240px){
   .terminal-header{gap:12px 18px;padding:12px 18px}
   .header-metrics{
-    order:2;flex-basis:100%;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr) minmax(0,1fr);
+    order:2;flex-basis:100%;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr) minmax(0,1fr);
     margin:0;padding:12px 0 0;border-left:0;border-top:1px solid var(--border);
   }
-  .header-debt{padding-left:0}
+  .header-balance{padding-left:0}
   .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:24px}
 }
 @media(max-width:640px){
@@ -206,9 +206,9 @@ dialog{width:min(470px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflo
   .nav-button{min-height:40px;padding:8px;font-size:12px;gap:5px}
   .nav-button .icon{width:16px;height:16px}
   .header-metrics{grid-template-columns:minmax(0,1fr);gap:10px;padding-top:10px}
-  .header-balance{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 0 0;border-left:0;border-top:1px solid var(--border)}
+  .header-balance{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:2px 0;border:0}
   .header-balance-value{gap:8px}
-  .header-debt{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:2px 0}
+  .header-debt{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:10px 0 0;border-left:0;border-top:1px solid var(--border)}
   #header-forecast{padding:0;border:0}
   .header-forecast-value{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px}
   .header-balance strong,.header-debt strong,.header-forecast-value strong{font-size:20px;letter-spacing:-.3px}
@@ -429,6 +429,7 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .payment-ledger .expense-undated-heading td{height:auto;padding:7px 14px;color:var(--muted);font-size:12px}
 .payment-ledger .expense-undated-heading strong{font-weight:600}
 .payments-panel:not(.income-panel) .payment-ledger .editable-row .name-cell .row-name{margin-inline-start:16px;max-width:calc(100% - 16px)}
+.payments-panel:not(.income-panel) .payment-ledger .name-cell button.row-name:hover{text-decoration:none}
 @media(max-width:640px){.payment-ledger tbody .expense-undated-heading td{grid-column:1/-1}}
 .payment-ledger tfoot .payments-total{color:var(--red);font-size:14px;font-weight:600}
 .payment-ledger tfoot .debt-total{border-left:1px solid var(--border);color:var(--purple);font-size:14px;font-weight:600}
@@ -473,6 +474,11 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .plan-ledger .plan-date{padding:5px 14px;vertical-align:top;border-top:1px solid var(--border);background:var(--head);color:var(--muted);font-size:12px;line-height:1.4;font-weight:600;text-align:left;white-space:normal}
 .plan-ledger .plan-event:nth-child(odd){background:var(--hover)}
 .plan-ledger .plan-event:hover{background:var(--active)}
+.plan-ledger .plan-event{cursor:pointer}
+.plan-ledger .plan-event:focus-visible{outline:2px solid var(--purple);outline-offset:-2px}
+.plan-ledger .plan-event.completed td{position:relative;opacity:.7}
+.plan-ledger .plan-event.completed td::after{content:"";position:absolute;top:50%;left:0;right:0;height:1px;background:var(--muted);pointer-events:none}
+@media(max-width:640px){.plan-ledger .plan-event.completed td::after{display:none}.plan-ledger .plan-event.completed td{text-decoration:line-through}}
 .plan-ledger tfoot td{height:auto;padding:10px 14px}
 .plan-totals{display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:13px}
 .plan-event-count{margin-right:auto;font-size:13px;font-weight:600;white-space:nowrap}
@@ -577,19 +583,26 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .service-switch input:focus-visible+.switch-track{outline:2px solid var(--purple);outline-offset:2px}
 @media(max-width:640px){.service-fields{grid-template-columns:minmax(0,1fr) minmax(145px,.5fr)}.expense-type .choices span{white-space:normal}}
 
+.app-tooltip{
+  position:fixed;inset:auto;margin:0;z-index:10000;max-width:min(320px,calc(100vw - 16px));
+  padding:8px 11px;border:1px solid var(--border);border-radius:9px;
+  background:var(--dialog);color:var(--text);box-shadow:0 8px 24px var(--shadow);
+  font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;pointer-events:none;
+}
+.app-tooltip[hidden]{display:none}
 </style></head>
 <body>
   <div class="night" aria-hidden="true"><div class="stars"></div><div class="aurora"></div><div class="sky-sun"></div><div class="clouds"></div><div class="mountain mountain-back"></div><div class="mountain mountain-front"></div></div>
   <div class="shell compact-shell">
     <header class="terminal-header">
       <div class="header-navigation">
-        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" title="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-        <div class="header-right" title="Текущая дата"><span id="current-date"></span></div>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить дневной режим" aria-pressed="false" data-tooltip="Включить дневной режим"><svg class="theme-moon" viewBox="3 -0.5 32 32" aria-hidden="true"><path d="M21 4a12 12 0 1 0 7 21A14 14 0 0 1 21 4Z" fill="currentColor"/><path d="m25 3 1.2 3.8L30 8l-3.8 1.2L25 13l-1.2-3.8L20 8l3.8-1.2Z" fill="#99dfc8"/></svg><svg class="theme-sun" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="6" fill="currentColor"/><path d="M16 2v4m0 20v4M2 16h4m20 0h4M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <div class="header-right" data-tooltip="Текущая дата"><span id="current-date"></span></div>
         <nav id="navigation" aria-label="Разделы"></nav>
       </div>
       <div class="header-metrics">
-        <button id="header-debt" class="header-debt" type="button" data-action="toggle-mortgage-debt" aria-live="polite"></button>
         <div id="header-balance" class="header-balance"></div>
+        <button id="header-debt" class="header-debt" type="button" data-action="toggle-mortgage-debt" aria-live="polite"></button>
         <div id="header-forecast" aria-live="polite"></div>
       </div>
     </header>
@@ -786,16 +799,16 @@ function nextIncomeDate(state,start) {
   return eventsBetween(state,start,addDays(start,370)).find(e=>e.kind==='income' && e.date>start)?.date;
 }
 function settle(state,event,paidOn=today()) {
-  if(state.balance===null) throw new Error('Сначала укажи текущий остаток');
   if(!event.debt && state.completed[event.key]) throw new Error('Эта операция уже учтена');
   const debtId=event.debt?event.id:event.debtId;
   const debt=debtId?state.debts.find(d=>d.id===debtId):null;
-  if(debtId && (!debt || event.amount>debt.amount)) throw new Error('Погашение превышает текущий остаток долга');
+  if(debtId && (!debt || debt.amount===null || event.amount>debt.amount)) throw new Error('Погашение превышает текущий остаток долга');
   const completionKey=event.debt?`${event.key}:${crypto.randomUUID()}`:event.key;
   const delta=event.kind==='income'?event.amount:-event.amount;
-  state.balance+=delta;
-  state.completed[completionKey]={delta,balanceDelta:delta,paidOn,name:event.name.slice(0,120),date:event.date,kind:event.kind,amount:event.amount,debtId:debtId||null};
-  if(debt) debt.amount-=event.amount;
+  state.balance=addMoney(state.balance??0,delta);
+  const planEvent=Object.fromEntries(['id','sourceId','incomeType','name','kind','amount','date','scheduledDate','key','debtId','loanDebtId','calendarEstimated'].filter(key=>event[key]!=null).map(key=>[key,event[key]]));
+  state.completed[completionKey]={delta,balanceDelta:delta,paidOn,name:event.name.slice(0,120),date:event.date,kind:event.kind,amount:event.amount,debtId:debtId||null,balanceAfter:state.balance,planEvent};
+  if(debt){debt.amount-=event.amount;if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,event.amount);}
   return completionKey;
 }
 function undoSettlement(state,key) {
@@ -803,8 +816,8 @@ function undoSettlement(state,key) {
   if(!entry) throw new Error('Отметка не найдена');
   const debt=entry.debtId?state.debts.find(d=>d.id===entry.debtId):null;
   if(entry.debtId && !debt) throw new Error('Долг удалён. Восстанови его из резервной копии перед отменой погашения');
-  state.balance=(state.balance??0)-(entry.balanceDelta??entry.delta);
-  if(debt) debt.amount+=entry.amount;
+  state.balance=addMoney(state.balance??0,-(entry.balanceDelta??entry.delta));
+  if(debt){debt.amount=addMoney(debt.amount,entry.amount);if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,-entry.amount);}
   delete state.completed[key];
 }
 
@@ -923,9 +936,18 @@ return {today,addDays,monthEnd,parseMoney,cardDebtAmount,plannedRepayments,unpla
 const module_2 = (() => {
 function compactPlan(ctx) {
   const {state,now,end,plan,dateLabel,money,esc,kindNames}=ctx;
-  const rows=plan.points
-    .filter(point=>point.event)
-    .map(({event,balance})=>({...event,running:balance}));
+  const pending=plan.points.filter(point=>point.event).map(({event,balance})=>({...event,running:balance}));
+  const completed=Object.entries(state.completed).filter(([,entry])=>entry.planEvent&&entry.date>=now&&entry.date<=end)
+    .map(([key,entry])=>({...entry.planEvent,key,completed:true,delta:entry.balanceDelta??entry.delta}));
+  const rows=[...pending,...completed].sort((a,b)=>a.date.localeCompare(b.date)||Number(Boolean(b.completed))-Number(Boolean(a.completed))||((a.kind==='income'?-1:1)-(b.kind==='income'?-1:1))||a.name.localeCompare(b.name));
+  // Reconstruct completed balances from current cash, in display order. Stored
+  // snapshots can become stale when another completion is undone or reordered.
+  let completedBalance=BigInt(state.balance??0)-completed.reduce((sum,event)=>sum+BigInt(event.delta),0n);
+  for(const event of rows){
+    if(!event.completed)continue;
+    completedBalance+=BigInt(event.delta);
+    event.running=completedBalance>=BigInt(Number.MIN_SAFE_INTEGER)&&completedBalance<=BigInt(Number.MAX_SAFE_INTEGER)?Number(completedBalance):null;
+  }
   const eventDetails=e=>{
     if(e.kind==='income'){
       const source=state.incomeSources?.find(item=>item.id===e.sourceId);
@@ -948,7 +970,7 @@ function compactPlan(ctx) {
     if(days[days.length-1]?.date!==event.date)days.push({date:event.date,events:[]});
     days[days.length-1].events.push(event);
   }
-  const minimumBalance=rows.reduce((minimum,e)=>Math.min(minimum,e.running),Infinity);
+  const minimumBalance=pending.reduce((minimum,e)=>Math.min(minimum,e.running),Infinity);
   const countForm=new Intl.PluralRules('ru').select(rows.length);
   const countLabel={one:'событие',few:'события',many:'событий'}[countForm] || 'событий';
   const crossesYear=now.slice(0,4)!==end.slice(0,4);
@@ -957,15 +979,15 @@ function compactPlan(ctx) {
   const empty=!state.transactions.length&&!state.debts.length&&!(state.incomeSources||[]).length;
   const renderEvent=(e,index,day)=>{
     const {name,type}=eventDetails(e);
-    const minimum=state.balance!==null&&e.kind==='expense'&&e.running>=0&&e.running===minimumBalance;
+    const minimum=!e.completed&&state.balance!==null&&e.kind==='expense'&&e.running>=0&&e.running===minimumBalance;
     const balanceClass=e.running<0?'negative':minimum?'plan-minimum':'';
     const signedAmount=e.kind==='income'?money(e.amount,true):money(-e.amount).replace(/^-/,'−');
-    return `<tr class="plan-event">${index===0?`<th scope="rowgroup" rowspan="${day.events.length}" class="plan-date"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th>`:''}<td class="plan-type" data-label="Тип">${esc(type)}</td><td class="name-cell"><span class="row-name">${esc(name)}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" title="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}</td><td class="numeric plan-amount ${e.kind==='income'?'income-text':'expense-text'}" data-label="Сумма">${signedAmount}</td><td data-label="Остаток" class="numeric running-balance ${balanceClass}"${minimum?' title="Минимальный остаток после события за выбранный период"':''}>${state.balance===null?'—':money(e.running)}</td></tr>`;
+    return `<tr class="plan-event${e.completed?' completed':''}" tabindex="0" data-plan-key="${esc(e.key)}" aria-label="${esc(name)}: ${e.completed?'выполнено':'запланировано'}. Нажми Enter или дважды нажми, чтобы ${e.completed?'отменить отметку':'отметить выполнение'}" data-tooltip="Двойное нажатие — ${e.completed?'отменить выполнение':'отметить выполнение'}">${index===0?`<th scope="rowgroup" rowspan="${day.events.length}" class="plan-date"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th>`:''}<td class="plan-type" data-label="Тип">${esc(type)}</td><td class="name-cell"><span class="row-name">${esc(name)}</span>${e.scheduledDate&&e.scheduledDate!==e.date?`<span class="transfer-tag">Перенос с ${dateLabel(e.scheduledDate,e.scheduledDate.slice(0,4)!==e.date.slice(0,4))}</span>`:''}${e.calendarEstimated?'<span class="calendar-estimate" data-tooltip="Производственный календарь на этот год ещё не загружен; учтены только суббота и воскресенье">Дата предварительная</span>':''}</td><td class="numeric plan-amount ${e.kind==='income'?'income-text':'expense-text'}" data-label="Сумма">${signedAmount}</td><td data-label="Остаток" class="numeric running-balance ${balanceClass}"${e.completed?' data-tooltip="Текущий остаток с пересчётом выполненных событий в порядке таблицы"':minimum?' data-tooltip="Минимальный остаток после события за выбранный период"':''}>${state.balance===null||e.running==null?'—':money(e.running)}</td></tr>`;
   };
   return `<section class="panel ledger-panel plan-panel">${warning?`<div class="ledger-toolbar">${warning}</div>`:''}
   <div class="ledger-scroll"><table class="ledger plan-ledger"><thead><tr><th scope="col" class="plan-date-col">Дата</th><th scope="col" class="plan-type-col">Тип</th><th scope="col">Событие</th><th scope="col" class="numeric amount-col">Сумма</th><th scope="col" class="numeric balance-col">Остаток</th></tr></thead>
   ${days.length?days.map(day=>`<tbody class="plan-day-group"><tr class="plan-day"><th scope="rowgroup" colspan="5"><time datetime="${day.date}">${dateLabel(day.date,crossesYear)}</time></th></tr>${day.events.map((event,index)=>renderEvent(event,index,day)).join('')}</tbody>`).join(''):`<tbody><tr><td colspan="5"><div class="empty"><h2>${plan.error?'Не удалось рассчитать прогноз':empty?'Весь денежный план — на одном экране':'На этот период событий нет'}</h2><p>${plan.error?esc(plan.error):empty?'Добавь источники во вкладке «Приход» и расходы во вкладке «Расход».':'Добавь запись во вкладке «Расход» или «Приход».'}</p></div></td></tr></tbody>`}
-  <tfoot><tr><td colspan="5"><div class="plan-totals"><span class="plan-event-count">${rows.length} ${countLabel}</span><span class="plan-total"><span>Приход</span><strong class="income-text">${plan.error?'—':money(plan.income)}</strong></span><span class="plan-total"><span>Расход</span><strong class="expense-text">${plan.error?'—':money(plan.expense)}</strong></span><span class="plan-total plan-final"><span>Остаток</span><strong class="${plan.balance<0?'negative':''}">${state.balance===null||plan.error?'—':money(plan.balance)}</strong></span></div></td></tr></tfoot></table></div></section>`;
+  <tfoot><tr><td colspan="5"><div class="plan-totals"><span class="plan-event-count">${rows.length} ${countLabel}</span><span class="plan-total"><span data-tooltip="Только невыполненные события">Приход</span><strong class="income-text">${plan.error?'—':money(plan.income)}</strong></span><span class="plan-total"><span data-tooltip="Только невыполненные события">Расход</span><strong class="expense-text">${plan.error?'—':money(plan.expense)}</strong></span><span class="plan-total plan-final"><span>Остаток</span><strong class="${plan.balance<0?'negative':''}">${state.balance===null||plan.error?'—':money(plan.balance)}</strong></span></div></td></tr></tfoot></table></div></section>`;
 }
 
 function compactDebts(ctx) {
@@ -987,7 +1009,7 @@ function compactDebts(ctx) {
     const pastRepayment=Boolean(e.transaction?.debtId&&e.amount!=null&&e.date&&e.date<ctx.now);
     const schedule=e.date?(e.repeat==='monthly'?((e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'):dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':'')):'Не задано';
     return `${index===firstUndated?'<tr class="expense-undated-heading"><td colspan="5"><strong>Без даты</strong></td></tr>':''}<tr class="editable-row ${!e.date?'expense-undated-row':''}" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?'<span class="repayment-past-tag">Дата прошла</span>':''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
-  }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric payments-total" data-label="Платежи" title="Сумма отображённых платежей, включая регулярные, разовые и прошедшие">${paymentsTotalLabel}</td><td class="numeric debt-total" data-label="Долг">${totalLabel}</td></tr></tfoot></table></div></section>`;
+  }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric payments-total" data-label="Платежи" data-tooltip="Сумма отображённых платежей, включая регулярные, разовые и прошедшие">${paymentsTotalLabel}</td><td class="numeric debt-total" data-label="Долг">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 
 function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown,incomeFilter}) {
@@ -1000,12 +1022,12 @@ function compactIncome({state,money,icon,button,esc,dateLabel,incomeBreakdown,in
     const {net,salary,advance}=source.legacy?{net:source.amount,salary:source.amount,advance:0}:incomeBreakdown(source);
     const schedule=source.repeat==='once'?`${dateLabel(source.date,true)} · разово`:source.repeat==='yearly'?`${dateLabel(source.date)} · ежегодно`:[salary?`${source.salaryShare<10000?'Зарплата · ':''}${(source.salaryDay??Number(source.date.slice(8)))===31?'последний день месяца':(source.salaryDay??Number(source.date.slice(8)))+'-го'} · ${money(salary)}`:'',advance?`Аванс · ${(source.advanceDay??Number(source.advanceDate.slice(8)))===31?'последний день месяца':(source.advanceDay??Number(source.advanceDate.slice(8)))+'-го'} · ${money(advance)}`:''].filter(Boolean).join('<br>');
     return `<tr class="editable-row" tabindex="0" data-action="edit-income" data-id="${esc(source.id)}" aria-label="Изменить источник ${esc(source.name)}"><td class="name-cell"><button class="row-name" data-action="edit-income" data-id="${esc(source.id)}">${esc(source.name)}</button></td><td data-label="Тип">${incomeTypeNames[source.incomeType]}</td><td class="schedule-cell" data-label="Расписание">${schedule}</td><td class="numeric income-text" data-label="Сумма на руки">${money(net)}</td></tr>`;
-  }).join('')||'<tr><td colspan="4"><div class="empty">В этом разделе поступлений пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего</td><td class="numeric income-total" title="Сумма отображённых поступлений; регулярные и разовые сложены вместе">${totalLabel}</td></tr></tfoot></table></div></section>`;
+  }).join('')||'<tr><td colspan="4"><div class="empty">В этом разделе поступлений пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего</td><td class="numeric income-total" data-tooltip="Сумма отображённых поступлений; регулярные и разовые сложены вместе">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money}) {
   const selected=forecastEnd || end;
   const amount=selected===end ? plan.balance : forecast(state,now,selected).balance;
-  return `<div class="header-forecast-value" data-date-trigger title="Выбрать дату расчёта"><span>Свободно по <label class="forecast-date" title="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" title="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
+  return `<div class="header-forecast-value" data-date-trigger data-tooltip="Выбрать дату расчёта"><span>Свободно по <label class="forecast-date" data-tooltip="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" data-tooltip="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
 }
 
 return {compactPlan,compactDebts,compactIncome,headerForecast};
@@ -1071,6 +1093,14 @@ function validateState(input) {
   for(const [key,row] of Object.entries(state.completed)) {
     check(key.length<=160&&object(row),'Некорректная история');money(row.delta,false,true);date(row.paidOn);
     if('balanceDelta' in row)money(row.balanceDelta,false,true);
+    if('balanceAfter' in row)money(row.balanceAfter,false,true);
+    if('planEvent' in row){
+      const event=row.planEvent;check(object(event)&&typeof event.key==='string'&&event.key===key&&typeof event.id==='string'&&event.id.length<=108,'Некорректная запись плана');
+      name(event.name);date(event.date);date(event.scheduledDate);money(event.amount);check(['income','expense'].includes(event.kind)&&event.amount===row.amount&&event.date===row.date&&event.kind===row.kind,'Некорректная запись плана');
+      for(const field of ['sourceId','debtId','loanDebtId','incomeType'])if(event[field]!=null)check(typeof event[field]==='string'&&event[field].length<=100,'Некорректная запись плана');
+      if('calendarEstimated' in event)check(typeof event.calendarEstimated==='boolean','Некорректная запись плана');
+      check('balanceAfter' in row,'Некорректная запись плана');
+    }
     if('amount' in row)money(row.amount);
     if('date' in row)date(row.date);
     if('kind' in row)check(['income','expense'].includes(row.kind),'Некорректная история');
@@ -1261,10 +1291,73 @@ function initDatePickers(){
 
 return {initDatePickers};
 })();
+const module_tooltip = (() => {
+function positionTooltip(anchor,box,viewport){
+  const margin=8,gap=10;
+  const left=Math.max(margin,Math.min(anchor.x,viewport.width-box.width-margin));
+  const below=anchor.bottom+gap;
+  const top=below+box.height<=viewport.height-margin?below:Math.max(margin,anchor.top-box.height-gap);
+  return {left,top};
+}
+function initTooltips(){
+  const tooltip=document.createElement('div');tooltip.id='app-tooltip';tooltip.className='app-tooltip';tooltip.setAttribute('role','tooltip');tooltip.hidden=true;
+  const usePopover=typeof tooltip.showPopover==='function';
+  if(usePopover)tooltip.setAttribute('popover','manual');
+  document.body.append(tooltip);
+  let owner=null,timer=null,point=null,describedBefore=null;
+  function hide(){
+    clearTimeout(timer);timer=null;
+    if(owner&&describedBefore!==null){if(describedBefore)owner.setAttribute('aria-describedby',describedBefore);else owner.removeAttribute('aria-describedby');}
+    describedBefore=null;owner=null;point=null;
+    if(usePopover&&tooltip.matches(':popover-open'))tooltip.hidePopover();
+    tooltip.hidden=true;
+  }
+  function place(){
+    if(!owner?.isConnected){hide();return;}
+    const rect=owner.getBoundingClientRect(),box=tooltip.getBoundingClientRect();
+    const anchor=point?{x:point.x+12,top:point.y,bottom:point.y}:{x:rect.left,top:rect.top,bottom:rect.bottom};
+    const position=positionTooltip(anchor,box,{width:window.innerWidth,height:window.innerHeight});
+    tooltip.style.left=position.left+'px';tooltip.style.top=position.top+'px';
+  }
+  function schedule(target,pointer){
+    if(target===owner){if(pointer){point=pointer;if(!tooltip.hidden)place();}return;}
+    hide();
+    if(!target||!target.dataset.tooltip?.trim())return;
+    owner=target;point=pointer;timer=setTimeout(()=>{
+      if(!owner?.isConnected){hide();return;}
+      tooltip.textContent=owner.dataset.tooltip;
+      if(!usePopover){const dialog=owner.closest('dialog[open]');(dialog||document.body).append(tooltip);}
+      tooltip.hidden=false;
+      if(usePopover)tooltip.showPopover();
+      describedBefore=owner.getAttribute('aria-describedby')||'';
+      owner.setAttribute('aria-describedby',[describedBefore,tooltip.id].filter(Boolean).join(' '));
+      place();
+    },pointer?500:0);
+  }
+  document.addEventListener('pointerover',event=>{
+    if(event.pointerType==='touch')return;
+    schedule(event.target.closest('[data-tooltip]'),{x:event.clientX,y:event.clientY});
+  });
+  document.addEventListener('pointermove',event=>{
+    if(point&&owner){point={x:event.clientX,y:event.clientY};if(!tooltip.hidden)place();}
+  });
+  document.addEventListener('pointerout',event=>{
+    if(point&&owner&&!owner.contains(event.relatedTarget))hide();
+  });
+  document.addEventListener('focusin',event=>{
+    if(event.target.matches(':focus-visible'))schedule(event.target.closest('[data-tooltip]'),null);
+  });
+  document.addEventListener('focusout',event=>{if(owner&&owner.contains(event.target)&&!point)hide();});
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')hide();});
+  document.addEventListener('scroll',hide,true);
+  window.addEventListener('resize',hide);
+}
+return {positionTooltip,initTooltips};
+})();
 const module_6 = (() => {
 const {initDatePickers} = module_5;
 const {browserStore,validateState,STORAGE_KEY} = module_3;
-const {today,addDays,parseMoney,forecast,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
+const {today,addDays,parseMoney,forecast,eventsBetween,settle,undoSettlement,plannedRepayments,unplannedDebtAmount,scheduleRepayment,loanPayment,loanPayments,incomeBreakdown,saveIncomeSource,paymentTiming,paymentEntries,savePaymentEntry,cardDebtAmount} = module_1;
 const {compactPlan,compactDebts,compactIncome,headerForecast} = module_2;
 const {demoStore} = module_4;
 const isDemo=document.body.dataset.demo==='true';
@@ -1290,7 +1383,7 @@ function applyTheme(theme){
   const day=theme==='day',label=day?'Включить ночной режим':'Включить дневной режим';
   $('#theme-toggle').setAttribute('aria-label',label);
   $('#theme-toggle').setAttribute('aria-pressed',String(day));
-  $('#theme-toggle').title=label;
+  $('#theme-toggle').dataset.tooltip=label;
   $('meta[name="theme-color"]').content=day?'#d8eafb':'#0b1021';
 }
 let savedTheme='night';
@@ -1361,8 +1454,8 @@ function render(){
   const debtLabel=hasMortgage?(showMortgageDebt?'Долг с ипотекой':'Долг без ипотеки'):'Долг';
   const debtButton=$('#header-debt');debtButton.disabled=!hasMortgage;
   if(hasMortgage)debtButton.setAttribute('aria-pressed',String(showMortgageDebt));else debtButton.removeAttribute('aria-pressed');
-  debtButton.title=hasMortgage?(showMortgageDebt?'Показать долг без ипотеки':'Показать долг с ипотекой'):'';
-  debtButton.innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong title="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:''}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
+  debtButton.dataset.tooltip=hasMortgage?(showMortgageDebt?'Показать долг без ипотеки':'Показать долг с ипотекой'):'';
+  debtButton.innerHTML=`<small>${debtLabel}${missingDebt?' · указано':''}</small><strong data-tooltip="${missingDebt?'Сумма известных остатков; не заполнено: '+missingDebt:''}">${totalDebt===null?'Сумма вне диапазона':debts.length&&!knownDebts.length?'—':money(totalDebt)}</strong>`;
   $('#header-forecast').innerHTML=headerForecast(ctx);
   const previousToolbar=$('.ledger-panel .ledger-toolbar');
   if(previousToolbar)headerSizeObserver.unobserve(previousToolbar);
@@ -1391,7 +1484,7 @@ function incomeDialog(id=null){
   openDialog(id?'Изменить поступление':'Добавить поступление',
     `<div class="income-type">${select('income-type','Тип',incomeTypeNames,type)}</div>`+
     floating('name','Источник',source?.name||'','required maxlength="100"')+
-    `<div id="income-salary" data-legacy-once="${salary.repeat==='once'}">${salary.repeat==='once'?'<p class="dialog-note">Эта запись ранее добавлена как разовое поступление.</p>':''}<div class="field-row">${field('gross','Сумма до налога, ₽','text',salary.amount===''?'':salary.amount/100,'required inputmode="decimal"')}${field('tax-rate','Налог, %','number',salary.taxRate/100,'required min="0" max="100" step="0.01"')}</div><div id="income-split"><div class="field-row">${field('salary-share','Зарплата, %','number',salary.salaryShare/100,'required min="0" max="100" step="0.01"')}${field('advance-share','Аванс, %','number',(10000-salary.salaryShare)/100,'required min="0" max="100" step="0.01"')}</div></div><div class="field-row" id="income-days"><div id="salary-day-field">${field('salary-day','Число зарплаты','number',salary.salaryDay??(salary.date?Number(salary.date.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="advance-day-field">${field('advance-day','Число аванса','number',salary.advanceDay??(salary.advanceDate?Number(salary.advanceDate.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div></div><div id="income-once-date">${field('income-date','Дата поступления','date',salary.repeat==='once'?salary.date:'','min="2000-01-01" max="2100-12-31"')}</div><div class="income-preview" id="income-preview" aria-live="polite"></div></div>`+
+    `<div id="income-salary" data-legacy-once="${salary.repeat==='once'}">${salary.repeat==='once'?'<p class="dialog-note">Эта запись ранее добавлена как разовое поступление.</p>':''}<div class="field-row">${field('gross','Сумма до налога, ₽','text',salary.amount===''?'':salary.amount/100,'required inputmode="decimal"')}${field('tax-rate','Налог, %','number',salary.taxRate/100,'required min="0" max="100" step="0.01"')}</div><div id="income-split"><div class="field-row">${field('salary-share','Зарплата, %','number',salary.salaryShare/100,'required min="0" max="100" step="0.01"')}${field('advance-share','Аванс, %','number',(10000-salary.salaryShare)/100,'required min="0" max="100" step="0.01"')}</div></div><div class="field-row" id="income-days"><div id="salary-day-field">${field('salary-day','Число зарплаты','number',salary.salaryDay??(salary.date?Number(salary.date.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" data-tooltip="31 — последний день месяца"')}</div><div id="advance-day-field">${field('advance-day','Число аванса','number',salary.advanceDay??(salary.advanceDate?Number(salary.advanceDate.slice(8)):''),'min="1" max="31" step="1" placeholder="1–31" data-tooltip="31 — последний день месяца"')}</div></div><div id="income-once-date">${field('income-date','Дата поступления','date',salary.repeat==='once'?salary.date:'','min="2000-01-01" max="2100-12-31"')}</div><div class="income-preview" id="income-preview" aria-live="polite"></div></div>`+
     `<div id="income-other"><div id="other-heading"><strong>Поступление</strong><label class="service-switch"><span>Регулярно</span><input type="checkbox" name="other-once-switch" value="once" ${other.repeat==='once'?'checked':''} role="switch" aria-label="Разовое поступление"><span class="switch-track" aria-hidden="true"></span><span>Разово</span></label></div><div class="service-fields">${floating('other-amount','Сумма, ₽',other.amount===''?'':other.amount/100,'required inputmode="decimal"')}<div id="other-monthly">${dayInput('other-day',other.repeat==='monthly'?(other.salaryDay??(other.date?Number(other.date.slice(8)):'')):'',true)}</div><div id="other-once"><label class="expense-floating"><input name="other-date" type="date" value="${esc(other.repeat==='once'?other.date||'':'')}" min="2000-01-01" max="2100-12-31"><span>Дата поступления</span></label></div></div></div>`,async data=>{
       const selected=data.get('income-type'),isSalary=selected==='salary';
       const original=isSalary?salary:other;
@@ -1442,12 +1535,12 @@ $('#editor-form').addEventListener('input',updateIncomeFields);
 $('#editor-form').addEventListener('change',updateIncomeFields);
 function dayInput(name,value,compact=false){
   const day=value==null||value===''?'':Math.max(1,Math.min(31,Number(value)||1));
-  const input=`<input name="${name}" class="day-number" type="number" value="${day}" min="1" max="31" step="1" inputmode="numeric" placeholder=" " title="Укажите число от 1 до 31. Если в месяце нет такого числа, событие будет показано в последний день месяца.">`;
+  const input=`<input name="${name}" class="day-number" type="number" value="${day}" min="1" max="31" step="1" inputmode="numeric" placeholder=" " data-tooltip="Укажите число от 1 до 31. Если в месяце нет такого числа, событие будет показано в последний день месяца.">`;
   return compact?`<label class="expense-floating compact-day">${input}<span>Число от 1 до 31</span></label>`:`<label class="field">Число платежа${input}</label>`;
 }
 function paymentDateFields(prefix,item,useWheel=true){
   const day=item?.day??(item?.date?Number(item.date.slice(8)):'');
-  return `<div id="${prefix}-day-field">${useWheel?dayInput(prefix+'-day',day):field(prefix+'-day','Число платежа','number',day,'min="1" max="31" step="1" placeholder="1–31" title="31 — последний день месяца"')}</div><div id="${prefix}-date-field">${field(prefix+'-date','Дата платежа','date',item?.repeat!=='monthly'?item?.date||'':'','min="2000-01-01" max="2100-12-31"')}</div>`;
+  return `<div id="${prefix}-day-field">${useWheel?dayInput(prefix+'-day',day):field(prefix+'-day','Число платежа','number',day,'min="1" max="31" step="1" placeholder="1–31" data-tooltip="31 — последний день месяца"')}</div><div id="${prefix}-date-field">${field(prefix+'-date','Дата платежа','date',item?.repeat!=='monthly'?item?.date||'':'','min="2000-01-01" max="2100-12-31"')}</div>`;
 }
 function loanDateRow(payment=null){
   const completed=Boolean(payment?.debtId&&state.completed[`${payment.id}:${payment.date}`]);
@@ -1671,6 +1764,27 @@ async function handle(action,el){
   if(action==='import'){$('#import-file').click();return;}
 
 }
+async function togglePlan(row){
+  if(!row||busy)return;
+  const key=row.dataset.planKey,completed=Boolean(state.completed[key]);
+  await change(s=>{
+    if(completed){undoSettlement(s,key);return;}
+    const end=forecastEnd||addDays(today(),30);
+    const event=eventsBetween(s,today(),end).find(item=>item.key===key);
+    if(!event)throw new Error('Событие больше не найдено в плане');
+    settle(s,event);
+  },completed?'Отметка отменена':'Событие выполнено');
+  document.querySelectorAll('[data-plan-key]').forEach(item=>{if(item.dataset.planKey===key)item.focus({preventScroll:true});});
+}
+document.addEventListener('dblclick',event=>{
+  if(event.target.closest('button'))return;
+  const row=event.target.closest('[data-plan-key]');
+  if(row)Promise.resolve(togglePlan(row)).catch(error=>notify(error.message));
+});
+document.addEventListener('keydown',event=>{
+  const row=event.target.closest('[data-plan-key]');
+  if(row&&event.target===row&&['Enter',' '].includes(event.key)){event.preventDefault();Promise.resolve(togglePlan(row)).catch(error=>notify(error.message));}
+});
 document.addEventListener('keydown',event=>{
   if(event.key!=='Tab'||!event.target.closest('#editor-form'))return;
   const selector='input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),textarea,select';
@@ -1726,6 +1840,7 @@ try{store=isDemo?demoStore(today()):browserStore(window.localStorage);({state,re
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
 
 initDatePickers();
+module_tooltip.initTooltips();
 
 return {};
 })();

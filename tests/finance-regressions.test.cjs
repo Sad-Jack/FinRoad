@@ -179,7 +179,7 @@ test('author credits use the intended destinations and opposite corners', () => 
 
 test('debt header toggles mortgage and shows just debt when there is none', () => {
   const start=script.indexOf('  const hasMortgage=state.debts.some'),end=script.indexOf("  $('#header-forecast')",start);assert(start>=0&&end>start);
-  const button={attrs:{},setAttribute(key,value){this.attrs[key]=value;},removeAttribute(key){delete this.attrs[key];}};
+  const button={attrs:{},dataset:{},setAttribute(key,value){this.attrs[key]=value;},removeAttribute(key){delete this.attrs[key];}};
   const ctx={state:{debts:[{kind:'loan',amount:10000},{kind:'mortgage',amount:50000}]},showMortgageDebt:false,$:()=>button,money:String};vm.createContext(ctx);
   const block='{'+script.slice(start,end)+'}';vm.runInContext(block,ctx);assert(button.innerHTML.includes('Долг без ипотеки'));assert(button.innerHTML.includes('10000'));
   ctx.showMortgageDebt=true;vm.runInContext(block,ctx);assert(button.innerHTML.includes('Долг с ипотекой'));assert(button.innerHTML.includes('60000'));
@@ -264,4 +264,93 @@ test('only undated expense rows receive the group indentation class', () => {
 
 test('indentation applies to all expense rows without affecting income rows', () => {
   assert(html.includes('.payments-panel:not(.income-panel) .payment-ledger .editable-row .name-cell .row-name{margin-inline-start:16px;'));
+});
+
+test('settling an occurrence updates cash once, preserves the forecast and can be undone', () => {
+  const s=empty();s.balance=0;
+  s.transactions=[{id:'salary',name:'Зарплата',kind:'income',amount:11527500,repeat:'monthly',date:'2026-11-01',day:10},{id:'bill',name:'Покупка',kind:'expense',amount:1600000,repeat:'once',date:'2026-11-10'}];
+  const before=finance.forecast(s,'2026-11-10','2026-12-10');
+  const salary=before.events.find(e=>e.id==='salary');finance.settle(s,salary,'2026-11-10');
+  assert.equal(s.balance,11527500);assert.throws(()=>finance.settle(s,salary),/уже учтена/);
+  let after=finance.forecast(s,'2026-11-10','2026-12-10');
+  assert.equal(after.balance,before.balance);assert(!after.events.some(e=>e.key===salary.key));
+  assert(after.events.some(e=>e.id==='salary'&&e.scheduledDate==='2026-12-10'));
+  storage.validateState(JSON.parse(JSON.stringify(s)));
+  const bill=after.events.find(e=>e.id==='bill');finance.settle(s,bill,'2026-11-10');assert.equal(s.balance,9927500);
+  finance.undoSettlement(s,salary.key);assert.equal(s.balance,-1600000);
+  finance.undoSettlement(s,bill.key);assert.equal(s.balance,0);
+  assert.equal(finance.forecast(s,'2026-11-10','2026-12-10').balance,before.balance);
+});
+
+test('completed items stay visible above pending items and show their recalculated balance', () => {
+  const s=empty();s.balance=0;
+  s.transactions=[{id:'a',name:'А',kind:'expense',amount:500,repeat:'once',date:'2026-11-10'},{id:'b',name:'Б',kind:'expense',amount:700,repeat:'once',date:'2026-11-10'}];
+  const event=finance.forecast(s,'2026-11-10','2026-12-10').events[1];finance.settle(s,event);
+  const plan=finance.forecast(s,'2026-11-10','2026-12-10');
+  const out=views.compactPlan({state:s,now:'2026-11-10',end:'2026-12-10',plan,dateLabel:String,money:String,esc:String,kindNames:{}});
+  assert(out.indexOf('data-plan-key="b:2026-11-10"')<out.indexOf('data-plan-key="a:2026-11-10"'));
+  assert.match(out,/plan-event completed/);assert.match(out,/>-700<\/td>/);
+  assert.equal(plan.expense,500);assert.equal(plan.balance,-1200);
+});
+
+test('card and private debt repayments adjust debt and cash and undo safely', () => {
+  for(const type of ['card','personal']){
+    const s=empty();s.balance=100000;
+    const entry={type,name:'Долг',amount:100000,payments:[{amount:30000,repeat:'once',date:'2026-11-20'}]};
+    if(type==='card')Object.assign(entry,{creditLimit:200000,cardBalance:100000});
+    finance.savePaymentEntry(s,entry);const event=finance.forecast(s,'2026-11-10','2026-12-10').events[0];
+    finance.settle(s,event);assert.equal(s.balance,70000);assert.equal(s.debts[0].amount,70000);
+    if(type==='card')assert.equal(s.debts[0].cardBalance,130000);
+    storage.validateState(JSON.parse(JSON.stringify(s)));finance.undoSettlement(s,event.key);
+    assert.equal(s.balance,100000);assert.equal(s.debts[0].amount,100000);storage.validateState(s);
+  }
+});
+
+
+test('completed balances are rebuilt after another event is undone, as in the plan screenshot', () => {
+  const s=empty();s.balance=0;
+  s.transactions=[
+    {id:'salary',name:'Зарплата',kind:'income',amount:11527500,repeat:'once',date:'2026-11-10'},
+    {id:'gas',name:'Газовщик',kind:'expense',amount:1600000,repeat:'once',date:'2026-11-10'},
+    {id:'debt',name:'Влад',kind:'expense',amount:500000,repeat:'once',date:'2026-11-10'}
+  ];
+  const get=id=>finance.forecast(s,'2026-11-10','2026-12-10').events.find(e=>e.id===id);
+  finance.settle(s,get('salary'));finance.settle(s,get('gas'));finance.settle(s,get('debt'));
+  finance.undoSettlement(s,'gas:2026-11-10');
+  assert.equal(s.balance,11027500);
+  assert.equal(s.completed['debt:2026-11-10'].balanceAfter,9427500); // Previously saved, now stale.
+  const render=()=>views.compactPlan({state:s,now:'2026-11-10',end:'2026-12-10',plan:finance.forecast(s,'2026-11-10','2026-12-10'),dateLabel:String,money:String,esc:String,kindNames:{}});
+  const row=(out,id)=>out.match(new RegExp(`<tr[^>]*data-plan-key="${id}:2026-11-10"[\\s\\S]*?</tr>`))[0];
+  let out=render();
+  assert.match(row(out,'salary'),/>11527500<\/td>/);
+  assert.match(row(out,'debt'),/>11027500<\/td>/);
+  assert.match(row(out,'gas'),/>9427500<\/td>/);
+  s.balance+=100000;out=render();
+  assert.match(row(out,'salary'),/>11627500<\/td>/);
+  assert.match(row(out,'debt'),/>11127500<\/td>/);
+  assert.match(row(out,'gas'),/>9527500<\/td>/);
+});
+
+
+test('tooltips stay inside the viewport and choose a side with space', () => {
+  const start=script.indexOf('const module_tooltip ='),end=script.indexOf('const module_6 =',start);
+  const {positionTooltip}=vm.runInNewContext(script.slice(start,end)+';module_tooltip');
+  const box={width:150,height:40},viewport={width:300,height:200};
+  const bottom=positionTooltip({x:290,top:170,bottom:185},box,viewport);
+  assert.equal(bottom.left,142);assert.equal(bottom.top,120);
+  const top=positionTooltip({x:-20,top:8,bottom:25},box,viewport);
+  assert.equal(top.left,8);assert.equal(top.top,35);
+});
+
+test('keyboard focus displays a themed tooltip and Escape restores its description', () => {
+  const start=script.indexOf('const module_tooltip ='),end=script.indexOf('const module_6 =',start);
+  const handlers={},windowHandlers={};let tip,callback;
+  const document={body:{append(el){tip=el;}},createElement(){return {style:{},hidden:false,attrs:{},setAttribute(k,v){this.attrs[k]=v;},getBoundingClientRect(){return {width:100,height:40};}};},addEventListener(k,fn){handlers[k]=fn;}};
+  const window={innerWidth:300,innerHeight:200,addEventListener(k,fn){windowHandlers[k]=fn;}};
+  const ctx={document,window,setTimeout(fn){callback=fn;return 1;},clearTimeout(){callback=null;}};
+  const tooltip=vm.runInNewContext(script.slice(start,end)+';module_tooltip',ctx);tooltip.initTooltips();
+  const owner={dataset:{tooltip:'Подсказка'},attrs:{'aria-describedby':'existing'},isConnected:true,matches:()=>true,closest(selector){return selector==='[data-tooltip]'?this:null;},getAttribute(k){return this.attrs[k]||null;},setAttribute(k,v){this.attrs[k]=v;},removeAttribute(k){delete this.attrs[k];},getBoundingClientRect(){return {left:250,top:150,bottom:170};},contains(node){return node===this;}};
+  handlers.focusin({target:owner});callback();assert.equal(tip.textContent,'Подсказка');assert.equal(tip.hidden,false);
+  assert.equal(owner.attrs['aria-describedby'],'existing app-tooltip');assert.equal(tip.style.left,'192px');assert.equal(tip.style.top,'100px');
+  handlers.keydown({key:'Escape'});assert.equal(tip.hidden,true);assert.equal(owner.attrs['aria-describedby'],'existing');
 });
