@@ -217,3 +217,37 @@ test('expense schedules omit monthly and one-time labels but retain annual recur
   assert(out.includes('>10-го</td>'));assert(out.includes('>2026-11-20</td>'));assert(out.includes('2026-12-01 · ежегодно'));
   assert(!out.includes('Ежемесячно ·'));assert(!out.includes(' · разово'));
 });
+
+test('new recurring expense and income day fields are empty while saved days remain', () => {
+  const dayStart=script.indexOf('function dayInput('),dayEnd=script.indexOf('function paymentDateFields(',dayStart);
+  const paymentStart=script.indexOf('function paymentDialog('),paymentEnd=script.indexOf('function updateEntryFields(',paymentStart);
+  const incomeStart=script.indexOf('function incomeDialog('),incomeEnd=script.indexOf('function updateIncomeType(',incomeStart);
+  let rendered='';const editor={dataset:{}},s=empty();
+  const context={state:s,incomeFilter:'side',incomeTypeNames:{salary:'Зарплата',side:'Подработка'},
+    esc:value=>String(value??''),select:()=>'',field:()=>'',icon:()=>'',loanDateRow:()=>'',
+    $:selector=>selector==='#editor'?editor:null,openDialog:(_title,fields)=>{rendered=fields;},dialogDelete:()=>{},updateEntryFields:()=>{},updateIncomeType:()=>{},
+    loanPayments:finance.loanPayments,loanPayment:finance.loanPayment,plannedRepayments:finance.plannedRepayments};
+  vm.createContext(context);vm.runInContext(script.slice(dayStart,dayEnd)+script.slice(paymentStart,paymentEnd)+script.slice(incomeStart,incomeEnd),context);
+  context.paymentDialog();assert.match(rendered,/name="service-day"[^>]*value=""/);assert.match(rendered,/name="credit-day"[^>]*value=""/);
+  context.incomeDialog();assert.match(rendered,/name="other-day"[^>]*value=""/);
+  finance.savePaymentEntry(s,{type:'regular',name:'Связь',payments:[{amount:10000,repeat:'monthly',day:15}]});
+  context.paymentDialog({transactionId:s.transactions[0].id});assert.match(rendered,/name="service-day"[^>]*value="15"/);
+  finance.saveIncomeSource(s,{id:'other-saved',incomeType:'side',name:'Заказ',amount:10000,taxRate:0,salaryShare:10000,repeat:'monthly',date:'2026-11-01',salaryDay:20,advanceDate:null});
+  context.incomeDialog('other-saved');assert.match(rendered,/name="other-day"[^>]*value="20"/);
+});
+
+test('expense table groups undated items after dated items within the selected filter', () => {
+  const s=empty();
+  finance.savePaymentEntry(s,{type:'regular',name:'Без даты 1',payments:[{amount:5000,repeat:'monthly',day:null}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'С датой',payments:[{amount:10000,repeat:'once',date:'2026-11-20'}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'Без даты 2',payments:[{amount:4000,repeat:'once',date:null}]});
+  finance.savePaymentEntry(s,{type:'personal',name:'Лена',amount:null,payments:[]});
+  const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries};
+  const out=views.compactDebts({...ctx,debtFilter:'regular'}),group=out.indexOf('<strong>Без даты</strong>');
+  assert(group>out.indexOf('data-id="'+s.transactions.find(t=>t.name==='С датой').id+'"'));
+  assert(group<out.indexOf('data-id="'+s.transactions.find(t=>t.name==='Без даты 1').id+'"'));
+  assert.equal((out.match(/<strong>Без даты<\/strong>/g)||[]).length,1);
+  assert.match(out,/<td class="numeric payments-total"[^>]*>19000<\/td>/);
+  const onlyDated=views.compactDebts({...ctx,debtFilter:'loan'});assert(!onlyDated.includes('<strong>Без даты</strong>'));
+  const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(allUndated.includes('<strong>Без даты</strong>'));
+});
