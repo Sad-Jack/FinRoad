@@ -554,3 +554,24 @@ test('a single regular or one-time group hides its heading', () => {
     assert(!out.includes('<strong>Регулярные</strong>'));assert(!out.includes('<strong>Разовые</strong>'));
   }
 });
+
+test('expense total excludes paid items and restores them after undo', () => {
+  const s=empty();s.balance=10000000;
+  for(const [name,amount,repeat,day,date] of [['ММА',500000,'monthly',23,null],['Связь',80000,'monthly',26,null],['GPT',1000000,'monthly',1,null],['Форма',500000,'once',null,null],['Пошлина',1000000,'once',null,null],['Газовщик',1600000,'once',null,'2026-11-10']])
+    finance.savePaymentEntry(s,{type:'regular',name,payments:[{amount,repeat,day,date}]});
+  const gas=s.transactions.find(t=>t.name==='Газовщик'),event=finance.eventsBetween(s,'2026-11-10','2026-12-10').find(e=>e.id===gas.id);
+  const footer=()=>views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'regular'}).split('<tfoot>')[1];
+  assert.match(footer(),/class="numeric payments-total"[^>]*>4680000</);
+  finance.settle(s,event);assert.match(footer(),/class="numeric payments-total"[^>]*>3080000</);
+  finance.undoSettlement(s,event.key);assert.match(footer(),/class="numeric payments-total"[^>]*>4680000</);
+});
+
+test('expense totals distinguish no unpaid payments from an unknown unpaid amount', () => {
+  const s=empty();s.balance=10000;
+  finance.savePaymentEntry(s,{type:'regular',name:'Оплачен',payments:[{amount:1000,repeat:'once',date:'2026-11-10'}]});
+  finance.settle(s,finance.eventsBetween(s,'2026-11-10','2026-11-10')[0]);
+  const footer=()=>views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'regular'}).split('<tfoot>')[1];
+  assert.match(footer(),/class="numeric payments-total"[^>]*>0</);
+  finance.savePaymentEntry(s,{type:'regular',name:'Неизвестно',payments:[{amount:null,repeat:'once',date:null}]});
+  assert.match(footer(),/class="numeric payments-total"[^>]*>—</);
+});
