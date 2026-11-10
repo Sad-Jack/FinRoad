@@ -249,7 +249,7 @@ test('expense table groups undated items after dated items within the selected f
   assert.equal((out.match(/<strong>Без даты<\/strong>/g)||[]).length,1);
   assert.match(out,/<td class="numeric payments-total"[^>]*>19000<\/td>/);
   const onlyDated=views.compactDebts({...ctx,debtFilter:'loan'});assert(!onlyDated.includes('<strong>Без даты</strong>'));
-  const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(allUndated.includes('<strong>Без даты</strong>'));
+  const allUndated=views.compactDebts({...ctx,debtFilter:'personal'});assert(!allUndated.includes('<strong>Без даты</strong>'));
 });
 
 test('only undated expense rows receive the group indentation class', () => {
@@ -451,4 +451,75 @@ test('long creditor names do not block automatic settlement', () => {
   s.transactions=[{id:'p',name,kind:'expense',amount:1000,repeat:'once',date:'2026-11-10',debtId:'d'}];
   assert.equal(finance.closePastDays(s,'2026-11-11').count,1);
   storage.validateState(s);assert.equal(s.balance,1000);
+});
+
+
+test('closed debts follow active dated and undated entries in the paid group', () => {
+  const s=empty();
+  finance.savePaymentEntry(s,{type:'personal',name:'Закрыт',amount:0,payments:[]});
+  finance.savePaymentEntry(s,{type:'personal',name:'Не указан',amount:null,payments:[]});
+  finance.savePaymentEntry(s,{type:'personal',name:'Открыт',amount:50000,payments:[]});
+  finance.savePaymentEntry(s,{type:'regular',name:'По дате',payments:[{amount:1000,repeat:'once',date:'2026-11-20'}]});
+  const ctx={state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{personal:'Частный долг'},paymentEntries:finance.paymentEntries};
+  const out=views.compactDebts({...ctx,debtFilter:'all'}),row=name=>out.indexOf('>'+name+'</button>');
+  assert(row('По дате')<out.indexOf('<strong>Без даты</strong>'));
+  assert(out.indexOf('<strong>Без даты</strong>')<row('Не указан'));
+  assert(row('Открыт')<out.indexOf('<strong>Выплатил</strong>'));
+  assert(out.indexOf('<strong>Выплатил</strong>')<row('Закрыт'));
+  const closed=s.debts.find(debt=>debt.name==='Закрыт');
+  assert.match(out,new RegExp(`class="editable-row expense-undated-row expense-paid-row"[^>]+data-id="${closed.id}"`));
+  const unknown=s.debts.find(debt=>debt.name==='Не указан');
+  assert(!out.includes(`expense-paid-row" tabindex="0" data-action="edit-debt" data-id="${unknown.id}"`));
+  assert.match(out,/class="numeric debt-total"[^>]*>50000<\/td>/);
+});
+
+test('a single paid or undated section has no heading', () => {
+  for(const amount of [0,1000,null]){
+    const s=empty();finance.savePaymentEntry(s,{type:'personal',name:'Долг',amount,payments:[]});
+    const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'personal'});
+    assert(!out.includes('<strong>Без даты</strong>'));assert(!out.includes('<strong>Выплатил</strong>'));
+    assert.equal(out.includes('expense-paid-row'),amount===0);
+  }
+});
+
+test('closing and reopening a debt moves its rows between sections without changing the plan', () => {
+  const s=empty();s.balance=0;
+  finance.savePaymentEntry(s,{type:'loan',name:'Кредит',amount:10000,payments:[{amount:1000,repeat:'once',date:'2026-11-20'}]});
+  const debt=s.debts[0],payment=s.transactions[0],render=()=>views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+  const before=finance.forecast(s,'2026-11-10','2026-12-10').balance;
+  assert(!render().includes('expense-paid-row'));debt.amount=0;assert(render().includes('expense-paid-row'));
+  assert.equal(finance.forecast(s,'2026-11-10','2026-12-10').balance,before);
+  debt.amount=10000;assert(!render().includes('expense-paid-row'));
+});
+
+test('a paid one-time service moves to the paid group and undo restores it', () => {
+  const s=empty();s.balance=5000000;
+  finance.savePaymentEntry(s,{type:'regular',name:'Ивану газовщику',payments:[{amount:1600000,repeat:'once',date:'2026-11-10'}]});
+  finance.savePaymentEntry(s,{type:'regular',name:'ММА',payments:[{amount:500000,repeat:'once',date:'2026-11-23'}]});
+  const payment=s.transactions.find(t=>t.name==='Ивану газовщику');
+  const event=finance.eventsBetween(s,'2026-11-10','2026-12-10').find(e=>e.id===payment.id);
+  const render=()=>views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+  assert(!render().includes('expense-paid-row'));finance.settle(s,event);
+  let out=render();assert(out.indexOf('<strong>Выплатил</strong>')<out.indexOf('>Ивану газовщику</button>'));
+  assert.match(out,new RegExp(`expense-paid-row"[^>]*data-id="${payment.id}"`));
+  finance.undoSettlement(s,event.key);out=render();assert(!out.includes('expense-paid-row'));assert(!out.includes('<strong>Выплатил</strong>'));
+});
+
+test('one paid recurring occurrence does not mark the entire schedule paid', () => {
+  const s=empty();s.balance=20000;
+  finance.savePaymentEntry(s,{type:'regular',name:'Связь',payments:[{amount:1000,repeat:'monthly',day:10}]});
+  const event=finance.eventsBetween(s,'2026-11-10','2026-12-10')[0];finance.settle(s,event);
+  const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+  assert(!out.includes('expense-paid-row'));assert(finance.eventsBetween(s,'2026-12-01','2026-12-31').length);
+});
+
+test('paid partial debt repayments remain visible without hiding the outstanding debt', () => {
+  const s=empty();s.balance=100000;
+  finance.savePaymentEntry(s,{type:'personal',name:'Влад',amount:60000,payments:[{amount:10000,repeat:'once',date:'2026-11-10'}]});
+  const event=finance.eventsBetween(s,'2026-11-10','2026-12-10')[0];finance.settle(s,event);
+  const items=finance.paymentEntries(s,'2026-11-10');assert.equal(items.length,2);
+  assert(items.some(e=>e.id===event.id));assert(items.some(e=>e.id===s.debts[0].id));
+  const out=views.compactDebts({state:s,now:'2026-11-10',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+  assert.match(out,new RegExp(`expense-paid-row"[^>]*data-id="${event.id}"`));
+  assert(out.includes('<strong>Выплатил</strong>'));assert.equal(s.debts[0].amount,50000);
 });

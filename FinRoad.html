@@ -428,6 +428,9 @@ input,textarea,.row-name,.header-balance strong{user-select:text;-webkit-user-se
 .payment-ledger tbody tr.expense-undated-heading,.payment-ledger tbody tr.expense-undated-heading:hover{background:var(--head)}
 .payment-ledger .expense-undated-heading td{height:auto;padding:7px 14px;color:var(--muted);font-size:12px}
 .payment-ledger .expense-undated-heading strong{font-weight:600}
+.payment-ledger .expense-paid-row td{position:relative;opacity:.7}
+.payment-ledger .expense-paid-row td::after{content:"";position:absolute;top:50%;left:0;right:0;height:1px;background:var(--muted);pointer-events:none}
+@media(max-width:640px){.payment-ledger .expense-paid-row td::after{display:none}.payment-ledger .expense-paid-row td,.payment-ledger .expense-paid-row .row-name{text-decoration:line-through}}
 .payments-panel:not(.income-panel) .payment-ledger .editable-row .name-cell .row-name{margin-inline-start:16px;max-width:calc(100% - 16px)}
 .payments-panel:not(.income-panel) .payment-ledger .name-cell button.row-name:hover{text-decoration:none}
 @media(max-width:640px){.payment-ledger tbody .expense-undated-heading td{grid-column:1/-1}}
@@ -896,9 +899,9 @@ function paymentEntries(state,referenceDate=today()) {
   const represented=new Set();
   const loans=new Map(state.debts.filter(d=>['loan','mortgage'].includes(d.kind)).map(d=>[loanPayment(state,d)?.id,d]));
   for(const transaction of state.transactions.filter(t=>t.kind==='expense')){
-    if(transaction.debtId&&state.completed[`${transaction.id}:${transaction.date}`])continue;
     const debt=state.debts.find(d=>d.id===(transaction.debtId||transaction.loanDebtId))||loans.get(transaction.id);
-    if(debt)represented.add(debt.id);
+    const completedRepayment=Boolean(transaction.debtId&&state.completed[`${transaction.id}:${transaction.date}`]);
+    if(debt&&(!completedRepayment||debt.amount===0))represented.add(debt.id);
     entries.push({id:transaction.id,name:transaction.debtId&&debt?debt.name:transaction.name,kind:debt?.kind||'regular',amount:transaction.amount,repeat:transaction.repeat,date:transaction.date,day:transaction.day,debt,transaction});
   }
   for(const debt of state.debts){
@@ -1029,8 +1032,16 @@ function compactPlan(ctx) {
 function compactDebts(ctx) {
   const {state,money,icon,button,esc,dateLabel,kindNames,debtFilter,paymentEntries}=ctx;
   const entries=paymentEntries(state),groups=[['all','Все'],['regular','Услуги и покупки'],['personal','Частные долги'],['card','Кредитные карты'],['loan','Кредиты'],['mortgage','Ипотека']];
-  const filtered=entries.filter(e=>debtFilter==='all'||e.kind===debtFilter);
-  const firstUndated=filtered.findIndex(entry=>!entry.date);
+  const selected=entries.filter(e=>debtFilter==='all'||e.kind===debtFilter);
+  const paid=entry=>Boolean((entry.debt&&entry.debt.amount===0)||(entry.transaction?.repeat==='once'&&entry.transaction.date&&state.completed[`${entry.transaction.id}:${entry.transaction.date}`]));
+  const sections=[
+    {label:'',items:selected.filter(entry=>!paid(entry)&&entry.date)},
+    {label:'Без даты',items:selected.filter(entry=>!paid(entry)&&!entry.date)},
+    {label:'Выплатил',items:selected.filter(paid)}
+  ].filter(section=>section.items.length);
+  const filtered=sections.flatMap(section=>section.items);
+  const sectionStarts=new Map();
+  if(sections.length>1){let index=0;for(const section of sections){if(section.label)sectionStarts.set(index,section.label);index+=section.items.length;}}
   const knownPayments=filtered.filter(entry=>entry.amount!==null);
   const paymentsTotal=knownPayments.reduce((sum,entry)=>sum+BigInt(entry.amount),0n);
   const paymentsTotalLabel=filtered.length&&!knownPayments.length?'—':paymentsTotal>BigInt(Number.MAX_SAFE_INTEGER)?'Сумма вне диапазона':money(Number(paymentsTotal));
@@ -1045,7 +1056,7 @@ function compactDebts(ctx) {
     const pastRepayment=Boolean(e.transaction?.debtId&&e.amount!=null&&e.date&&e.date<ctx.now);
     const completedRepayment=pastRepayment&&Boolean(state.completed[`${e.id}:${e.date}`]);
     const schedule=e.date?(e.repeat==='monthly'?((e.day??Number(e.date.slice(8)))===31?'последний день месяца':(e.day??Number(e.date.slice(8)))+'-го'):dateLabel(e.date,true)+(e.repeat==='yearly'?' · ежегодно':'')):'Не задано';
-    return `${index===firstUndated?'<tr class="expense-undated-heading"><td colspan="5"><strong>Без даты</strong></td></tr>':''}<tr class="editable-row ${!e.date?'expense-undated-row':''}" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?`<span class="repayment-past-tag">${completedRepayment?'Учтено':'Дата прошла'}</span>`:''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
+    return `${sectionStarts.has(index)?`<tr class="expense-undated-heading"><td colspan="5"><strong>${sectionStarts.get(index)}</strong></td></tr>`:''}<tr class="editable-row ${!e.date?'expense-undated-row':''}${paid(e)?' expense-paid-row':''}" tabindex="0" data-action="${action}" data-id="${esc(e.id)}" data-payment-id="${esc(e.id)}" aria-label="Изменить ${esc(e.name)}"><td class="name-cell"><button class="row-name" data-action="${action}" data-id="${esc(e.id)}">${esc(e.name)}</button></td><td data-label="Тип">${kindNames[e.kind]||'Услуги и покупки'}</td><td class="schedule-cell" data-label="Расписание">${schedule}${pastRepayment?`<span class="repayment-past-tag">${completedRepayment?'Учтено':'Дата прошла'}</span>`:''}</td><td class="numeric expense-text" data-label="Сумма платежа">${e.amount===null?'<span class="dash">—</span>':money(e.amount)}</td><td class="numeric payment-debt" data-label="Остаток долга">${e.debt?`<button class="row-name" data-action="edit-debt" data-id="${esc(e.debt.id)}" aria-label="Изменить долг ${esc(e.debt.name)}">${e.debt.amount===null?'—':money(e.debt.amount)}</button>`:'—'}</td></tr>`;
   }).join('')||'<tr><td colspan="5"><div class="empty">В этом разделе платежей пока нет.</div></td></tr>'}</tbody><tfoot><tr><td colspan="3" class="total-label">Всего${missing?`<span class="foot-muted">не заполнено ${missing}</span>`:''}</td><td class="numeric payments-total" data-label="Платежи" data-tooltip="Сумма отображённых платежей, включая регулярные, разовые и прошедшие">${paymentsTotalLabel}</td><td class="numeric debt-total" data-label="Долг">${totalLabel}</td></tr></tfoot></table></div></section>`;
 }
 
