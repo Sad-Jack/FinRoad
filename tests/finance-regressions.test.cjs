@@ -575,3 +575,13 @@ test('expense totals distinguish no unpaid payments from an unknown unpaid amoun
   finance.savePaymentEntry(s,{type:'regular',name:'Неизвестно',payments:[{amount:null,repeat:'once',date:null}]});
   assert.match(footer(),/class="numeric payments-total"[^>]*>—</);
 });
+
+test('an empty plan offers backup import without showing it for a calculation error', () => {
+  const s=empty(),now='2026-11-10',end='2026-12-10';
+  const context={state:s,now,end,dateLabel:String,money:String,esc:String,kindNames:{}};
+  const html=views.compactPlan({...context,plan:finance.forecast(s,now,end)});
+  assert.match(html,/<button type="button" class="button" data-action="import">Импортировать данные<\/button>/);
+  assert(html.includes('восстанови данные из резервной копии'));
+  const error=views.compactPlan({...context,plan:{points:[],error:'Ошибка',income:0,expense:0,balance:0}});
+  assert(!error.includes('data-action="import"'));
+});
