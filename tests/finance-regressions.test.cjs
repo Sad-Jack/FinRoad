@@ -419,11 +419,11 @@ test('automatic debt settlement tracks the cash expense and the debt adjustment 
   }
 });
 
-test('existing backups begin automatic accounting on activation instead of replaying older events', () => {
+test('existing backups account for past one-time events once when activated', () => {
   const s=empty();delete s.autoFromDate;s.balance=50000;
   s.transactions=[{id:'old',name:'Старый платёж',kind:'expense',amount:10000,repeat:'once',date:'2026-11-01'}];
-  const activated=finance.closePastDays(s,'2026-11-10');assert(activated.activated);assert.equal(s.balance,50000);assert(!s.completed['old:2026-11-01']);
-  assert.equal(finance.closePastDays(s,'2026-11-11').count,0);assert.equal(s.balance,50000);
+  const activated=finance.closePastDays(s,'2026-11-10');assert(activated.activated);assert.equal(s.balance,40000);assert(s.completed['old:2026-11-01']);
+  assert.equal(finance.closePastDays(s,'2026-11-11').count,0);assert.equal(s.balance,40000);
 });
 
 test('automatic settlements remain saveable when a later planned repayment exceeds the reduced debt', () => {
@@ -584,4 +584,37 @@ test('an empty plan offers backup import without showing it for a calculation er
   assert(html.includes('восстанови данные из резервной копии'));
   const error=views.compactPlan({...context,plan:{points:[],error:'Ошибка',income:0,expense:0,balance:0}});
   assert(!error.includes('data-action="import"'));
+});
+
+test('past one-time events from an older backup are settled exactly once and reflected in expenses', () => {
+  const s=empty();s.balance=10000000;s.autoFromDate='2026-11-12';
+  s.debts=[{id:'vlad',name:'Влад',kind:'personal',amount:500000}];
+  s.transactions=[
+    {id:'gas',name:'Газовщик',kind:'expense',amount:1600000,repeat:'once',date:'2026-11-10'},
+    {id:'repayment',name:'Влад',kind:'expense',amount:500000,repeat:'once',date:'2026-11-10',debtId:'vlad'},
+    {id:'today',name:'Сегодня',kind:'expense',amount:300000,repeat:'once',date:'2026-11-12'},
+    {id:'draft',name:'Черновик',kind:'expense',amount:null,repeat:'once',date:null,draft:true}
+  ];
+  const result=finance.closePastDays(s,'2026-11-12');assert.equal(result.count,2);
+  assert.equal(s.balance,7900000);assert.equal(s.debts[0].amount,0);
+  assert(s.completed['gas:2026-11-10']);assert(s.completed['repayment:2026-11-10']);assert(!s.completed['today:2026-11-12']);
+  storage.validateState(s);assert.equal(finance.closePastDays(s,'2026-11-12').count,0);assert.equal(s.balance,7900000);
+  const out=views.compactDebts({state:s,now:'2026-11-12',money:String,icon:()=>'',button:()=>'',esc:String,dateLabel:String,kindNames:{},paymentEntries:finance.paymentEntries,debtFilter:'all'});
+  assert.match(out,/expense-paid-row[^>]*data-id="gas"/);assert.match(out,/expense-paid-row[^>]*data-id="repayment"/);
+});
+
+test('undoing an automatic past one-time settlement does not reapply it', () => {
+  const s=empty();s.balance=50000;s.autoFromDate='2026-11-12';
+  s.transactions=[{id:'bill',name:'Платёж',kind:'expense',amount:10000,repeat:'once',date:'2026-11-01'}];
+  finance.closePastDays(s,'2026-11-12');assert.equal(s.balance,40000);
+  finance.undoSettlement(s,'bill:2026-11-01');assert.equal(s.balance,50000);
+  storage.validateState(s);assert.equal(finance.closePastDays(s,'2026-11-13').count,0);assert.equal(s.balance,50000);
+});
+
+test('backfill accounts for past one-time income but does not replay older recurring schedules', () => {
+  const s=empty();s.balance=50000;s.autoFromDate='2026-11-12';
+  s.incomeSources=[{id:'income',name:'Доход',incomeType:'side',amount:30000,taxRate:0,salaryShare:10000,repeat:'once',date:'2026-11-01'}];
+  s.transactions=[{id:'monthly',name:'Подписка',kind:'expense',amount:1000,repeat:'monthly',date:'2026-10-01',day:5}];
+  const r=finance.closePastDays(s,'2026-11-12');assert.equal(r.count,1);assert.equal(s.balance,80000);
+  assert(!s.completed['monthly:2026-11-05']);storage.validateState(s);
 });

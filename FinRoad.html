@@ -844,17 +844,32 @@ function undoSettlement(state,key) {
   state.balance=addMoney(state.balance??0,-(entry.balanceDelta??entry.delta));
   const debtDelta=entry.debtDelta??entry.amount;
   if(debt&&debtDelta){if(debt.amount===null)throw new Error('Сначала укажи текущий остаток долга');debt.amount=addMoney(debt.amount,debtDelta);if(debt.kind==='card'&&debt.creditLimit!=null&&debt.cardBalance!=null)debt.cardBalance=addMoney(debt.cardBalance,-debtDelta);}
+  if(entry.automatic){
+    state.autoIgnored??={};state.autoIgnored[key]=true;
+  }
   delete state.completed[key];
 }
 
-// The watermark is the first calendar day whose events have not yet been closed.
+// The watermark is the first calendar day whose recurring events have not been closed.
 function closePastDays(state,now=today()) {
-  if(!state.autoFromDate){state.autoFromDate=now;return {changed:true,count:0,activated:true};}
-  if(state.autoFromDate>=now)return {changed:false,count:0,activated:false};
-  const events=eventsBetween(state,state.autoFromDate,addDays(now,-1));
-  for(const event of events)settle(state,event,event.date,true);
-  state.autoFromDate=now;
-  return {changed:true,count:events.length,activated:false};
+  const activated=!state.autoFromDate;
+  const start=state.autoFromDate||now;
+  const events=start<now?eventsBetween(state,start,addDays(now,-1)):[];
+  const onceItems=[...state.transactions,...(state.incomeSources||[]).flatMap(incomeTransactions)];
+  const oneOffs=onceItems.filter(item=>item.repeat==='once'&&!item.draft&&item.date&&item.date<now)
+    .map(item=>{
+      const linked=state.debts.find(debt=>debt.id===item.debtId);
+      return {...item,...(linked?{name:`Погашение · ${linked.name}`} : {}),scheduledDate:item.date,key:`${item.id}:${item.date}`,debt:false};
+    });
+  const unique=new Map();
+  for(const event of [...events,...oneOffs]){
+    if(!state.completed[event.key]&&!state.autoIgnored?.[event.key])unique.set(event.key,event);
+  }
+  const pending=[...unique.values()].sort((a,b)=>a.date.localeCompare(b.date)||(a.kind==='income'?-1:1)-(b.kind==='income'?-1:1)||a.name.localeCompare(b.name));
+  for(const event of pending)settle(state,event,event.date,true);
+  const changed=activated||start<now||pending.length>0;
+  if(activated||start<now)state.autoFromDate=now;
+  return {changed,count:pending.length,activated};
 }
 
 // Percentages are integer hundredths of a percent; rounding is to kopecks.
@@ -1098,6 +1113,7 @@ function validateState(input) {
   check(object(state)&&state.schema===1,'Это не резервная копия FinRoad');
   money(state.balance,true,true);date(state.balanceDate);
   if('autoFromDate' in state)date(state.autoFromDate);
+  if('autoIgnored' in state){check(object(state.autoIgnored)&&Object.keys(state.autoIgnored).length<=20000,'Некорректная история');for(const [key,value] of Object.entries(state.autoIgnored))check(key.length<=160&&value===true,'Некорректная история');}
   check(typeof state.demo==='boolean','Некорректный формат данных');
   delete state.reserve;
   state.incomeSources??=[];
@@ -1538,7 +1554,7 @@ function field(name,label,type='text',value='',extra=''){
 function select(name,label,options,value){return `<fieldset class="choice-field"><legend>${label}</legend><div class="choices">${Object.entries(options).map(([k,v])=>`<label><input type="radio" name="${name}" value="${k}" ${k===value?'checked':''}><span>${v}</span></label>`).join('')}</div></fieldset>`;}
 function openDialog(title,fields,submit,label='Сохранить'){$('#delete-dialog').hidden=true;delete $('#delete-dialog').dataset.action;delete $('#delete-dialog').dataset.id;$('#dialog-title').textContent=title;$('#dialog-fields').innerHTML=fields;$('#submit-dialog').textContent=label;$('#form-error').textContent='';dialogSubmit=submit;if(!$('#editor').open)$('#editor').showModal();queueMicrotask(()=>{if(!$('#editor').open)return;const inputs=[...$('#dialog-fields').querySelectorAll('input:not([type=hidden]):not([type=radio]):not([type=checkbox]),textarea,select')];inputs.find(input=>!input.disabled&&input.getClientRects().length)?.focus();});}
 function dialogDelete(action,id){if(!id)return;const button=$('#delete-dialog');button.hidden=false;button.dataset.action=action;button.dataset.id=id;}
-function closeDialog(){$('#editor').close();dialogSubmit=null;if(state?.autoFromDate!==today())render();}
+function closeDialog(){$('#editor').close();dialogSubmit=null;if(state)render();}
 function incomeDialog(id=null){
   const source=(state.incomeSources||[]).find(item=>item.id===id);
   const type=source?(source.incomeType||'salary'):incomeFilter==='all'?'salary':incomeFilter;
