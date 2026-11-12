@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+.playwright-cli/
+output/
+data/
+__pycache__/
+node_modules/
+.venv/
+.env
+.env.*
+*.sqlite3
+*.sqlite3-*
+finroad-*.json
+*.log

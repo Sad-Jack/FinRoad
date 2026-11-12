@@ -1,0 +1,11 @@
+const {test} = require('node:test');
+const assert = require('node:assert/strict');
+const {decide} = require('../app/sync/reconcile.js');
+const c = (localExists,dirty,base,remote) => decide({localExists,dirty,base,remote});
+test('first launch downloads existing remote data instead of replacing it',()=>{assert.deepEqual(c(false,false,null,'r1'),{action:'download',version:'r1'});assert.deepEqual(c(false,false,null,null),{action:'empty'});});
+test('first upload is conditional on an empty remote',()=>{assert.deepEqual(c(true,true,null,null),{action:'upload',expected:null});assert.equal(c(true,true,null,'r1').action,'conflict');});
+test('unchanged local copy accepts an updated remote',()=>{assert.deepEqual(c(true,false,'r1','r2'),{action:'download',version:'r2'});});
+test('offline edits conflict with remote changes and never choose a winner',()=>{assert.deepEqual(c(true,true,'r1','r2'),{action:'conflict',reason:'concurrent-changes'});});
+test('upload includes the expected remote version',()=>{assert.deepEqual(c(true,true,'r1','r1'),{action:'upload',expected:'r1'});assert.equal(c(true,false,'r1','r1').action,'current');});
+test('remote disappearance is not treated as permission to overwrite',()=>{assert.deepEqual(c(true,true,'r1',null),{action:'conflict',reason:'remote-missing'});assert.equal(c(true,false,'r1',null).action,'conflict');});
+test('invalid state is rejected',()=>{assert.throws(()=>c(false,true,null,null));assert.throws(()=>c(true,false,'',null));assert.throws(()=>c(false,false,'r1',null));});

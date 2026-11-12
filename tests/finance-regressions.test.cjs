@@ -3,8 +3,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const html = fs.readFileSync(path.join(__dirname, '..', 'FinRoad.html'), 'utf8');
-const script = html.split('<script>')[1].split('</script>')[0];
+const html = fs.readFileSync(path.join(__dirname, '..', 'app/index.html'), 'utf8') + fs.readFileSync(path.join(__dirname, '..', 'app/assets/styles.css'), 'utf8');
+const script = ['domain/calendar.js', 'domain/finance.js', 'views/plan.js', 'storage/state.js', 'domain/demo.js', 'ui/date-picker.js', 'ui/tooltip.js', 'ui/app.js'].map(file => fs.readFileSync(path.join(__dirname, '..', 'app', file), 'utf8')).join('\n');
 class FixedDate extends Date {
   constructor(...args) { if (args.length) super(...args); else super(2026, 10, 10, 12); }
 }
