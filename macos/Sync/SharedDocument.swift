@@ -47,7 +47,7 @@ struct SharedDocument {
     static func write(_ bytes: Data, to url: URL, expected: String?) throws {
         let canonicalBytes = try canonical(bytes)
         var error: NSError?; var result: Result<Void, Error>?
-        NSFileCoordinator().coordinate(writingItemAt: url, options: .forMerging, error: &error) { coordinated in
+        NSFileCoordinator().coordinate(writingItemAt: url, options: .forReplacing, error: &error) { coordinated in
             result = Result {
                 guard !hasConflicts(coordinated) else { throw SharedDocumentError.unresolved }
                 let exists = FileManager.default.fileExists(atPath: coordinated.path)

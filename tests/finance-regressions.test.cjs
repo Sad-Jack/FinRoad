@@ -436,13 +436,15 @@ test('automatic settlements remain saveable when a later planned repayment excee
   assert(finance.forecast(s,'2026-11-11','2026-11-30').events.some(e=>e.id==='future'));
 });
 
-test('automatic events are listed with an undo action', () => {
+test('automatic history is hidden on Mac but remains available in the browser', () => {
   const s=empty();s.balance=10000;
   s.transactions=[{id:'bill',name:'Связь',kind:'expense',amount:1000,repeat:'once',date:'2026-11-10'}];
   finance.closePastDays(s,'2026-11-11');
   const now='2026-11-11',end='2026-12-10',plan=finance.forecast(s,now,end);
   const out=views.compactPlan({state:s,now,end,plan,dateLabel:String,money:String,esc:String,kindNames:{}});
   assert.match(out,/Автоматически учтено: 1/);assert.match(out,/data-action="undo-auto" data-id="bill:2026-11-10"/);
+  const mac=views.compactPlan({state:s,now,end,plan,dateLabel:String,money:String,esc:String,kindNames:{},hideAutoHistory:true});
+  assert.doesNotMatch(mac,/Автоматически учтено|data-action="undo-auto"/);assert.equal(s.balance,9000);assert(s.completed['bill:2026-11-10']);
 });
 
 test('long creditor names do not block automatic settlement', () => {

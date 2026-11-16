@@ -45,6 +45,7 @@ final class App: NSObject, NSApplicationDelegate, WKUIDelegate, WKNavigationDele
         let fileItem = NSMenuItem(); bar.addItem(fileItem); let menu = NSMenu(title: "Файл"); fileItem.submenu = menu
         menu.addItem(withTitle: "Настроить синхронизацию iCloud Drive…", action: #selector(chooseSync), keyEquivalent: "")
         menu.addItem(withTitle: "Состояние синхронизации", action: #selector(showSyncStatus), keyEquivalent: "")
+        menu.addItem(withTitle: "Разрешить конфликт планов…", action: #selector(resolveMacConflict), keyEquivalent: "")
         menu.addItem(withTitle: "Отключить синхронизацию", action: #selector(disconnectSync), keyEquivalent: "")
         menu.addItem(.separator())
         menu.addItem(withTitle: "Настроить копию в iCloud Drive…", action: #selector(chooseBackup), keyEquivalent: "")
@@ -55,6 +56,28 @@ final class App: NSObject, NSApplicationDelegate, WKUIDelegate, WKNavigationDele
         NSApp.mainMenu = bar
     }
     func alert(_ message: String) { let a = NSAlert(); a.messageText = "FinRoad"; a.informativeText = message; a.runModal() }
+    @objc func resolveMacConflict() {
+        sync.reviewConflict { [weak self] result in
+            guard let self else {return}
+            switch result {
+            case .failure(let error): self.alert("Не удалось открыть конфликт: \(error.localizedDescription). Системные конфликты iCloud можно разрешить на iPhone; обе версии сохраняются.")
+            case .success(let review):
+                func summary(_ data: Data) -> String {
+                    guard let s=(try? JSONSerialization.jsonObject(with:data)) as? [String:Any] else {return "не удалось прочитать"}
+                    let formatter=NumberFormatter();formatter.locale=Locale(identifier:"ru_RU");formatter.numberStyle = .decimal;formatter.maximumFractionDigits=2
+                    let balance=(s["balance"] as? NSNumber).flatMap {formatter.string(from:NSNumber(value:$0.doubleValue/100))} ?? "—"
+                    let count=["transactions","debts","incomeSources"].reduce(0){$0 + ((s[$1] as? [Any])?.count ?? 0)}
+                    return "остаток \(balance) ₽, записей \(count)"
+                }
+                let dialog=NSAlert();dialog.messageText="Выбрать версию плана";dialog.informativeText="На Mac: \(summary(review.local))\nВ общем файле: \(summary(review.remote))\n\nСумма и количество записей — ориентир: другие поля могут отличаться. Перед применением обе версии сохранятся в локальную папку ConflictBackups."
+                dialog.addButton(withTitle:"Оставить Mac");dialog.addButton(withTitle:"Взять общий файл");dialog.addButton(withTitle:"Отмена")
+                let response=dialog.runModal();guard response == .alertFirstButtonReturn || response == .alertSecondButtonReturn else {return}
+                self.sync.resolveConflict(review,useLocal:response == .alertFirstButtonReturn) { outcome in
+                    switch outcome {case .success: self.alert("Версия применена, обе копии сохранены. Статус загрузки проверь в Finder.");self.sync.run();case .failure(let error):self.alert("Не удалось завершить выбор: \(error.localizedDescription). Проверь обе версии и копии в папке данных FinRoad.")}
+                }
+            }
+        }
+    }
     @objc func showSyncStatus() { alert(syncStatus) }
     @objc func disconnectSync() {
         do { try sync.disconnect(); syncStatus = "Синхронизация не настроена"; window.title = "FinRoad"; alert("Синхронизация отключена. Файл на Mac и документ в iCloud Drive сохранены.") }
@@ -98,7 +121,8 @@ final class App: NSObject, NSApplicationDelegate, WKUIDelegate, WKNavigationDele
             if op == "get" { if !fm.fileExists(atPath: file.path) { return "{}" }; let value = try String(contentsOf: file, encoding: .utf8); return encode(["value":value]) }
             if op == "export" {
                 guard let value = request["value"], let bytes = value.data(using: .utf8) else { throw NSError(domain: "FinRoad", code: 4) }
-                let panel = NSSavePanel(); panel.nameFieldStringValue = "finroad-backup.json"; panel.allowedContentTypes = [.json]
+                let formatter = DateFormatter(); formatter.locale = Locale(identifier: "en_US_POSIX"); formatter.calendar = Calendar(identifier: .gregorian); formatter.timeZone = .current; formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+                let panel = NSSavePanel(); panel.nameFieldStringValue = "finroad-backup-\(formatter.string(from: Date())).json"; panel.allowedContentTypes = [.json]
                 if panel.runModal() == .OK, let url = panel.url { try bytes.write(to: url, options: .atomic); return encode(["value":"saved"]) }
                 return encode(["value":"cancelled"])
             }

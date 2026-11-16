@@ -1,0 +1,26 @@
+// Creates fictional FinRoad data, never reads user files or iCloud.
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const root = path.resolve(__dirname, '../../..');
+const js = ['app/domain/calendar.js','app/domain/finance.js','app/storage/state.js'].map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+const context = vm.createContext({crypto:require('node:crypto').webcrypto,structuredClone,Date});
+const {finance,storage} = vm.runInContext(js+';({finance:module_1,storage:module_3})',context);
+const today=finance.today();
+const state=storage.emptyState(today);state.balance=18000000;
+const makePayment=(type,name,amount,payments,extra={})=>finance.savePaymentEntry(state,{type,name,amount,payments,...extra});
+makePayment('regular','Интернет (пример)',null,[{repeat:'monthly',day:20,amount:160000}]);
+makePayment('regular','Покупка (пример)',null,[{repeat:'once',date:finance.addDays(today,6),amount:475000}]);
+makePayment('regular','Черновик без даты',null,[{repeat:'once',date:null,amount:null}]);
+makePayment('loan','Учебный кредит',8000000,[{repeat:'monthly',day:18,amount:800000}]);
+makePayment('mortgage','Учебная ипотека',90000000,[{repeat:'monthly',day:25,amount:4200000}]);
+makePayment('personal','Частный долг (пример)',3000000,[{repeat:'once',date:finance.addDays(today,12),amount:500000}]);
+makePayment('card','Карта (пример)',2000000,[{repeat:'once',date:finance.addDays(today,15),amount:400000}],{creditLimit:5000000,cardBalance:3000000});
+finance.saveIncomeSource(state,{id:'fiction-salary',name:'Зарплата (пример)',incomeType:'salary',amount:15000000,taxRate:1300,salaryShare:6000,repeat:'monthly',date:finance.addDays(today,8),advanceDate:finance.addDays(today,18)});
+finance.saveIncomeSource(state,{id:'fiction-extra',name:'Разовое поступление (пример)',incomeType:'other',amount:250000,taxRate:0,salaryShare:10000,repeat:'once',date:finance.addDays(today,4)});
+state.transactions.push({id:'fiction-settled',name:'Уже выполненный платёж',kind:'expense',amount:100000,repeat:'once',date:today});
+const event=finance.eventsBetween(state,today,today).find(e=>e.id==='fiction-settled');finance.settle(state,event,today);
+const valid=storage.validateState(state);
+const output=process.argv[2];if(!output)throw Error('Укажи путь для тестового файла');
+fs.writeFileSync(output,JSON.stringify(valid,null,2)+'\n');
+console.log('Создан тестовый план: расходы, долги, зарплата, разовый доход, черновик и выполненное событие.');

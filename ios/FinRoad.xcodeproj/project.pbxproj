@@ -1,0 +1,402 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0DF077ABC285C0FE82451430 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1B3DF50032A46BADC48B8E8 /* Foundation.framework */; };
+		135C20957C4946CFA292AD13 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 730FE334BA674565BD04914F /* Assets.xcassets */; };
+		324BE65FE6A9B0FFE934EB57 /* FinRoadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4AD09FD50160BE77A37FE41 /* FinRoadApp.swift */; };
+		8A2053C28500374890EAA8E7 /* FinanceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D1777DED890D911380CEBD /* FinanceEngine.swift */; };
+		B4A2289A08B6FB14B6172BA0 /* CloudConflicts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B030BDA2E56895082C36121B /* CloudConflicts.swift */; };
+		C900167252F01C897159D9AA /* PlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B33F260C388E9F59E939F5E /* PlanStore.swift */; };
+		D2466F62DDAD37B3DB0CD2AF /* SharedDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D0F37C62A0571103CC78CB /* SharedDocument.swift */; };
+		DFE2E217CA780CB0CA62A385 /* SyncSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5846F90F31D69E6E47F2D2AF /* SyncSession.swift */; };
+		F494B7F466C900447EDB5AFE /* SyncRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C9CE2425EC16A30C64D906 /* SyncRecord.swift */; };
+		F4F9911752061AE407BE3AB0 /* SyncPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC87E91AA9715DE89809FE6A /* SyncPolicy.swift */; };
+		F8F05E96AAC013A75AC4153A /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB395617F6529709FE24D94C /* DocumentPicker.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		730FE334BA674565BD04914F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B33F260C388E9F59E939F5E /* PlanStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlanStore.swift; sourceTree = "<group>"; };
+		5846F90F31D69E6E47F2D2AF /* SyncSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncSession.swift; sourceTree = "<group>"; };
+		62D5D1B8EB888A467C226AD6 /* finance.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = finance.js; path = ../app/domain/finance.js; sourceTree = "<group>"; };
+		75712B2A8883FE16CD4771BD /* calendar.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = calendar.js; path = ../app/domain/calendar.js; sourceTree = "<group>"; };
+		8C0FA4873200399E79B9993F /* state.js */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.javascript; name = state.js; path = ../app/storage/state.js; sourceTree = "<group>"; };
+		AB395617F6529709FE24D94C /* DocumentPicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		B030BDA2E56895082C36121B /* CloudConflicts.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CloudConflicts.swift; sourceTree = "<group>"; };
+		B4AD09FD50160BE77A37FE41 /* FinRoadApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FinRoadApp.swift; sourceTree = "<group>"; };
+		BC87E91AA9715DE89809FE6A /* SyncPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SyncPolicy.swift; path = ../macos/Sync/SyncPolicy.swift; sourceTree = "<group>"; };
+		C1B3DF50032A46BADC48B8E8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		C2D0F37C62A0571103CC78CB /* SharedDocument.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SharedDocument.swift; path = ../macos/Sync/SharedDocument.swift; sourceTree = "<group>"; };
+		C8D1777DED890D911380CEBD /* FinanceEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FinanceEngine.swift; sourceTree = "<group>"; };
+		E1C9CE2425EC16A30C64D906 /* SyncRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SyncRecord.swift; sourceTree = "<group>"; };
+		FB6375E5DC9CA90A6E36ECDA /* FinRoad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinRoad.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2465D1A3603CC1752F97FFFE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0DF077ABC285C0FE82451430 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5527E223AD0033DFE5A21EC4 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				C1B3DF50032A46BADC48B8E8 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		6F7C2A9E50DA4F7C9BC469CE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FB6375E5DC9CA90A6E36ECDA /* FinRoad.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A131D9B60A83286AE68B960D /* FinRoad */ = {
+			isa = PBXGroup;
+			children = (
+				730FE334BA674565BD04914F /* Assets.xcassets */,
+				B4AD09FD50160BE77A37FE41 /* FinRoadApp.swift */,
+				4B33F260C388E9F59E939F5E /* PlanStore.swift */,
+				C8D1777DED890D911380CEBD /* FinanceEngine.swift */,
+				E1C9CE2425EC16A30C64D906 /* SyncRecord.swift */,
+				5846F90F31D69E6E47F2D2AF /* SyncSession.swift */,
+				AB395617F6529709FE24D94C /* DocumentPicker.swift */,
+				B030BDA2E56895082C36121B /* CloudConflicts.swift */,
+			);
+			path = FinRoad;
+			sourceTree = "<group>";
+		};
+		B479B18DF6AFD3BB5249ABAC /* Shared Finance */ = {
+			isa = PBXGroup;
+			children = (
+				75712B2A8883FE16CD4771BD /* calendar.js */,
+				62D5D1B8EB888A467C226AD6 /* finance.js */,
+				8C0FA4873200399E79B9993F /* state.js */,
+				BC87E91AA9715DE89809FE6A /* SyncPolicy.swift */,
+				C2D0F37C62A0571103CC78CB /* SharedDocument.swift */,
+			);
+			name = "Shared Finance";
+			sourceTree = "<group>";
+		};
+		DF0975444E7EB377361D8739 = {
+			isa = PBXGroup;
+			children = (
+				6F7C2A9E50DA4F7C9BC469CE /* Products */,
+				ECA2A59525D4E947A066DCF7 /* Frameworks */,
+				A131D9B60A83286AE68B960D /* FinRoad */,
+				B479B18DF6AFD3BB5249ABAC /* Shared Finance */,
+			);
+			sourceTree = "<group>";
+		};
+		ECA2A59525D4E947A066DCF7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5527E223AD0033DFE5A21EC4 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3A5346CEE4049B2C0DF0E403 /* FinRoad */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B89FF0CA8DAB1D8415535BFF /* Build configuration list for PBXNativeTarget "FinRoad" */;
+			buildPhases = (
+				CDAF4EC6F3128F5E7720FECE /* Sources */,
+				2465D1A3603CC1752F97FFFE /* Frameworks */,
+				45659DD5D8C8BA6014AE50EE /* Resources */,
+				6E82CC2515FD984E7C3445BA /* Copy financial engine */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FinRoad;
+			productName = FinRoad;
+			productReference = FB6375E5DC9CA90A6E36ECDA /* FinRoad.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		588BA1F3677C3077482F80EB /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					3A5346CEE4049B2C0DF0E403 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D3A7B6ABE47EE6307AC63AB2 /* Build configuration list for PBXProject "FinRoad" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DF0975444E7EB377361D8739;
+			productRefGroup = 6F7C2A9E50DA4F7C9BC469CE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3A5346CEE4049B2C0DF0E403 /* FinRoad */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		45659DD5D8C8BA6014AE50EE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				135C20957C4946CFA292AD13 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6E82CC2515FD984E7C3445BA /* Copy financial engine */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/../app/domain/calendar.js",
+				"$(SRCROOT)/../app/domain/finance.js",
+				"$(SRCROOT)/../app/storage/state.js",
+			);
+			name = "Copy financial engine";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Finance/calendar.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Finance/finance.js",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Finance/state.js",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nmkdir -p \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Finance\"\ncp \"$SRCROOT/../app/domain/calendar.js\" \"$SRCROOT/../app/domain/finance.js\" \"$SRCROOT/../app/storage/state.js\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Finance/\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CDAF4EC6F3128F5E7720FECE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				324BE65FE6A9B0FFE934EB57 /* FinRoadApp.swift in Sources */,
+				C900167252F01C897159D9AA /* PlanStore.swift in Sources */,
+				8A2053C28500374890EAA8E7 /* FinanceEngine.swift in Sources */,
+				F494B7F466C900447EDB5AFE /* SyncRecord.swift in Sources */,
+				DFE2E217CA780CB0CA62A385 /* SyncSession.swift in Sources */,
+				F4F9911752061AE407BE3AB0 /* SyncPolicy.swift in Sources */,
+				D2466F62DDAD37B3DB0CD2AF /* SharedDocument.swift in Sources */,
+				F8F05E96AAC013A75AC4153A /* DocumentPicker.swift in Sources */,
+				B4A2289A08B6FB14B6172BA0 /* CloudConflicts.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		021B40FCE7B4A3F64FB8A00B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FinRoad;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = local.finroad.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7ADE9B3D4B02CA02966969A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		BD2EAD1BB87324E53404780C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FinRoad;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = local.finroad.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		E26AA3030F6BDAD00586E6A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B89FF0CA8DAB1D8415535BFF /* Build configuration list for PBXNativeTarget "FinRoad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				021B40FCE7B4A3F64FB8A00B /* Release */,
+				BD2EAD1BB87324E53404780C /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3A7B6ABE47EE6307AC63AB2 /* Build configuration list for PBXProject "FinRoad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7ADE9B3D4B02CA02966969A7 /* Debug */,
+				E26AA3030F6BDAD00586E6A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 588BA1F3677C3077482F80EB /* Project object */;
+}

@@ -41,6 +41,49 @@ import Foundation
   let final = try SharedDocument.read(remoteURL); let finalBalance = try balance(final); check(finalBalance == 5, "remote changed during conflict")
   let finalLocal = try JSONSerialization.jsonObject(with:Data(contentsOf:localURL)) as! [String:Any]
   check((finalLocal["state"] as! [String:Any])["balance"] as! Int == 4, "local changed during conflict")
+  var reviewResult: Result<SyncManager.ConflictReview,Error>?
+  manager.reviewConflict { reviewResult=$0 }
+  let reviewDeadline=Date().addingTimeInterval(5);while reviewResult == nil && Date()<reviewDeadline { RunLoop.current.run(until:Date().addingTimeInterval(0.01)) }
+  guard let reviewResult else {fatalError("review timeout")};let review=try reviewResult.get()
+  var resolution:Result<Void,Error>?
+  manager.resolveConflict(review,useLocal:false) { resolution=$0 }
+  let resolveDeadline=Date().addingTimeInterval(5);while resolution == nil && Date()<resolveDeadline { RunLoop.current.run(until:Date().addingTimeInterval(0.01)) }
+  guard let resolution else {fatalError("resolution timeout")};try resolution.get()
+  let resolved=try JSONSerialization.jsonObject(with:Data(contentsOf:localURL)) as! [String:Any]
+  check((resolved["state"] as! [String:Any])["balance"] as! Int == 5,"resolution chose wrong version")
+  let archives=try fm.contentsOfDirectory(at:localDir.appendingPathComponent("ConflictBackups"),includingPropertiesForKeys:nil)
+  check(archives.count==1,"missing conflict archives")
+  try saveLocal(6)
+  let latest=try SharedDocument.read(remoteURL)
+  try SharedDocument.write(try JSONSerialization.data(withJSONObject:state(7)),to:remoteURL,expected:SharedDocument.hash(latest))
+  run(); check(status.contains("разные версии"),"second conflict")
+  var secondReview:Result<SyncManager.ConflictReview,Error>?
+  manager.reviewConflict { secondReview=$0 }
+  let d1=Date().addingTimeInterval(5);while secondReview == nil && Date()<d1 { RunLoop.current.run(until:Date().addingTimeInterval(0.01)) }
+  let oldReview=try secondReview!.get()
+  let prior=try SharedDocument.read(remoteURL)
+  try SharedDocument.write(try JSONSerialization.data(withJSONObject:state(8)),to:remoteURL,expected:SharedDocument.hash(prior))
+  var staleResult:Result<Void,Error>?
+  manager.resolveConflict(oldReview,useLocal:true) { staleResult=$0 }
+  let d2=Date().addingTimeInterval(5);while staleResult == nil && Date()<d2 { RunLoop.current.run(until:Date().addingTimeInterval(0.01)) }
+  do { try staleResult!.get();fatalError("stale Mac conflict selection accepted") } catch SharedDocumentError.changed {}
+  let still=try SharedDocument.read(remoteURL); let stillBalance=try balance(still);check(stillBalance==8,"stale choice overwrote shared version")
+  func dated(_ value:Int,_ date:String) -> [String:Any] { var s=state(value);s["autoFromDate"]=date;return s }
+  let baseline=try SharedDocument.canonical(JSONSerialization.data(withJSONObject:dated(10,"2026-11-14")))
+  let checkpoint=dated(10,"2026-11-15"), incoming=dated(20,"2026-11-14")
+  try JSONSerialization.data(withJSONObject:["revision":3,"state":checkpoint]).write(to:localURL,options:.atomic)
+  try JSONEncoder().encode(SyncManager.Configuration(path:remoteURL.path,base:SharedDocument.hash(baseline))).write(to:manager.configURL,options:.atomic)
+  try SharedDocument.write(try JSONSerialization.data(withJSONObject:incoming),to:remoteURL,expected:SharedDocument.hash(still))
+  run();check(status.contains("получены изменения"),"checkpoint blocked remote update")
+  let merged=try JSONSerialization.jsonObject(with:Data(contentsOf:localURL)) as! [String:Any]
+  let mergedState=merged["state"] as! [String:Any]
+  check(mergedState["balance"] as! Int == 20 && mergedState["autoFromDate"] as! String == "2026-11-15","checkpoint merge lost data")
+  run();let uploaded=try SharedDocument.read(remoteURL)
+  let uploadedState=try JSONSerialization.jsonObject(with:uploaded) as! [String:Any]
+  check(uploadedState["balance"] as! Int == 20 && uploadedState["autoFromDate"] as! String == "2026-11-15","checkpoint not uploaded")
+  try JSONSerialization.data(withJSONObject:["revision":4,"state":dated(30,"2026-11-16")]).write(to:localURL,options:.atomic)
+  try SharedDocument.write(try JSONSerialization.data(withJSONObject:dated(25,"2026-11-15")),to:remoteURL,expected:SharedDocument.hash(uploaded))
+  run();check(status.contains("разные версии"),"financial conflict was silently merged")
   print("Sync manager upload, download and conflict tests passed")
  }
 }

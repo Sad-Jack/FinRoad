@@ -98,7 +98,7 @@ function render(){
   $('#current-date').innerHTML=`${icon('calendar')}<time datetime="${now}">${dateLabel(now,true)}</time>`;
   $('#page-name').textContent=titles[page];
   $('#navigation').innerHTML=[['overview','План'],['debts','Расход'],['income','Приход']].map(([key,title])=>`<button class="nav-button ${key===page?'active':''}" data-action="nav-${key}" ${key===page?'aria-current="page"':''}>${icon(key)}<span>${title}</span></button>`).join('');
-  const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,incomeFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries};
+  const ctx={state,now,end,plan,forecastEnd,forecast,dateLabel,shortDate,money,esc,icon,button,kindNames,debtFilter,incomeFilter,plannedRepayments,unplannedDebtAmount,loanPayment,incomeBreakdown,paymentEntries,hideAutoHistory:Boolean(window.finroadNativeStorage)};
   if(!editingBalance)renderBalance();
   const hasMortgage=state.debts.some(debt=>debt.kind==='mortgage');
   if(!hasMortgage)showMortgageDebt=false;
