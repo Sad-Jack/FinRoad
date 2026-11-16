@@ -87,38 +87,81 @@ struct PlanView: View {
     @State private var editingBalance = false
     @State private var balanceText = ""
     @State private var selectedEvent: EventAction?
+    private let summaryColumnSpacing: CGFloat = 20
     private var rows: [PlanRow] { store.forecast?.rows ?? [] }
     private var days: [String] { var seen = Set<String>(); return rows.map(\.date).filter { seen.insert($0).inserted } }
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 if let plan = store.plan {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(alignment: .top, spacing: 12) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Сейчас в наличии").font(.caption).foregroundStyle(.secondary)
-                                Button { balanceText = plan.balance.map { String(Double($0) / 100) } ?? ""; store.isEditing = true; editingBalance = true } label: {
-                                    HStack(spacing: 5) { Text(rubles(plan.balance)).font(.headline); Image(systemName: "pencil").font(.caption2) }
-                                }.buttonStyle(.plain).disabled(store.syncing).accessibilityLabel("Изменить текущий остаток: \(rubles(plan.balance))")
-                            }.frame(maxWidth: .infinity, alignment: .leading)
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text("Свободно на дату").font(.caption).foregroundStyle(.secondary)
-                                Text(plan.balance == nil ? "—" : rubles(store.forecast?.balance)).font(.headline).foregroundStyle(accent)
-                            }.frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(spacing: 10) {
+                        HStack(spacing: 10) {
+                            Text("Сейчас в наличии")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                            Button {
+                                balanceText = plan.balance.map { String(Double($0) / 100) } ?? ""
+                                store.isEditing = true
+                                editingBalance = true
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Text(rubles(plan.balance))
+                                        .font(.title2.weight(.semibold))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                    Image(systemName: "pencil").font(.caption)
+                                }
+                                .frame(minHeight: 34)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(store.syncing)
+                            .accessibilityLabel("Изменить текущий остаток: \(rubles(plan.balance))")
                         }
-                        HStack(spacing: 4) {
-                            Text("Дата расчёта").font(.caption).foregroundStyle(.secondary)
-                            Spacer(minLength: 0)
-                            DatePicker("Дата расчёта", selection: $store.selectedDate, in: Date.now..., displayedComponents: .date)
-                                .labelsHidden().environment(\.locale, Locale(identifier: "ru_RU")).scaleEffect(0.85, anchor: .trailing)
-                        }.frame(height: 27)
+                        Divider()
+                        HStack(spacing: summaryColumnSpacing) {
+                            VStack(spacing: 3) {
+                                Text("Дата расчёта").font(.caption).foregroundStyle(.secondary)
+                                DatePicker("Дата расчёта", selection: $store.selectedDate, in: Date.now..., displayedComponents: .date)
+                                    .datePickerStyle(.compact)
+                                    .labelsHidden()
+                                    .environment(\.locale, Locale(identifier: "ru_RU"))
+                            }.frame(maxWidth: .infinity)
+                            VStack(spacing: 3) {
+                                Text("Свободно на дату").font(.caption).foregroundStyle(.secondary)
+                                Text(plan.balance == nil ? "—" : rubles(store.forecast?.balance))
+                                    .font(.title2.weight(.semibold))
+                                    .foregroundStyle(accent)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.7)
+                                    .frame(minHeight: 34)
+                            }.frame(maxWidth: .infinity)
+                        }
+                        .multilineTextAlignment(.center)
+                        .overlay {
+                            Rectangle()
+                                .fill(.white.opacity(0.1))
+                                .frame(width: 1)
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
                         if let shortfall = store.forecast?.firstShortfall, plan.balance != nil {
                             HStack(spacing: 4) { Image(systemName:"exclamationmark.triangle.fill"); Text("Нехватка \(planDate(shortfall.date)) · \(rubles(shortfall.balance))") }
-                                .font(.caption.bold()).foregroundStyle(.pink).fixedSize(horizontal: false, vertical: true)
+                                .font(.caption.bold()).foregroundStyle(.pink).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                         }
-                    }.padding(12).frame(maxWidth: .infinity, alignment: .leading).background(panel, in: RoundedRectangle(cornerRadius: 14))
+                    }.padding(12).frame(maxWidth: .infinity).background(panel, in: RoundedRectangle(cornerRadius: 14))
                     if let error=store.accountingError { Label("Не удалось автоматически учесть события: \(error)", systemImage:"exclamationmark.triangle").font(.footnote).foregroundStyle(.pink) }
-                    HStack { Text("План").font(.headline); Spacer(); if let f=store.forecast { Text("+\(rubles(f.income))  −\(rubles(f.expense))").font(.caption2).foregroundStyle(.secondary) } }
+                    HStack(alignment: .firstTextBaseline) {
+                        Text("План").font(.headline)
+                        Spacer()
+                        if let forecast = store.forecast {
+                            HStack(spacing: 14) {
+                                Text("+\(rubles(forecast.income))").foregroundStyle(mint)
+                                Text("−\(rubles(forecast.expense))").foregroundStyle(.pink)
+                            }.font(.caption2)
+                        }
+                    }
                     if !rows.isEmpty {
                         VStack(spacing: 0) {
                             ForEach(days, id: \.self) { day in

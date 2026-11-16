@@ -17,6 +17,9 @@ const mobileDemo = (() => {
     const cash = value => value == null ? '—' : money(value);
     const balance = cash(state.balance);
     const projected = state.balance == null || plan.error ? '—' : money(plan.balance);
+    const calculationDate = new Date(`${end}T00:00:00Z`).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC',
+    });
     const shortfall = state.balance != null && plan.firstShortfall;
     const warning = shortfall ? `<p class="mobile-warning"><span aria-hidden="true">⚠</span> Нехватка ${formatDate(shortfall.date)} · ${money(shortfall.balance)}</p>` : '';
     const days = new Map();
@@ -33,19 +36,29 @@ const mobileDemo = (() => {
         <strong class="${event.kind === 'income' ? 'mobile-positive' : 'mobile-negative'}">${event.kind === 'income' ? '+' : '−'}${money(event.amount)}</strong>
       </button>`).join('')}
     </section>`).join('');
-    const totals = plan.error ? '' : `+${money(plan.income)} &nbsp; −${money(plan.expense)}`;
+    const totals = plan.error ? '' : `<small class="mobile-plan-totals">
+      <span class="mobile-positive">+${money(plan.income)}</span>
+      <span class="mobile-negative">−${money(plan.expense)}</span>
+    </small>`;
     return `<div class="mobile-view">
       <section class="mobile-card mobile-summary" aria-label="Прогноз остатка">
+        <div class="mobile-cash">
+          <small>Сейчас в наличии</small>
+          <button type="button" class="mobile-balance" data-action="mobile-balance" aria-label="Изменить текущий остаток: ${balance}">${balance} ${icon('edit')}</button>
+        </div>
         <div class="mobile-metrics">
-          <div><small>Сейчас в наличии</small><button type="button" class="mobile-balance" data-action="mobile-balance" aria-label="Изменить текущий остаток: ${balance}">${balance} ${icon('edit')}</button></div>
+          <div>
+            <small>Дата расчёта</small>
+            <label class="forecast-date mobile-date" data-date-trigger>
+              <span aria-hidden="true">${calculationDate}</span>
+              <input id="forecast-date" type="date" value="${end}" min="${now}" max="2100-12-31" aria-label="Дата расчёта">
+            </label>
+          </div>
           <div><small>Свободно на дату</small><strong class="mobile-projected">${projected}</strong></div>
         </div>
-        <label class="mobile-date-row" for="forecast-date">Дата расчёта
-          <input id="forecast-date" class="mobile-date" type="date" lang="ru" value="${end}" min="${now}" max="2100-12-31">
-        </label>
         ${warning}
       </section>
-      <div class="mobile-plan-heading"><h1>План</h1><small>${totals}</small></div>
+      <div class="mobile-plan-heading"><h1>План</h1>${totals}</div>
       ${events ? `<div class="mobile-card mobile-events">${events}</div>` : `<p class="mobile-card mobile-note">${plan.error ? esc(plan.error) : 'На выбранный период событий нет.'}</p>`}
     </div>`;
   }

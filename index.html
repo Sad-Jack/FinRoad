@@ -1198,7 +1198,7 @@ document.addEventListener('visibilitychange',()=>{
 try{store=isDemo?demoStore(today()):browserStore(window.localStorage);({state,revision}=store.load(today()));render();}
 catch(error){$('#app').innerHTML=`<section class="panel empty"><h2>Не удалось открыть хранилище</h2><p>${esc(error.message)}</p><p>Открой файл в обычном окне браузера с разрешённым сохранением данных. Существующие записи не перезаписаны.</p>${store?button('Импорт резервной копии','import',true,'up'):''}</section>`;}
 
-initDatePickers({selector:'input[type="date"]:not(.mobile-date)'});
+initDatePickers();
 module_tooltip.initTooltips();
 
 return {};
