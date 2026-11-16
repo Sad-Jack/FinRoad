@@ -1,6 +1,5 @@
 const module_2 = (() => {
-function compactPlan(ctx) {
-  const {state,now,end,plan,dateLabel,money,esc,kindNames}=ctx;
+function planRows({state,now,end,plan}) {
   const pending=plan.points.filter(point=>point.event).map(({event,balance})=>({...event,running:balance}));
   const completed=Object.entries(state.completed).filter(([,entry])=>entry.planEvent&&entry.date>=now&&entry.date<=end)
     .map(([key,entry])=>({...entry.planEvent,key,completed:true,delta:entry.balanceDelta??entry.delta}));
@@ -13,6 +12,12 @@ function compactPlan(ctx) {
     completedBalance+=BigInt(event.delta);
     event.running=completedBalance>=BigInt(Number.MIN_SAFE_INTEGER)&&completedBalance<=BigInt(Number.MAX_SAFE_INTEGER)?Number(completedBalance):null;
   }
+  return rows;
+}
+
+function compactPlan(ctx) {
+  const {state,now,end,plan,dateLabel,money,esc,kindNames}=ctx;
+  const rows=planRows(ctx);
   const eventDetails=e=>{
     if(e.kind==='income'){
       const source=state.incomeSources?.find(item=>item.id===e.sourceId);
@@ -35,7 +40,7 @@ function compactPlan(ctx) {
     if(days[days.length-1]?.date!==event.date)days.push({date:event.date,events:[]});
     days[days.length-1].events.push(event);
   }
-  const minimumBalance=pending.reduce((minimum,e)=>Math.min(minimum,e.running),Infinity);
+  const minimumBalance=plan.points.reduce((minimum,point)=>point.event?Math.min(minimum,point.balance):minimum,Infinity);
   const countForm=new Intl.PluralRules('ru').select(rows.length);
   const countLabel={one:'событие',few:'события',many:'событий'}[countForm] || 'событий';
   const crossesYear=now.slice(0,4)!==end.slice(0,4);
@@ -109,5 +114,5 @@ function headerForecast({state,now,end,plan,forecastEnd,forecast,dateLabel,money
   return `<div class="header-forecast-value" data-date-trigger data-tooltip="Выбрать дату расчёта"><span>Свободно по <label class="forecast-date" data-tooltip="Выбрать дату расчёта"><span>${dateLabel(selected,selected.slice(0,4)!==now.slice(0,4))}</span><input id="forecast-date" type="date" value="${selected}" min="${now}" max="2100-12-31" aria-label="Изменить дату расчёта: ${dateLabel(selected,true)}"></label></span><strong class="${amount<0?'negative':''}" data-tooltip="Остаток на конец выбранной даты с учётом поступлений и платежей">${state.balance===null||plan.error?'—':money(amount)}</strong></div>`;
 }
 
-return {compactPlan,compactDebts,compactIncome,headerForecast};
+return {planRows,compactPlan,compactDebts,compactIncome,headerForecast};
 })();

@@ -1,7 +1,7 @@
 const module_5 = (() => {
 const {monthEnd} = module_1;
 // A shared, local calendar for every date field, including fields inside dialogs.
-function initDatePickers(){
+function initDatePickers({selector='input[type="date"]'}={}){
   const popup=document.createElement('div');
   popup.className='date-picker';popup.id='date-picker';popup.setAttribute('popover','auto');
   popup.setAttribute('role','dialog');popup.setAttribute('aria-label','Выбрать дату');
@@ -79,8 +79,8 @@ function initDatePickers(){
     event.preventDefault();cursor=clamp(iso(d));shown=cursor.slice(0,7);draw(true);
   });
   popup.addEventListener('toggle',()=>{if(!popup.matches(':popover-open'))input?.setAttribute('aria-expanded','false');});
-  document.addEventListener('click',event=>{const target=event.target.closest('input[type="date"]')||event.target.closest('[data-date-trigger]')?.querySelector('input[type="date"]');if(target&&!target.disabled&&!target.readOnly){event.preventDefault();open(target);}},true);
-  document.addEventListener('keydown',event=>{if(event.target.matches('input[type="date"]')&&['Enter',' ','ArrowDown'].includes(event.key)&&!event.target.disabled&&!event.target.readOnly){event.preventDefault();open(event.target);}},true);
+  document.addEventListener('click',event=>{const target=event.target.closest(selector)||event.target.closest('[data-date-trigger]')?.querySelector(selector);if(target&&!target.disabled&&!target.readOnly){event.preventDefault();open(target);}},true);
+  document.addEventListener('keydown',event=>{if(event.target.matches(selector)&&['Enter',' ','ArrowDown'].includes(event.key)&&!event.target.disabled&&!event.target.readOnly){event.preventDefault();open(event.target);}},true);
   document.addEventListener('close',event=>{if(event.target.contains(popup))close(false);},true);
   window.addEventListener('resize',()=>{if(popup.matches(':popover-open'))position();});
   document.addEventListener('scroll',event=>{if(popup.matches(':popover-open')&&!popup.contains(event.target))position();},true);
