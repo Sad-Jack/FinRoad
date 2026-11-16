@@ -142,7 +142,7 @@
   .mobile-positive { color: var(--mint); }
   .mobile-negative { color: var(--red); }
   .mobile-event > strong { font-size: 14px; font-weight: 650; white-space: nowrap; }
-  .mobile-section-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 14px; }
+  .mobile-section-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
   .mobile-section-header h1 { font-size: 32px; line-height: 1.2; letter-spacing: -.025em; }
   .mobile-section-header button {
     display: grid;

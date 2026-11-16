@@ -206,6 +206,19 @@ struct Metric: View { let label: String; let value: String
 }
 extension View { func card() -> some View { self.padding(16).frame(maxWidth: .infinity, alignment: .leading).background(panel, in: RoundedRectangle(cornerRadius: 16)) } }
 
+private struct TabPageHeading<Trailing: View>: View {
+    let title: String
+    @ViewBuilder var trailing: () -> Trailing
+
+    var body: some View {
+        HStack {
+            Text(title).font(.largeTitle.bold()).accessibilityAddTraits(.isHeader)
+            Spacer()
+            trailing()
+        }.frame(minHeight: 44)
+    }
+}
+
 struct EditableItem: Identifiable { let entry: Entry; let section: String; var id: String { section + ":" + entry.id } }
 struct EntriesView: View {
     enum Collection { case expense, income }
@@ -245,8 +258,27 @@ struct EntriesView: View {
             ForEach(entries) { item in Button { store.isEditing = true; selection = item } label: {
                 HStack(alignment: .top) { VStack(alignment: .leading, spacing: 5) { Text(item.entry.name).font(.headline); Text(description(for:item)).font(.caption).foregroundStyle(.secondary) }; Spacer(); Text(rubles(item.entry.amount)).font(.subheadline.bold()); Image(systemName:"chevron.right").font(.caption).foregroundStyle(.secondary) }.card()
             }.buttonStyle(.plain).disabled(store.syncing) }
-        }.padding() }.background(ink).navigationTitle(title)
-        .toolbar { ToolbarItem(placement: .primaryAction) { Button { store.isEditing = true; adding = true } label: { Label(collection == .income ? "Добавить доход" : "Добавить расход", systemImage: "plus") }.disabled(store.syncing || store.plan == nil) } }
+        }.padding(.horizontal, 16).padding(.bottom, 16) }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            TabPageHeading(title: title) {
+                Button {
+                    store.isEditing = true
+                    adding = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.title2.weight(.medium))
+                        .foregroundStyle(accent)
+                        .frame(width: 44, height: 44)
+                        .background(.white.opacity(0.04), in: Circle())
+                        .overlay { Circle().strokeBorder(accent.opacity(0.18)) }
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(collection == .income ? "Добавить доход" : "Добавить расход")
+                .disabled(store.syncing || store.plan == nil)
+            }.padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 10).background(ink)
+        }
+        .background(ink).toolbar(.hidden, for: .navigationBar)
         .sheet(item: $selection, onDismiss: { store.editorClosed() }) { item in EntryEditor(item: item) }
         .sheet(isPresented: $adding, onDismiss: { store.editorClosed() }) { NewEntryEditor(income: collection == .income) }
     }
@@ -537,7 +569,12 @@ struct MoreView: View {
                 Text("Остаток и количество записей — ориентир. Другие поля тоже могут отличаться.").font(.footnote).foregroundStyle(.secondary)
             }.card()
         }
-    }.padding() }.background(ink).navigationTitle("Ещё")
+    }.padding(.horizontal, 16).padding(.bottom, 16) }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            TabPageHeading(title: "Ещё") { EmptyView() }
+                .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 14).background(ink)
+        }
+        .background(ink).toolbar(.hidden, for: .navigationBar)
         .fileImporter(isPresented:$importingBackup, allowedContentTypes:[.json]) { result in
             store.isEditing=true
             do { pendingImport=try store.readImport(result.get()); confirmingImport=true }
